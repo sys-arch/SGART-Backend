@@ -70,4 +70,46 @@ public class UserTest {
         user.setProfile("User");
         assertEquals("User", user.getProfile());
     }
+    
+    @Test
+	public void testSetPassword() {
+		user.setPassword("newPassword123");
+		assertEquals("newPassword123", user.getPassword());
+	}
+    
+    @Test
+	public void testComprobarFormatoPasswordCorrecto() {
+		user.setPassword("password123");
+		assertTrue(user.comprobarFormatoPassword());
+	}
+    
+    @Test
+    public void testComprobarFormatoPasswordIncorrecto() {
+		user.setPassword("password");
+		assertFalse(user.comprobarFormatoPassword());
+	}
+    
+    @Test
+    public void testComprobarFormatoEmailCorrecto() {
+    	user.setEmail("user@example.com");
+    	assertTrue(user.comprobarFormatoEmail());
+    }
+    
+    @Test 
+    public void testComprobarFormatoEmailIncorrecto() {
+    	user.setEmail("userexample.com");
+    	assertFalse(user.comprobarFormatoEmail());
+    }
+    
+    @Test
+	public void testComprobarFormatoFechaCorrecto() {
+		user.setHiringDate("01/01/2024");
+		assertTrue(user.comprobarFormatoFecha());
+	}
+    
+    @Test
+    public void testComprobarFormatoFechaIncorrecto() {
+    	user.setHiringDate("01-01-24");
+    	assertFalse(user.comprobarFormatoFecha());
+    }
 }

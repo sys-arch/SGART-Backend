@@ -1,5 +1,7 @@
 package com.team1.sgart.backend.model;
 
+import java.util.function.BooleanSupplier;
+
 public class User {
 	
 	private String name;
@@ -100,5 +102,20 @@ public class User {
 	public void setBlocked(boolean blocked) {
 		this.blocked = blocked;
 	}
+
+	public boolean comprobarFormatoPassword() {
+		// TODO Auto-generated method stub
+		return true;
+	}
+	
+	public boolean comprobarFormatoEmail() {
+		// TODO Auto-generated method stub
+		return true;
+	}
+	
+	public boolean comprobarFormatoFecha() {
+        // TODO Auto-generated method stub
+        return true;
+    }
 
 }
