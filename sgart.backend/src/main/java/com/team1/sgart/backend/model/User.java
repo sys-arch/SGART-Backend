@@ -131,7 +131,7 @@ public class User {
 		int longitudMinima = 8;
 	    String mayus = ".*[A-Z].*";
 	    String minus = ".*[a-z].*";
-	    String digit = "\\d";
+	    String digit = ".*[0-9]*.";
 	    String specialCharacters = ".*[!@#\\$%\\^&\\*].*";
 
 
@@ -152,7 +152,6 @@ public class User {
 	    
 	    // Verificar que tenga al menos un dígito
 	    if (!Pattern.matches(digit, password)) {
-	    	System.out.println(digit);
 	    	valida = false;
 	    }
 
