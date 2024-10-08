@@ -1,6 +1,5 @@
 package com.team1.sgart.backend.model;
 
-import java.util.function.BooleanSupplier;
 import java.util.regex.Pattern;
 
 public class User {
@@ -131,7 +130,7 @@ public class User {
 		int longitudMinima = 8;
 	    String mayus = ".*[A-Z].*";
 	    String minus = ".*[a-z].*";
-	    String digit = ".*[0-9]*.";
+	    String digit = ".*\\d*.";
 	    String specialCharacters = ".*[!@#\\$%\\^&\\*].*";
 
 
