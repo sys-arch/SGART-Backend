@@ -23,8 +23,8 @@ public class UserTest {
         assertEquals("carlos.romero@example.com", user.getEmail());
         assertEquals("01/01/2024", user.getHiringDate());
         assertEquals("Scrum Developer", user.getProfile());
-        assertEquals("password123", user.getPassword());
-        assertEquals("password123", user.getPasswordConfirm());
+        assertEquals("password123@", user.getPassword());
+        assertEquals("password123@", user.getPasswordConfirm());
         assertTrue(user.isInternal());
         assertFalse(user.isBlocked());
     }

@@ -173,8 +173,12 @@ public class User {
 	}
 
 	public boolean comprobarFormatoFecha() {
-        // TODO Auto-generated method stub
-        return true;
+        boolean valido = true;
+        String fechaPattern = "^\\d{2}/\\d{2}/\\d{4}$";
+		if (!Pattern.matches(fechaPattern, hiringDate)) {
+			valido = false;
+		}
+        return valido;
     }
 
 }
