@@ -10,7 +10,7 @@ import com.team1.sgart.backend.model.User;
 
 public interface UserDAO extends JpaRepository<User, String> {
     Optional<User> findByEmail(String email);
-    Optional<User> findById(int id);	//por si hace falta luego
+    
     Optional<User> findByEmailAndPassword(String email, String password);
     
     // Método para verificar si el usuario está validado
@@ -19,7 +19,7 @@ public interface UserDAO extends JpaRepository<User, String> {
 
     // Método para marcar al usuario como validado
     @Modifying
-    @Query("UPDATE Usuario u SET u.validado = true WHERE u.email = :email")
+    @Query("UPDATE User u SET u.validated = true WHERE u.email = :email")
     void validarUsuario(@Param("email") String email);
 
 }

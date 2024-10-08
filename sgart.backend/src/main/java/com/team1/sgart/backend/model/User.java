@@ -10,21 +10,31 @@ import java.util.Date;
 
 @Entity
 public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column
     private int id;
 
+    @Column(nullable = false)
     private String name;
+    @Column(nullable = false)
     private String lastName;
-
-    @Column(unique = true)
+    
+    @Id @Column(unique = true, nullable = false)
     private String email;
 
-    private String department;
+    
+    private String department; //puede ser nulo
+    
+    @Column(nullable = false)
     private String center;
+    
+    @Column(nullable = false)
     private Date hiringDate;
-    private String profile;
+    
+    private String profile;//puede ser nulo
+    
+    @Column(nullable = false)
     private String password;
+    @Column(nullable = false)
     private boolean blocked = false;
     
    
@@ -42,8 +52,9 @@ public class User {
 		this.blocked = blocked;
 	}
 	public User() {
-		// TODO Auto-generated constructor stub
+		
 	}
+	
 	// Getters y setters
 	public int getId() {
 		return id;

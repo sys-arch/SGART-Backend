@@ -12,7 +12,7 @@ import com.team1.sgart.backend.model.User;
 @Service
 public class UserService {
 
-    @Autowired
+    
     private UserDAO userDAO;
 
     public User registrarUsuario(RegistrationRequest request) {
@@ -33,12 +33,13 @@ public class UserService {
         return userDAO.save(usuario);
     }
 
-    public User validarUsuario(String email) {
+    public void validarUsuario(String email) {
     	 if (!userDAO.isUsuarioValidado(email)) {
              userDAO.validarUsuario(email);
          } else {
              throw new IllegalArgumentException("El usuario ya está validado");
          }
+		
 
     }
 }
