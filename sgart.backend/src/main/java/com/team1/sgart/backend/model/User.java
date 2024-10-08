@@ -164,8 +164,12 @@ public class User {
 	}
 
 	public boolean comprobarFormatoEmail() {
-		// TODO Auto-generated method stub
-		return true;
+		boolean valido = true;
+		String emailPattern = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+		if (!Pattern.matches(emailPattern, email)) {
+			valido = false;
+		}
+		return valido;
 	}
 
 	public boolean comprobarFormatoFecha() {
