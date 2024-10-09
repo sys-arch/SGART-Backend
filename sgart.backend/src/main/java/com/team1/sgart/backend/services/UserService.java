@@ -12,7 +12,7 @@ import com.team1.sgart.backend.model.User;
 @Service
 public class UserService {
 
-    
+    @Autowired
     private UserDAO userDAO;
 
     public User registrarUsuario(RegistrationRequest request) {
@@ -20,27 +20,16 @@ public class UserService {
             throw new IllegalArgumentException("El email ya está en uso");
         }
 
-        User usuario = new User();
-        usuario.setName(request.getName());
-        usuario.setLastName(request.getLastName());
-        usuario.setEmail(request.getEmail());
-        usuario.setDepartment(request.getDepartment());
-        usuario.setCenter(request.getCenter());
-        usuario.setHiringDate(Date.from(request.getHiringDate().toInstant()));
-        usuario.setProfile(request.getProfile());
-        usuario.setPassword(request.getPassword());
+        User user = new User();
+        user.setName(request.getName());
+        user.setLastName(request.getLastName());
+        user.setEmail(request.getEmail());
+        user.setDepartment(request.getDepartment());
+        user.setCenter(request.getCenter());
+        user.setHiringDate(Date.from(request.getHiringDate().toInstant()));
+        user.setProfile(request.getProfile());
+        user.setPassword(request.getPassword()); 
 
-        return userDAO.save(usuario);
-    }
-
-    public void validarUsuario(String email) {
-    	 if (!userDAO.isUsuarioValidado(email)) {
-             userDAO.validarUsuario(email);
-         } else {
-             throw new IllegalArgumentException("El usuario ya está validado");
-         }
-		
-
+        return userDAO.save(user);
     }
 }
-
