@@ -10,12 +10,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@ContextConfiguration(classes = {UserController.class, UserService.class})
 @WebMvcTest(UserController.class)
 public class UserControllerTest {
 
@@ -77,7 +79,7 @@ public class UserControllerTest {
         ObjectMapper objectMapper = new ObjectMapper();
         String userJson = objectMapper.writeValueAsString(user);
 
-        mockMvc.perform(post("/users/register")
+        mockMvc.perform(post("/users/registro")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(userJson))
                 .andExpect(status().isBadRequest())
@@ -88,7 +90,7 @@ public class UserControllerTest {
     public void jsonMalformado_devuelve400() throws Exception {
         String malformedJson = "{ \"name\": \"John\", \"lastName\": \"Doe\" "; // JSON malformado
 
-        mockMvc.perform(post("/users/register")
+        mockMvc.perform(post("/users/registro")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(malformedJson))
                 .andExpect(status().isBadRequest());
