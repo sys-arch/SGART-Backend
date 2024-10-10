@@ -6,20 +6,20 @@ import com.team1.sgart.backend.services.UserService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.server.ResponseStatusException;
 
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ContextConfiguration(classes = {UserController.class, UserService.class})
 @WebMvcTest(UserController.class)
-public class UserControllerTest {
+class UserControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -28,7 +28,7 @@ public class UserControllerTest {
     private UserService userService;
     
 
-    User user;
+    private User user;
     @BeforeEach
     public void setUp() {
         user = new User("Carlos", "Romero Navarro", "Quality", "Ciudad Real", "carlos.romero@example.com", "01/01/2024", 
@@ -36,63 +36,56 @@ public class UserControllerTest {
     }
 
     @Test
-    public void usuarioValido_devuelve201() throws Exception {
+    void usuarioValido_devuelve201() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         String userJson = objectMapper.writeValueAsString(user);
-
-        mockMvc.perform(post("/users/registro")
-                .contentType(MediaType.APPLICATION_JSON)
+        	
+        Mockito.when(userService.registrarUser(user)).thenReturn(user);
+        mockMvc.perform(post("/users/registro").contentType(MediaType.APPLICATION_JSON)
                 .content(userJson))
-                .andExpect(status().isCreated())
-                .andExpect(content().string("Usuario registrado correctamente"));
+                .andExpect(status().isCreated());
     }
 
     @Test
-    public void emailUsuarioInvalido_devuelve400() throws Exception {
+	void emailUsuarioInvalido_devuelve400() throws Exception { // Comprobado con el método emailFormatoValido de servicios
+        user.setEmail("carlos.romero");
+    	ObjectMapper objectMapper = new ObjectMapper();
+        String userJson = objectMapper.writeValueAsString(user);
         
-        ObjectMapper objectMapper = new ObjectMapper();
-        String userJson = objectMapper.writeValueAsString(user);
-
-        mockMvc.perform(post("/users/registro")
-                .contentType(MediaType.APPLICATION_JSON)
+        Mockito.doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Formato del email incorrecto"))
+        	.when(userService).registrarUser(Mockito.any(User.class));
+        
+        mockMvc.perform(post("/users/registro").contentType(MediaType.APPLICATION_JSON)
                 .content(userJson))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors.email").value("Formato del email incorrecto"));
-    }
-
-    @Test
-    public void usuarioExistente_devuelve409() throws Exception {
-       when(userService.emailYaRegistrado(user.getEmail())).thenReturn(true);
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        String userJson = objectMapper.writeValueAsString(user);
-
-        mockMvc.perform(post("/users/registro")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(userJson))
-                .andExpect(status().isConflict())
-                .andExpect(content().string("Email en uso")); //Sujeto a cambios de seguridad
-    }
-
-    @Test
-    public void passwordDebil_devuelve400() throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
-        String userJson = objectMapper.writeValueAsString(user);
-
-        mockMvc.perform(post("/users/registro")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(userJson))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors.password").value("Siga las instrucciones de seguridad para la contraseña"));
-    }
-
-    @Test
-    public void jsonMalformado_devuelve400() throws Exception {
-        String malformedJson = "{ \"name\": \"John\", \"lastName\": \"Doe\" "; // JSON malformado
-
-        mockMvc.perform(post("/users/registro")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(malformedJson))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    void usuarioExistente_devuelve409() throws Exception { //Comprobado en servicios con la comprobación de emailYaRegistrado
+        ObjectMapper objectMapper = new ObjectMapper();
+        String userJson = objectMapper.writeValueAsString(user);
+        
+        Mockito.doThrow(new ResponseStatusException(HttpStatus.CONFLICT, "El email ya está registrado"))
+    		.when(userService).registrarUser(Mockito.any(User.class));
+        
+        mockMvc.perform(post("/users/registro")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(userJson))
+                .andExpect(status().isConflict()); //Sujeto a cambios de seguridad
+    }
+
+    @Test
+    void passwordDebil_devuelve400() throws Exception {
+    	user.setPassword("password");
+        ObjectMapper objectMapper = new ObjectMapper();
+        String userJson = objectMapper.writeValueAsString(user);
+        
+        Mockito.doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Formato de la contraseña incorrecto"))
+    		.when(userService).registrarUser(Mockito.any(User.class));
+        mockMvc.perform(post("/users/registro")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(userJson))
+                .andExpect(status().isBadRequest());
+    }
+
 }

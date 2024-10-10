@@ -22,12 +22,8 @@ public class UserController {
 
     @PostMapping("/registro")
     public ResponseEntity<String> registrar(@RequestBody User user) {
-    	
-        if (userService.emailYaRegistrado(user.getEmail())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already in use");
-        }
-        
+            	
         userService.registrarUser(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
+        return ResponseEntity.status(HttpStatus.CREATED).body("Usuario registrado correctamente");        
     }
 }
