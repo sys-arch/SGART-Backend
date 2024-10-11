@@ -2,22 +2,46 @@ package com.team1.sgart.backend.model;
 
 import java.util.regex.Pattern;
 
-public class User {
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
+@Entity
+public class User {
+	
+	@Column(name = "name", nullable = false)
 	private String name;
+	
+	@Column(name = "lastName", nullable = false)
 	private String lastName;
+	
+	@Column(name = "department")
 	private String department;
+	
+	@Column(name = "center", nullable = false)
 	private String center;
+	
+	@Id
+	@Column(name = "email", nullable = false)
 	private String email;
+	
+	@Column(name = "hiringDate", nullable = false)
 	private String hiringDate;
+	
+	@Column(name = "profile")
 	private String profile;
+	
+	@Column(name = "password", nullable = false)
 	private String password;
+	
+	@Column(name = "passwordConfirm", nullable = false)
 	private String passwordConfirm;
-	private boolean internal;
+	
+    @Column(name = "blocked", nullable = false)
 	private boolean blocked;
 
 	public User(String name, String lastName, String department, String center, String email, String hiringDate,
-			String profile, String password, String passwordConfirm, boolean internal, boolean blocked) {
+			String profile, String password, String passwordConfirm, boolean blocked) {
 		super();
 		this.name = name;
 		this.lastName = lastName;
@@ -28,12 +52,10 @@ public class User {
 		this.profile = profile;
 		this.password = password;
 		this.passwordConfirm = passwordConfirm;
-		this.internal = internal;
 		this.blocked = blocked;
 	}
 
 	public User() {
-		// TODO Auto-generated constructor stub
 	}
 
 	public String getName() {
@@ -106,14 +128,6 @@ public class User {
 
 	public void setPasswordConfirm(String passwordConfirm) {
 		this.passwordConfirm = passwordConfirm;
-	}
-
-	public boolean isInternal() {
-		return internal;
-	}
-
-	public void setInternal(boolean internal) {
-		this.internal = internal;
 	}
 
 	public boolean isBlocked() {

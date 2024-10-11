@@ -11,7 +11,7 @@ public class UserTest {
     @BeforeEach
     public void setUp() {
         user = new User("Carlos", "Romero Navarro", "Quality", "Ciudad Real", "carlos.romero@example.com", "01/01/2024", 
-                        "Scrum Developer", "password123@", "password123@", true, false);
+                        "Scrum Developer", "password123@", "password123@", false);
     }
 
     @Test
@@ -25,7 +25,6 @@ public class UserTest {
         assertEquals("Scrum Developer", user.getProfile());
         assertEquals("password123@", user.getPassword());
         assertEquals("password123@", user.getPasswordConfirm());
-        assertTrue(user.isInternal());
         assertFalse(user.isBlocked());
     }
 
@@ -51,12 +50,6 @@ public class UserTest {
     public void testBlockUser() {
         user.setBlocked(true);
         assertTrue(user.isBlocked());
-    }
-
-    @Test
-    public void testSetInternal() {
-        user.setInternal(false);
-        assertFalse(user.isInternal());
     }
 
     @Test
