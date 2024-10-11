@@ -43,7 +43,7 @@ public class UserService {
 	public boolean emailYaRegistrado(User user) {
 		boolean yaRegistrado = true;
 		
-		if (userDao.findByEmail(user.getEmail()) == null)
+		if (!userDao.findByEmail(user.getEmail()).isPresent())
 			yaRegistrado = false;
 		
 		return yaRegistrado;

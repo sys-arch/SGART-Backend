@@ -5,39 +5,43 @@ import java.util.regex.Pattern;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
 @Entity
+@Table(name = "SGART_UsersTable", indexes = @Index(columnList = "email", unique = true))
 public class User {
 	
-	@Column(name = "name", nullable = false)
+	@Column(name = "Name", nullable = false)
 	private String name;
 	
-	@Column(name = "lastName", nullable = false)
+	@Column(name = "LastName", nullable = false)
 	private String lastName;
 	
-	@Column(name = "department")
+	@Column(name = "Department")
 	private String department;
 	
-	@Column(name = "center", nullable = false)
+	@Column(name = "Center", nullable = false)
 	private String center;
 	
 	@Id
-	@Column(name = "email", nullable = false)
+	@Column(name = "Email", nullable = false)
 	private String email;
 	
-	@Column(name = "hiringDate", nullable = false)
+	@Column(name = "HiringDate", nullable = false)
 	private String hiringDate;
 	
-	@Column(name = "profile")
+	@Column(name = "Profile")
 	private String profile;
 	
-	@Column(name = "password", nullable = false)
+	@Column(name = "Password", nullable = false)
 	private String password;
 	
-	@Column(name = "passwordConfirm", nullable = false)
+	@Transient
 	private String passwordConfirm;
 	
-    @Column(name = "blocked", nullable = false)
+    @Column(name = "Blocked", nullable = false)
 	private boolean blocked;
 
 	public User(String name, String lastName, String department, String center, String email, String hiringDate,
