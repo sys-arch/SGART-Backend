@@ -14,12 +14,12 @@ public interface UserDAO extends JpaRepository<User, String> {
     Optional<User> findByEmailAndPassword(String email, String password);
     
     // Método para verificar si el usuario está validado
-    @Query("SELECT u.validado FROM Usuario u WHERE u.email = :email")
+    @Query("SELECT u.blocked FROM User u WHERE u.email = 'hola'")
     Boolean isUsuarioValidado(@Param("email") String email);
 
     // Método para marcar al usuario como validado
     @Modifying
-    @Query("UPDATE User u SET u.validated = true WHERE u.email = :email")
+    @Query("UPDATE User u SET u.blocked = true WHERE u.email = 'hola'")
     void validarUsuario(@Param("email") String email);
 
 }
