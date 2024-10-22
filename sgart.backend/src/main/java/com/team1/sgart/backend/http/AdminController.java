@@ -22,4 +22,14 @@ public class AdminController {
         adminService.validarUsuario(email);
         return new ResponseEntity<>("Usuario validado con éxito", HttpStatus.OK);
     }
+    
+    @PutMapping("/cambiarHabilitacion/{email}")
+    public ResponseEntity<String> cambiarHabilitacionUsuario(@PathVariable String email){
+    	try {
+    		adminService.cambiarHabilitacionUsuario(email);
+    	}catch(IllegalArgumentException e) {
+    		return new ResponseEntity<>("No se pudo realizar el cambio.", HttpStatus.BAD_REQUEST);
+    	}
+    	return new ResponseEntity<>("Usuario cambiado con éxito", HttpStatus.OK);
+    }
 }

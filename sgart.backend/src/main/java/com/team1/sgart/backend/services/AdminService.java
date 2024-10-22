@@ -26,6 +26,12 @@ public class AdminService {
 			throw new IllegalArgumentException("El usuario ya está validado");
 		}
 	}
+	
+	public void cambiarHabilitacionUsuario(String userEmail){
+		if(!userDAO.findByEmail(userEmail).isPresent())
+			throw new IllegalArgumentException();
+        userDAO.cambiarHabilitacionUsuario(userEmail);
+    }
 
 	private boolean isUserValidated(User user) {
 		// Verificar si el usuario ya está validado en la base de datos

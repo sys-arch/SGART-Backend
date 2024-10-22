@@ -1,5 +1,9 @@
 package com.team1.sgart.backend.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Column;
+import java.util.Date;
 import java.util.regex.Pattern;
 
 import jakarta.persistence.Column;
@@ -10,7 +14,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
 @Entity
-@Table(name = "SGART_UsersTable", indexes = @Index(columnList = "email", unique = true))
+@Table(name = "SGART_UsersTable", indexes = @Index(columnList = "id", unique = true))
 public class User extends GenericUser{
 	
 	@Column(name = "Department")
@@ -27,6 +31,9 @@ public class User extends GenericUser{
 	
 	@Transient
 	private String passwordConfirm;
+  
+    @Column(name = "Validated", nullable = false)
+    private boolean validated = false;
 	
     @Column(name = "Blocked", nullable = false)
 	private boolean blocked;
@@ -44,6 +51,7 @@ public class User extends GenericUser{
 		this.password = password;
 		this.passwordConfirm = passwordConfirm;
 		this.blocked = blocked;
+		this.validated = validated;
 	}
 
 	public User() {

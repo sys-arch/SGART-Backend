@@ -1,6 +1,6 @@
 package com.team1.sgart.backend.model;
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 
 @Entity
 public class Admin extends GenericUser {
