@@ -11,13 +11,7 @@ import jakarta.persistence.Transient;
 
 @Entity
 @Table(name = "SGART_UsersTable", indexes = @Index(columnList = "email", unique = true))
-public class User {
-	
-	@Column(name = "Name", nullable = false)
-	private String name;
-	
-	@Column(name = "LastName", nullable = false)
-	private String lastName;
+public class User extends GenericUser{
 	
 	@Column(name = "Department")
 	private String department;
@@ -25,18 +19,11 @@ public class User {
 	@Column(name = "Center", nullable = false)
 	private String center;
 	
-	@Id
-	@Column(name = "Email", nullable = false)
-	private String email;
-	
 	@Column(name = "HiringDate", nullable = false)
 	private String hiringDate;
 	
 	@Column(name = "Profile")
 	private String profile;
-	
-	@Column(name = "Password", nullable = false)
-	private String password;
 	
 	@Transient
 	private String passwordConfirm;
