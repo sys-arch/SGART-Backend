@@ -1,32 +1,24 @@
 package com.team1.sgart.backend.model;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
+import jakarta.persistence.Column;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
 
+@MappedSuperclass
 public abstract class GenericUser {
-
-	@Column
-	private int id;
-
-	@Column(nullable = false)
+	
+	@Column(name = "Name", nullable = false)
 	protected String name;
-	@Column(nullable = false)
+	
+	@Column(name = "LastName", nullable = false)
 	protected String lastName;
 
 	@Id
-	@Column(unique = true, nullable = false)
-	private String email;
+	@Column(name = "Email", nullable = false)
+	protected String email;
 
-	@Column(nullable = false)
+	@Column(name = "Password", nullable = false)
 	protected String password;
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
 
 	public String getName() {
 		return name;
@@ -61,5 +53,5 @@ public abstract class GenericUser {
 	}
 
 	// Getters y setters
-
 }
+
