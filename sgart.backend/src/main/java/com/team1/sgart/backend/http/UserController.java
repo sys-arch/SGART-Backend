@@ -26,4 +26,11 @@ public class UserController {
         userService.registrarUser(user);
         return ResponseEntity.status(HttpStatus.CREATED).body("Usuario registrado correctamente");        
     }
+    
+    @PostMapping("/modificar")
+	public ResponseEntity<String> modificar(@RequestBody User user) {
+
+		userService.modificarUser(user);
+		return ResponseEntity.status(HttpStatus.OK).body("Usuario modificado correctamente");
+	}
 }
