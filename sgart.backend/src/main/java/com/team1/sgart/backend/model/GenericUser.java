@@ -53,5 +53,5 @@ public abstract class GenericUser {
 	}
 
 	// Getters y setters
-
 }
+
