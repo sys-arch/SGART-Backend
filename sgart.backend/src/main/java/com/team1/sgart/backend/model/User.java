@@ -9,7 +9,7 @@ import java.util.Date;
 @Entity
 public class User extends GenericUser {
        
-    private String department; //puede ser nulo
+    private String department; // Puede ser nulo
     
     @Column(nullable = false)
     private String center;
@@ -17,20 +17,24 @@ public class User extends GenericUser {
     @Column(nullable = false)
     private Date hiringDate;
     
-    private String profile;//puede ser nulo
+    private String profile; // Puede ser nulo
+    
+    @Column(nullable = false)
+    private boolean validated = false;
     
     @Column(nullable = false)
     private boolean blocked = false;
     
    
 
-	public User(String department, String center, Date hiringDate, String profile, boolean blocked) {
+	public User(String department, String center, Date hiringDate, String profile, boolean validated, boolean blocked) {
 		super();
 		this.department = department;
 		this.center = center;
 		this.hiringDate = hiringDate;
 		this.profile = profile;
 		this.blocked = blocked;
+		this.validated = validated;
 	}
 
 	public User() {

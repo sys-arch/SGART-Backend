@@ -7,6 +7,7 @@ import jakarta.persistence.MappedSuperclass;
 @MappedSuperclass
 public abstract class GenericUser {
 
+	@Id
 	@Column
 	private int id;
 
@@ -15,7 +16,6 @@ public abstract class GenericUser {
 	@Column(nullable = false)
 	protected String lastName;
 
-	@Id
 	@Column(unique = true, nullable = false)
 	private String email;
 
