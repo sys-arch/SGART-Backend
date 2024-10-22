@@ -13,22 +13,15 @@ public abstract class GenericUser {
 
 	@Column(nullable = false)
 	protected String name;
-	@Column(nullable = false)
+	
+	@Column(name = "LastName", nullable = false)
 	protected String lastName;
 
 	@Column(unique = true, nullable = false)
 	private String email;
 
-	@Column(nullable = false)
+	@Column(name = "Password", nullable = false)
 	protected String password;
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
 
 	public String getName() {
 		return name;
@@ -63,5 +56,5 @@ public abstract class GenericUser {
 	}
 
 	// Getters y setters
-
 }
+
