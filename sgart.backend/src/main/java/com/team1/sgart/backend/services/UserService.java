@@ -41,6 +41,17 @@ public class UserService {
 
 		return emailValido;
 	}
+	
+	public void modificarUser(User user) {
+		String email = user.getEmail();
+		if(!emailYaRegistrado(user)) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "El email no está registrado");
+		}else if (!emailFormatoValido(user)) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Formato del email incorrecto");
+		} else {
+			userDao.updateUser(email, user);
+		}
+	}
 
 	public boolean emailYaRegistrado(User user) {
 		boolean yaRegistrado = true;
@@ -59,16 +70,4 @@ public class UserService {
 
 		return passwordValido;
 	}
-
-	public void modificarUser(User user) {
-		String email = user.getEmail();
-		if (!emailFormatoValido(user)) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Formato del email incorrecto");
-		} else if (user.getPassword() != null && !passwordFormatoValido(user)) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Formato de la contraseña incorrecto");
-		} else {
-			userDao.updateUser(email, user);
-		}
-	}
-
 }
