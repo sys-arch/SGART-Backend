@@ -26,9 +26,9 @@ class UserControllerTest {
 
     @MockBean
     private UserService userService;
-    
 
     private User user;
+
     @BeforeEach
     public void setUp() {
         user = new User("Carlos", "Romero Navarro", "Quality", "Ciudad Real", "carlos.romero@example.com", "01/01/2024", 
@@ -36,10 +36,10 @@ class UserControllerTest {
     }
 
     @Test
-    void usuarioValido_devuelve201() throws Exception {
+    void usuarioValido_registro_devuelve201() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         String userJson = objectMapper.writeValueAsString(user);
-        	
+        
         Mockito.when(userService.registrarUser(user)).thenReturn(user);
         mockMvc.perform(post("/users/registro").contentType(MediaType.APPLICATION_JSON)
                 .content(userJson))
@@ -47,13 +47,13 @@ class UserControllerTest {
     }
 
     @Test
-	void emailUsuarioInvalido_devuelve400() throws Exception { // Comprobado con el método emailFormatoValido de servicios
+    void emailUsuarioInvalido_registro_devuelve400() throws Exception {
         user.setEmail("carlos.romero");
-    	ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = new ObjectMapper();
         String userJson = objectMapper.writeValueAsString(user);
         
         Mockito.doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Formato del email incorrecto"))
-        	.when(userService).registrarUser(Mockito.any(User.class));
+                .when(userService).registrarUser(Mockito.any(User.class));
         
         mockMvc.perform(post("/users/registro").contentType(MediaType.APPLICATION_JSON)
                 .content(userJson))
@@ -61,31 +61,71 @@ class UserControllerTest {
     }
 
     @Test
-    void usuarioExistente_devuelve409() throws Exception { //Comprobado en servicios con la comprobación de emailYaRegistrado
+    void usuarioExistente_registro_devuelve409() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         String userJson = objectMapper.writeValueAsString(user);
         
         Mockito.doThrow(new ResponseStatusException(HttpStatus.CONFLICT, "El email ya está registrado"))
-    		.when(userService).registrarUser(Mockito.any(User.class));
+                .when(userService).registrarUser(Mockito.any(User.class));
         
         mockMvc.perform(post("/users/registro")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(userJson))
-                .andExpect(status().isConflict()); //Sujeto a cambios de seguridad
+                .andExpect(status().isConflict());
     }
 
     @Test
-    void passwordDebil_devuelve400() throws Exception {
-    	user.setPassword("password");
+    void passwordDebil_registro_devuelve400() throws Exception {
+        user.setPassword("password");
         ObjectMapper objectMapper = new ObjectMapper();
         String userJson = objectMapper.writeValueAsString(user);
         
         Mockito.doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Formato de la contraseña incorrecto"))
-    		.when(userService).registrarUser(Mockito.any(User.class));
+                .when(userService).registrarUser(Mockito.any(User.class));
+        
         mockMvc.perform(post("/users/registro")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(userJson))
                 .andExpect(status().isBadRequest());
     }
 
+    // Tests para el método modificar
+    @Test
+    void usuarioValido_modificar_devuelve200() throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String userJson = objectMapper.writeValueAsString(user);
+        
+        Mockito.doNothing().when(userService).modificarUser(user);
+        mockMvc.perform(post("/users/modificar").contentType(MediaType.APPLICATION_JSON)
+                .content(userJson))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Usuario modificado correctamente"));
+    }
+
+    @Test
+    void emailUsuarioInvalido_modificar_devuelve400() throws Exception {
+        user.setEmail("carlos.romero");
+        ObjectMapper objectMapper = new ObjectMapper();
+        String userJson = objectMapper.writeValueAsString(user);
+        
+        Mockito.doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Formato del email incorrecto"))
+                .when(userService).modificarUser(Mockito.any(User.class));
+        
+        mockMvc.perform(post("/users/modificar").contentType(MediaType.APPLICATION_JSON)
+                .content(userJson))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void usuarioNoExistente_modificar_devuelve404() throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String userJson = objectMapper.writeValueAsString(user);
+        
+        Mockito.doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"))
+                .when(userService).modificarUser(Mockito.any(User.class));
+        
+        mockMvc.perform(post("/users/modificar").contentType(MediaType.APPLICATION_JSON)
+                .content(userJson))
+                .andExpect(status().isNotFound());
+    }
 }
