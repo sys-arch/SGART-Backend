@@ -34,9 +34,8 @@ public interface UserDao extends JpaRepository<User, String> {
     }
 
     private <T> void actualizarCampo(Consumer<T> setter, T nuevoValor) {
-        if (nuevoValor != null && !(nuevoValor instanceof String && ((String) nuevoValor).isEmpty())) {
+        if (nuevoValor != null && !(nuevoValor instanceof String str && str.isEmpty())) {
             setter.accept(nuevoValor);
         }
     }
-
 }

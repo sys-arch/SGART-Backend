@@ -11,8 +11,13 @@ import com.team1.sgart.backend.model.User;
 @Service
 public class UserService {
 
-	@Autowired
+	
 	private UserDao userDao;
+	
+	@Autowired
+	UserService(UserDao userDao) {
+        this.userDao = userDao;
+    }
 
 	public User registrarUser(User user) {
 		// Comprobar si el email ya está registrado
@@ -59,7 +64,7 @@ public class UserService {
 		String email = user.getEmail();
 		if (!emailFormatoValido(user)) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Formato del email incorrecto");
-		} else if (!passwordFormatoValido(user)) {
+		} else if (user.getPassword() != null && !passwordFormatoValido(user)) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Formato de la contraseña incorrecto");
 		} else {
 			userDao.updateUser(email, user);

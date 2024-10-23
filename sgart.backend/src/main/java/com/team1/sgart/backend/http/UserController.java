@@ -17,8 +17,12 @@ import com.team1.sgart.backend.services.UserService;
 @CrossOrigin("*")
 public class UserController {
 
-    @Autowired
     private UserService userService;
+    
+    @Autowired
+	UserController(UserService userService) {
+		this.userService = userService;
+	}
 
     @PostMapping("/registro")
     public ResponseEntity<String> registrar(@RequestBody User user) {
