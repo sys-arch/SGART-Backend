@@ -37,7 +37,7 @@ public class User {
 	
 	@Column(name = "user_password", nullable = false)
 	private String password;
-
+	
 	@Transient
 	private String passwordConfirm;
 	
