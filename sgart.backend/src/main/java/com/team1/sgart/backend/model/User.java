@@ -10,25 +10,38 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
 @Entity
-@Table(name = "SGART_UsersTable", indexes = @Index(columnList = "email", unique = true))
-public class User extends GenericUser{
+@Table(name = "SGART_UsersTable", indexes = @Index(columnList = "user_email", unique = true))
+public class User {
 	
-	@Column(name = "Department")
+	@Column(name = "user_name", nullable = false)
+	private String name;
+	
+	@Column(name = "user_lastName", nullable = false)
+	private String lastName;
+	
+	@Column(name = "user_department")
 	private String department;
 	
-	@Column(name = "Center", nullable = false)
+	@Column(name = "user_center", nullable = false)
 	private String center;
 	
-	@Column(name = "HiringDate", nullable = false)
+	@Id
+	@Column(name = "user_email", nullable = false)
+	private String email;
+	
+	@Column(name = "user_hiringDate", nullable = false)
 	private String hiringDate;
 	
-	@Column(name = "Profile")
+	@Column(name = "user_profile")
 	private String profile;
+	
+	@Column(name = "user_password", nullable = false)
+	private String password;
 	
 	@Transient
 	private String passwordConfirm;
 	
-    @Column(name = "Blocked", nullable = false)
+    @Column(name = "user_blockedStatus", nullable = false)
 	private boolean blocked;
 
 	public User(String name, String lastName, String department, String center, String email, String hiringDate,
