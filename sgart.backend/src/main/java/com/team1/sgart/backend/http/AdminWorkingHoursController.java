@@ -58,7 +58,7 @@ public class AdminWorkingHoursController{
     @GetMapping("/loadEvents")
     public ResponseEntity<List<CalendarEventDTO>> loadEvents(){
         try {
-            List<CalendarEventDTO> events = eventService.loadEvents();
+            List<CalendarEventDTO> events = eventService.loadAllEvents();
             logger.info("[!] Los eventos se han cargado correctamente en el calendario.");
             return ResponseEntity.ok(events);
         } catch (Exception e) {
