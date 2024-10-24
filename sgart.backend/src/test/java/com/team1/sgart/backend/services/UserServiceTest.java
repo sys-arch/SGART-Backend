@@ -20,7 +20,9 @@ import com.team1.sgart.backend.model.User;
 class UserServiceTest {
 	
 	private static final String PASSWORD_DEBIL = "password";
-	private static final String NUEVO_NOMBRE = "Pablo"; 
+	private static final String NUEVO_NOMBRE = "Pablo";
+	private static final String PASSWORD_FUERTE = "Password365@";
+	private static final String FECHA_CORRECTA = "01/01/2024";
 
     @Autowired
     private UserService userService;
@@ -32,8 +34,8 @@ class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        user = new User("Carlos", "Romero Navarro", "Quality", "Ciudad Real", "carlos.romero@example.com", "01/01/2024", 
-                        "Scrum Developer", "Password123@", "Password123@", false);
+    	user = new User("carlos.romero@example.com", "Carlos", "Romero Navarro", "Quality", "Ciudad Real", FECHA_CORRECTA, 
+                "Scrum Developer", PASSWORD_FUERTE, PASSWORD_FUERTE, false, false);
         
         Mockito.when(userDao.findByEmail(user.getEmail())).thenReturn(Optional.empty()); // Email no registrado
         Mockito.when(userDao.save(user)).thenReturn(user); // Simular guardado de usuario
