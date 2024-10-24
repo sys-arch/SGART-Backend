@@ -1,17 +1,24 @@
 package com.team1.sgart.backend.services;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.team1.sgart.backend.dao.UserDAO;
-
+import com.team1.sgart.backend.dao.UserDao;
 import com.team1.sgart.backend.model.User;
 
 @Service
 public class AdminService {
 
 	@Autowired
-	private UserDAO userDAO;
+	private UserDao userDAO;
+	
+	public List<User> getUsuariosValidados() {
+		return userDAO.getUsuariosValidados().get();
+	}
 
 	public void validarUsuario(String userEmail) {
 

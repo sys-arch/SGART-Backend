@@ -9,7 +9,7 @@ public abstract class GenericUser {
 
 	@Id
 	@Column
-	private int id;
+	protected int id;
 
 	@Column(nullable = false)
 	protected String name;
@@ -18,7 +18,7 @@ public abstract class GenericUser {
 	protected String lastName;
 
 	@Column(unique = true, nullable = false)
-	private String email;
+	protected String email;
 
 	@Column(name = "Password", nullable = false)
 	protected String password;

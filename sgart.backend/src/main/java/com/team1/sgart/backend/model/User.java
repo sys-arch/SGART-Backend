@@ -38,9 +38,10 @@ public class User extends GenericUser{
     @Column(name = "Blocked", nullable = false)
 	private boolean blocked;
 
-	public User(String name, String lastName, String department, String center, String email, String hiringDate,
+	public User(int id, String email, String name, String lastName, String department, String center, String hiringDate,
 			String profile, String password, String passwordConfirm, boolean blocked) {
-		super();
+		this.id=id;
+		this.email=email;
 		this.name = name;
 		this.lastName = lastName;
 		this.department = department;
