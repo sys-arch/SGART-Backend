@@ -18,6 +18,9 @@ import com.team1.sgart.backend.model.User;
 
 @SpringBootTest
 class UserServiceTest {
+	
+	private static final String PASSWORD_DEBIL = "password";
+	private static final String NUEVO_NOMBRE = "Pablo"; 
 
     @Autowired
     private UserService userService;
@@ -43,34 +46,34 @@ class UserServiceTest {
     }
 
     @Test
-    void testRegistrarUser_EmailYaRegistrado() {
+    void testRegistrarUserEmailYaRegistrado() {
     	
     	Optional<User> optionalUser = Optional.of(user);
         Mockito.when(userDao.findByEmail(user.getEmail())).thenReturn(optionalUser); // Simular que el email ya está registrado
         
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
-            userService.registrarUser(user);
-        });
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> 
+            userService.registrarUser(user)
+        );
         assertEquals("El email ya está registrado", exception.getReason());
     }
 
     @Test
-    void testRegistrarUser_PasswordDebil() {
+    void testRegistrarUserPasswordDebil() {
     	
-        user.setPassword("password"); // Contraseña débil
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
-            userService.registrarUser(user);
-        });
+        user.setPassword(PASSWORD_DEBIL); // Contraseña débil
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> 
+            userService.registrarUser(user)
+        );
 
         assertEquals("Formato de la contraseña incorrecto", exception.getReason());
     }
 
     @Test
-    void testRegistrarUser_EmailFormatoInvalido() {
+    void testRegistrarUserEmailFormatoInvalido() {
         user.setEmail("carlos.romero"); // Email con formato inválido
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
-            userService.registrarUser(user);
-        });
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> 
+            userService.registrarUser(user)
+        );
 
         assertEquals("Formato del email incorrecto", exception.getReason());
     }
@@ -81,25 +84,25 @@ class UserServiceTest {
         Optional<User> optionalUser = Optional.of(user);
         
         User userModificado = new User();
-        userModificado.setName("Pablo");
+        userModificado.setName(NUEVO_NOMBRE);
         userModificado.setEmail("carlos.romero@example.com");
 
         Mockito.when(userDao.findByEmail(user.getEmail())).thenReturn(optionalUser); // Simular que el usuario existe
         Mockito.when(userDao.save(userModificado)).thenReturn(userModificado);
 
         userService.modificarUser(userModificado);
-        assertEquals("Pablo", userModificado.getName()); // Verificar que el perfil ha sido actualizado
+        assertEquals(NUEVO_NOMBRE, userModificado.getName()); // Verificar que el perfil ha sido actualizado
     }
 
     @Test
     void testModificarUserNoExistente() {
     	User userModificado = new User();
-        userModificado.setName("Pablo");
+        userModificado.setName(NUEVO_NOMBRE);
         userModificado.setEmail("romero@example.com");
 
-        assertThrows(ResponseStatusException.class, () -> {
-            userService.modificarUser(userModificado);
-        });
+        assertThrows(ResponseStatusException.class, () -> 
+            userService.modificarUser(userModificado)
+        );
     }
 
 }
