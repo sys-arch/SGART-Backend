@@ -39,7 +39,7 @@ public class User extends GenericUser{
 	private boolean blocked;
 
 	public User(int id, String email, String name, String lastName, String department, String center, String hiringDate,
-			String profile, String password, String passwordConfirm, boolean blocked) {
+			String profile, String password, String passwordConfirm, boolean blocked, boolean validated) {
 		this.id=id;
 		this.email=email;
 		this.name = name;
@@ -136,6 +136,14 @@ public class User extends GenericUser{
 
 	public void setBlocked(boolean blocked) {
 		this.blocked = blocked;
+	}
+	
+	public boolean isValidated() {
+		return validated;
+	}
+	
+	public void setValidated(boolean validated) {
+		this.validated = validated;
 	}
 
 	public boolean comprobarFormatoPassword() {
