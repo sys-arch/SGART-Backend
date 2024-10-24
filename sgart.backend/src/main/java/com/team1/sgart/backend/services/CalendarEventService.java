@@ -1,6 +1,8 @@
 package com.team1.sgart.backend.services;
 
 import java.time.LocalTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +36,7 @@ public class CalendarEventService {
         logger.info("Hora de fin: {}", eventDTO.isEventAllDay() ? "23:59" : eventDTO.getEventTimeEnd());
         logger.info("Frecuencia del evento: {}", eventDTO.getEventFrequency());
         logger.info("Número de repeticiones: {}", eventDTO.getEventRepetitionsCount());
+
         CalendarEvent event = new CalendarEvent();
         event.setEventTitle(eventDTO.getEventTitle());
         event.setEventStartDate(eventDTO.getEventStartDate());
@@ -44,6 +47,24 @@ public class CalendarEventService {
         event.setEventRepetitionsCount(eventDTO.getEventRepetitionsCount());
 
         eventRepository.save(event);
+    }
+
+    public List<CalendarEventDTO> loadEvents() {
+        // Obtener todos los eventos
+        List<CalendarEvent> events = eventRepository.findAll();
+
+        // Convertirlos en el formato correcto para el front
+        return events.stream().map(event -> {
+            CalendarEventDTO dto = new CalendarEventDTO();
+            dto.setEventTitle(event.getEventTitle());
+            dto.setEventStartDate(event.getEventStartDate());
+            dto.setEventAllDay(event.isEventAllDay());
+            dto.setEventTimeStart(event.getEventTimeStart());
+            dto.setEventTimeEnd(event.getEventTimeEnd());
+            dto.setEventFrequency(event.getEventFrequency());
+            dto.setEventRepetitionsCount(event.getEventRepetitionsCount());
+            return dto;
+        }).collect(Collectors.toList());
     }
 
 }

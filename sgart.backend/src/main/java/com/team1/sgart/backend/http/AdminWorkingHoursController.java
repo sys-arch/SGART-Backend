@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
 
 import com.team1.sgart.backend.services.CalendarEventService;
 import com.team1.sgart.backend.modules.CalendarEventDTO;
@@ -51,6 +52,18 @@ public class AdminWorkingHoursController{
             errorResponse.put("error", "Error al guardar el evento");
 
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+    @GetMapping("/loadEvents")
+    public ResponseEntity<List<CalendarEventDTO>> loadEvents(){
+        try {
+            List<CalendarEventDTO> events = eventService.loadEvents();
+            logger.info("[!] Los eventos se han cargado correctamente en el calendario.");
+            return ResponseEntity.ok(events);
+        } catch (Exception e) {
+            logger.error("[!] Error al obtener los eventos", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 }
