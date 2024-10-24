@@ -1,5 +1,9 @@
 package com.team1.sgart.backend.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Column;
+import java.util.Date;
 import java.util.regex.Pattern;
 
 import jakarta.persistence.Column;
@@ -10,8 +14,8 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
 @Entity
-@Table(name = "SGART_UsersTable", indexes = @Index(columnList = "user_email", unique = true))
-public class User {
+@Table(name = "SGART_UsersTable", indexes = @Index(columnList = "id", unique = true))
+public class User extends GenericUser{
 	
 	@Column(name = "user_name", nullable = false)
 	private String name;
@@ -40,13 +44,17 @@ public class User {
 	
 	@Transient
 	private String passwordConfirm;
+  
+    @Column(name = "Validated", nullable = false)
+    private boolean validated = false;
 	
     @Column(name = "user_blockedStatus", nullable = false)
 	private boolean blocked;
 
-	public User(String name, String lastName, String department, String center, String email, String hiringDate,
-			String profile, String password, String passwordConfirm, boolean blocked) {
-		super();
+	public User(int id, String email, String name, String lastName, String department, String center, String hiringDate,
+			String profile, String password, String passwordConfirm, boolean blocked, boolean validated) {
+		this.id=id;
+		this.email=email;
 		this.name = name;
 		this.lastName = lastName;
 		this.department = department;
@@ -57,6 +65,7 @@ public class User {
 		this.password = password;
 		this.passwordConfirm = passwordConfirm;
 		this.blocked = blocked;
+		this.validated = validated;
 	}
 
 	public User() {
@@ -140,6 +149,14 @@ public class User {
 
 	public void setBlocked(boolean blocked) {
 		this.blocked = blocked;
+	}
+	
+	public boolean isValidated() {
+		return validated;
+	}
+	
+	public void setValidated(boolean validated) {
+		this.validated = validated;
 	}
 
 	public boolean comprobarFormatoPassword() {
