@@ -1,5 +1,7 @@
 package com.team1.sgart.backend.dao;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -10,7 +12,7 @@ import com.team1.sgart.backend.model.User;
 
 import jakarta.transaction.Transactional;
 
-public interface UserDAO extends JpaRepository<User, String> {
+public interface UserDao extends JpaRepository<User, String> {
 	Optional<User> findByEmail(String email);
 
 	Optional<User> findByEmailAndPassword(String email, String password);
@@ -29,5 +31,9 @@ public interface UserDAO extends JpaRepository<User, String> {
     @Transactional
     @Query("UPDATE User u SET u.blocked=NOT u.blocked WHERE u.email = :email")
     void cambiarHabilitacionUsuario(@Param("email") String email);
+
+ // Método para obtener la lista de usuarios que ya han sido validados.
+    @Query("SELECT u FROM User u where validated=true")
+	Optional<List<User>> getUsuariosValidados();
 }
 
