@@ -13,20 +13,30 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.team1.sgart.backend.dao.CalendarEventRepository;
+import com.team1.sgart.backend.dao.CalendarEventDAO;
+import com.team1.sgart.backend.dao.DefaultWorkingHoursDAO;
+import com.team1.sgart.backend.dao.WorkingHoursNewScheduleDAO;
 import com.team1.sgart.backend.modules.CalendarEvent;
 import com.team1.sgart.backend.modules.CalendarEventDTO;
+import com.team1.sgart.backend.modules.DefaultWorkingHours;
+import com.team1.sgart.backend.modules.DefaultWorkingHoursDTO;
+import com.team1.sgart.backend.modules.WorkingHoursNewSchedule;
+import com.team1.sgart.backend.modules.WorkingHoursNewScheduleDTO;
 
 @Service
 public class CalendarEventService {
 
     private static final Logger logger = LoggerFactory.getLogger(CalendarEventService.class);
-    private CalendarEventRepository eventRepository;
+    private CalendarEventDAO eventRepository;
+    private WorkingHoursNewScheduleDAO newScheduleRepository;
+    private DefaultWorkingHoursDAO defaultWorkingHoursDAO;
 
     @Autowired
-    public CalendarEventService(CalendarEventRepository eventRepository) {
+    public CalendarEventService(CalendarEventDAO eventRepository, WorkingHoursNewScheduleDAO newScheduleRepository, DefaultWorkingHoursDAO defaultWorkingHoursDAO) {
         logger.info("[!] CalendarEventService created");
         this.eventRepository = eventRepository;
+        this.newScheduleRepository = newScheduleRepository;
+        this.defaultWorkingHoursDAO = defaultWorkingHoursDAO;
     }
 
     public void saveEvent(CalendarEventDTO eventDTO) {
@@ -68,9 +78,10 @@ public class CalendarEventService {
 
     private List<CalendarEventDTO> calculateRecurrences(List<CalendarEventDTO> events) {
         List<CalendarEventDTO> allEvents = new ArrayList<>(events);
-    
+
         for (CalendarEventDTO event : events) {
-            if (event.getEventRepetitionsCount() != null && (event.getEventRepetitionsCount() > 1 || event.getEventRepetitionsCount() == -1)) {
+            if (event.getEventRepetitionsCount() != null
+                    && (event.getEventRepetitionsCount() > 1 || event.getEventRepetitionsCount() == -1)) {
                 // Calcular las recurrencias basadas en el tipo de frecuencia
                 switch (event.getEventFrequency()) {
                     case "Diario":
@@ -92,13 +103,16 @@ public class CalendarEventService {
         }
         return allEvents;
     }
-    
-    private void generateRecurringEvents(CalendarEventDTO originalEvent, List<CalendarEventDTO> allEvents, int amountToAdd, TemporalUnit unit) {
+
+    private void generateRecurringEvents(CalendarEventDTO originalEvent, List<CalendarEventDTO> allEvents,
+            int amountToAdd, TemporalUnit unit) {
         LocalDate startDate = originalEvent.getEventStartDate();
-    
-        // Si las repeticiones son ilimitadas (es decir, eventRepetitionsCount = -1), establecemos un límite máximo (100 por ejemplo)
-        int maxRepetitions = originalEvent.getEventRepetitionsCount() == -1 ? 100 : originalEvent.getEventRepetitionsCount();
-    
+
+        // Si las repeticiones son ilimitadas (es decir, eventRepetitionsCount = -1),
+        // establecemos un límite máximo (100 por ejemplo)
+        int maxRepetitions = originalEvent.getEventRepetitionsCount() == -1 ? 100
+                : originalEvent.getEventRepetitionsCount();
+
         for (int i = 2; i <= maxRepetitions; i++) {
             // Crear una copia del evento original para la nueva recurrencia
             CalendarEventDTO newEvent = new CalendarEventDTO();
@@ -108,14 +122,52 @@ public class CalendarEventService {
             newEvent.setEventTimeEnd(originalEvent.getEventTimeEnd());
             newEvent.setEventFrequency(originalEvent.getEventFrequency());
             newEvent.setEventRepetitionsCount(originalEvent.getEventRepetitionsCount());
-    
+
             // Calcular la nueva fecha basándose en la frecuencia (diaria, semanal, etc.)
             LocalDate newStartDate = startDate.plus((i - 1) * amountToAdd, unit);
             newEvent.setEventStartDate(newStartDate);
-    
+
             // Añadir el nuevo evento a la lista de eventos
             allEvents.add(newEvent);
         }
+    }
+
+    public void saveWorkingHourSchedule(WorkingHoursNewScheduleDTO exceptionDTO) {
+        WorkingHoursNewSchedule newSchedule = new WorkingHoursNewSchedule();
+        newSchedule.setExceptionDate(exceptionDTO.getExceptionDate());
+        newSchedule.setStartTime(exceptionDTO.getStartTime());
+        newSchedule.setEndTime(exceptionDTO.getEndTime());
+        newSchedule.setReason(exceptionDTO.getReason());
+        newScheduleRepository.save(newSchedule);
+    }
+
+    public List<WorkingHoursNewScheduleDTO> loadScheduleExceptions() {
+        // Obtener todos los eventos de la base de datos
+        List<WorkingHoursNewSchedule> schedules = newScheduleRepository.findAll();
+
+        // Convertirlos en el formato correcto para el frontend
+        return schedules.stream().map(schedule -> {
+            WorkingHoursNewScheduleDTO scheduledto = new WorkingHoursNewScheduleDTO();
+
+            scheduledto.setExceptionDate(schedule.getExceptionDate());
+            scheduledto.setStartTime(schedule.getStartTime());
+            scheduledto.setEndTime(schedule.getEndTime());
+            scheduledto.setReason(schedule.getReason() != null ? schedule.getReason() : "Motivo no especificado");
+            return scheduledto;
+        }).collect(Collectors.toList());
+    }
+
+    public List<DefaultWorkingHoursDTO> loadDefaultWorkingHours() {
+        List <DefaultWorkingHours> defaultHours = defaultWorkingHoursDAO.findAll();
+
+        return defaultHours.stream().map(defaultHour -> {
+            DefaultWorkingHoursDTO defaultHourdto = new DefaultWorkingHoursDTO();
+
+            defaultHourdto.setDayOfWeek(defaultHour.getDayOfWeek());
+            defaultHourdto.setDayStartTime(defaultHour.getDayStartTime());
+            defaultHourdto.setDayEndTime(defaultHour.getDayEndTime());
+            return defaultHourdto;
+        }).collect(Collectors.toList());
     }
 
 }

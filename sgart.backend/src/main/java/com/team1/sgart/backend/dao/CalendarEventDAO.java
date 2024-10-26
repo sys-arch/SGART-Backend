@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 import com.team1.sgart.backend.modules.CalendarEvent;
 
 @Repository
-public interface CalendarEventRepository extends JpaRepository<CalendarEvent, UUID> {
+public interface CalendarEventDAO extends JpaRepository<CalendarEvent, UUID> {
 }
