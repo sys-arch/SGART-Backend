@@ -1,26 +1,21 @@
 package com.team1.sgart.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 
 @MappedSuperclass
-public abstract class GenericUser {
+public abstract class GenericUserDTO {
 
-	@Id
-	@Column
-	protected int id;
-
-	@Column(nullable = false)
+	@JsonProperty("name")
 	protected String name;
-	
-	@Column(name = "LastName", nullable = false)
+	@JsonProperty("lastName")
 	protected String lastName;
-
-	@Column(unique = true, nullable = false)
+	@JsonProperty("email")
 	protected String email;
-
-	@Column(name = "Password", nullable = false)
+	@JsonProperty("password")
 	protected String password;
 
 	public String getName() {
@@ -57,3 +52,4 @@ public abstract class GenericUser {
 
 	// Getters y setters
 }
+

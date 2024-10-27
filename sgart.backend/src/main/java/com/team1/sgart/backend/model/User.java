@@ -3,12 +3,8 @@ package com.team1.sgart.backend.model;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Column;
-import java.util.Date;
 import java.util.regex.Pattern;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
@@ -17,35 +13,46 @@ import jakarta.persistence.Transient;
 @Table(name = "SGART_UsersTable", indexes = @Index(columnList = "id", unique = true))
 public class User extends GenericUser{
 	
-	@Column(name = "Department")
+	@Column(name = "user_name", nullable = false)
+	private String name;
+	
+	@Column(name = "user_lastName", nullable = false)
+	private String lastName;
+	
+	@Column(name = "user_department")
 	private String department;
 	
-	@Column(name = "Center", nullable = false)
+	@Column(name = "user_center", nullable = false)
 	private String center;
 	
-	@Column(name = "HiringDate", nullable = false)
+	@Column(name = "user_email", nullable = false)
+	private String email;
+	
+	@Column(name = "user_hiringDate", nullable = false)
 	private String hiringDate;
 	
-	@Column(name = "Profile")
+	@Column(name = "user_profile")
 	private String profile;
+	
+	@Column(name = "user_password", nullable = false)
+	private String password;
 	
 	@Transient
 	private String passwordConfirm;
   
-    @Column(name = "Validated", nullable = false)
+    @Column(name = "user_validated", nullable = false)
     private boolean validated = false;
 	
-    @Column(name = "Blocked", nullable = false)
+    @Column(name = "user_blockedStatus", nullable = false)
 	private boolean blocked;
 
-	public User(String name, String lastName, String department, String center, String email, String hiringDate,
-			String profile, String password, String passwordConfirm, boolean blocked) {
-		super();
+	public User(String email, String name, String lastName, String department, String center, String hiringDate,
+			String profile, String password, String passwordConfirm, boolean blocked, boolean validated) {
+		this.email=email;
 		this.name = name;
 		this.lastName = lastName;
 		this.department = department;
 		this.center = center;
-		this.email = email;
 		this.hiringDate = hiringDate;
 		this.profile = profile;
 		this.password = password;
@@ -135,6 +142,14 @@ public class User extends GenericUser{
 
 	public void setBlocked(boolean blocked) {
 		this.blocked = blocked;
+	}
+	
+	public boolean isValidated() {
+		return validated;
+	}
+	
+	public void setValidated(boolean validated) {
+		this.validated = validated;
 	}
 
 	public boolean comprobarFormatoPassword() {

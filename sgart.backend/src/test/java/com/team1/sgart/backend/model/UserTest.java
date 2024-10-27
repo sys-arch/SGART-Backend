@@ -4,104 +4,107 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class UserTest {
+class UserTest {
 
+	private static final String PASSWORD_FUERTE = "Password365#@";
+	private static final String FECHA_CORRECTA = "01/01/2024";
+	
     private User user;
 
     @BeforeEach
     public void setUp() {
-        user = new User("Carlos", "Romero Navarro", "Quality", "Ciudad Real", "carlos.romero@example.com", "01/01/2024", 
-                        "Scrum Developer", "password123@", "password123@", false);
+        user = new User("carlos.romero@example.com", "Carlos", "Romero Navarro", "Quality", "Ciudad Real", FECHA_CORRECTA, 
+                        "Scrum Developer", PASSWORD_FUERTE, PASSWORD_FUERTE, false, false);
     }
 
     @Test
-    public void testConstructor() {
+    void testConstructor() {
         assertEquals("Carlos", user.getName());
         assertEquals("Romero Navarro", user.getLastName());
         assertEquals("Quality", user.getDepartment());
         assertEquals("Ciudad Real", user.getCenter());
         assertEquals("carlos.romero@example.com", user.getEmail());
-        assertEquals("01/01/2024", user.getHiringDate());
+        assertEquals(FECHA_CORRECTA, user.getHiringDate());
         assertEquals("Scrum Developer", user.getProfile());
-        assertEquals("password123@", user.getPassword());
-        assertEquals("password123@", user.getPasswordConfirm());
+        assertEquals(PASSWORD_FUERTE, user.getPassword());
+        assertEquals(PASSWORD_FUERTE, user.getPasswordConfirm());
         assertFalse(user.isBlocked());
     }
 
     @Test
-    public void testSetName() {
+    void testSetName() {
         user.setName("Juan");
         assertEquals("Juan", user.getName());
     }
 
     @Test
-    public void testSetLastName() {
+    void testSetLastName() {
         user.setLastName("Garcia");
         assertEquals("Garcia", user.getLastName());
     }
 
     @Test
-    public void testPasswordConfirmationMatches() {
+    void testPasswordConfirmationMatches() {
         assertEquals(user.getPassword(), user.getPasswordConfirm(), 
                      "Password and passwordConfirm should match");
     }
 
     @Test
-    public void testBlockUser() {
+    void testBlockUser() {
         user.setBlocked(true);
         assertTrue(user.isBlocked());
     }
 
     @Test
-    public void testSetEmail() {
+    void testSetEmail() {
         user.setEmail("new.email@example.com");
         assertEquals("new.email@example.com", user.getEmail());
     }
 
     @Test
-    public void testSetProfile() {
+    void testSetProfile() {
         user.setProfile("User");
         assertEquals("User", user.getProfile());
     }
     
     @Test
-	public void testSetPassword() {
+	void testSetPassword() {
 		user.setPassword("newPassword123");
 		assertEquals("newPassword123", user.getPassword());
 	}
     
     @Test
-	public void testComprobarFormatoPasswordCorrecto() {
-		user.setPassword("Password123@");
+	void testComprobarFormatoPasswordCorrecto() {
+		user.setPassword(PASSWORD_FUERTE);
 		assertTrue(user.comprobarFormatoPassword());
 	}
     
     @Test
-    public void testComprobarFormatoPasswordIncorrecto() {
+    void testComprobarFormatoPasswordIncorrecto() {
 		user.setPassword("password");
 		assertFalse(user.comprobarFormatoPassword());
 	}
     
     @Test
-    public void testComprobarFormatoEmailCorrecto() {
+    void testComprobarFormatoEmailCorrecto() {
     	user.setEmail("user@example.com");
     	assertTrue(user.comprobarFormatoEmail());
     }
     
     @Test 
-    public void testComprobarFormatoEmailIncorrecto() {
+    void testComprobarFormatoEmailIncorrecto() {
     	user.setEmail("userexample.com");
     	assertFalse(user.comprobarFormatoEmail());
     }
     
     @Test
-	public void testComprobarFormatoFechaCorrecto() {
-		user.setHiringDate("01/01/2024");
+	void testComprobarFormatoFechaCorrecto() {
+		user.setHiringDate(FECHA_CORRECTA);
 		assertTrue(user.comprobarFormatoFecha());
 	}
     
     @Test
-    public void testComprobarFormatoFechaIncorrecto() {
+    void testComprobarFormatoFechaIncorrecto() {
     	user.setHiringDate("01-01-24");
     	assertFalse(user.comprobarFormatoFecha());
     }
