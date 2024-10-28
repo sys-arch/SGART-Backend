@@ -30,6 +30,12 @@ public class AdminController {
     	List<UserDTO> users=adminService.getUsuariosValidados();
     	return ResponseEntity.ok(users);
     }
+    
+    @GetMapping("/getUsuariosSinValidar")
+    public ResponseEntity<List<UserDTO>> getUsuariosSinValidar(){
+    	List<UserDTO> users=adminService.getUsuariosSinValidar();
+    	return ResponseEntity.ok(users);
+    }
 
     @PutMapping("/validar/{email}")
     public ResponseEntity<String> validarUsuario(@PathVariable String email) {

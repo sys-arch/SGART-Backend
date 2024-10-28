@@ -28,6 +28,7 @@ public interface UserDao extends JpaRepository<User, Integer> {
 
     // Método para marcar al usuario como validado
     @Modifying
+    @Transactional
     @Query("UPDATE User u SET u.validated = true WHERE u.email = :email")
     void validarUsuario(@Param("email") String email);
 
@@ -36,6 +37,10 @@ public interface UserDao extends JpaRepository<User, Integer> {
     @Transactional
     @Query("UPDATE User u SET u.blocked=CASE u.blocked WHEN TRUE THEN FALSE ELSE TRUE END WHERE u.email = :email")
     void cambiarHabilitacionUsuario(@Param("email") String email);
+    
+ // Método para obtener la lista de usuarios que quedan por validar.
+    @Query("SELECT u FROM User u where u.validated=false")
+	      Optional<List<User>> getUsuariosSinValidar();
 
     // Método para obtener la lista de usuarios que ya han sido validados.
     @Query("SELECT u FROM User u where u.validated=true")
@@ -64,7 +69,9 @@ public interface UserDao extends JpaRepository<User, Integer> {
         }
     }
     
+    @Transactional
     void deleteByEmail(String email);  // Para eliminar por email
+    @Transactional
     void deleteById(Integer id);  // O id si se da el caso
       
 }
