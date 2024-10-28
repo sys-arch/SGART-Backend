@@ -22,6 +22,7 @@ public class AdminService {
 		List<User> users= userDAO.getUsuariosValidados().get();
 		return users.stream().map(user -> {
 			UserDTO dto= new UserDTO();
+			dto.setID(user.getID());
 			dto.setEmail(user.getEmail());
 			dto.setName(user.getName());
 			dto.setLastName(user.getLastName());
@@ -58,4 +59,12 @@ public class AdminService {
 		// Verificar si el usuario ya está validado en la base de datos
 		return userDAO.isUsuarioValidado(user.getEmail());
 	}
+	
+	public void eliminarUsuarioPorId(Integer id) {
+        userDAO.deleteById(id);
+    }
+
+    public void eliminarUsuarioPorEmail(String email) {
+        userDAO.deleteByEmail(email);
+    }
 }

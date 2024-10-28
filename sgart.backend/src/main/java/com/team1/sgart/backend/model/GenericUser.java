@@ -8,20 +8,28 @@ import jakarta.persistence.MappedSuperclass;
 public abstract class GenericUser {
 
 	@Id
-	@Column
-	protected int id;
+	@Column(name = "user_id")
+	protected String id;
 
-	@Column(nullable = false)
+	@Column(name = "user_name", nullable = false)
 	protected String name;
 	
-	@Column(name = "LastName", nullable = false)
+	@Column(name = "user_lastName", nullable = false)
 	protected String lastName;
 
-	@Column(unique = true, nullable = false)
+	@Column(name = "user_email", unique = true, nullable = false)
 	protected String email;
 
-	@Column(name = "Password", nullable = false)
+	@Column(name = "user_password", nullable = false)
 	protected String password;
+	
+	public String getID() {
+		return id;
+	}
+	
+	public void setID(String id) {
+		this.id = id;
+	}
 
 	public String getName() {
 		return name;

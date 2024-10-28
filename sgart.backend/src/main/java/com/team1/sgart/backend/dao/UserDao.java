@@ -16,7 +16,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
 @Repository
-public interface UserDao extends JpaRepository<User, String> {
+public interface UserDao extends JpaRepository<User, Integer> {
 
     Optional<User> findByEmail(String email);
 
@@ -34,11 +34,11 @@ public interface UserDao extends JpaRepository<User, String> {
     // Método para invertir el valor de "blocked" de un usuario
     @Modifying
     @Transactional
-    @Query("UPDATE User u SET u.blocked=NOT u.blocked WHERE u.email = :email")
+    @Query("UPDATE User u SET u.blocked=CASE u.blocked WHEN TRUE THEN FALSE ELSE TRUE END WHERE u.email = :email")
     void cambiarHabilitacionUsuario(@Param("email") String email);
 
     // Método para obtener la lista de usuarios que ya han sido validados.
-    @Query("SELECT u FROM User u where validated=true")
+    @Query("SELECT u FROM User u where u.validated=true")
 	      Optional<List<User>> getUsuariosValidados();
 
     default User updateUser(String email, User updatedUser) {
@@ -63,5 +63,9 @@ public interface UserDao extends JpaRepository<User, String> {
             setter.accept(nuevoValor);
         }
     }
+    
+    void deleteByEmail(String email);  // Para eliminar por email
+    void deleteById(Integer id);  // O id si se da el caso
+      
 }
 

@@ -10,14 +10,8 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
 @Entity
-@Table(name = "SGART_UsersTable", indexes = @Index(columnList = "id", unique = true))
+@Table(name = "SGART_UsersTable", indexes = @Index(columnList = "user_id", unique = true))
 public class User extends GenericUser{
-	
-	@Column(name = "user_name", nullable = false)
-	private String name;
-	
-	@Column(name = "user_lastName", nullable = false)
-	private String lastName;
 	
 	@Column(name = "user_department")
 	private String department;
@@ -25,22 +19,16 @@ public class User extends GenericUser{
 	@Column(name = "user_center", nullable = false)
 	private String center;
 	
-	@Column(name = "user_email", nullable = false)
-	private String email;
-	
 	@Column(name = "user_hiringDate", nullable = false)
 	private String hiringDate;
 	
 	@Column(name = "user_profile")
 	private String profile;
-	
-	@Column(name = "user_password", nullable = false)
-	private String password;
-	
+
 	@Transient
 	private String passwordConfirm;
   
-    @Column(name = "user_validated", nullable = false)
+    @Column(name = "user_validatedStatus", nullable = false)
     private boolean validated = false;
 	
     @Column(name = "user_blockedStatus", nullable = false)
