@@ -22,6 +22,7 @@ public class AdminService {
 		List<User> users= userDAO.getUsuariosValidados().get();
 		return users.stream().map(user -> {
 			UserDTO dto= new UserDTO();
+			dto.setID(user.getID());
 			dto.setEmail(user.getEmail());
 			dto.setName(user.getName());
 			dto.setLastName(user.getLastName());

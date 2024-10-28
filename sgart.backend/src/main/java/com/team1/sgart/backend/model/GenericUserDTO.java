@@ -9,6 +9,8 @@ import jakarta.persistence.MappedSuperclass;
 @MappedSuperclass
 public abstract class GenericUserDTO {
 
+	@JsonProperty("id")
+	protected String id;
 	@JsonProperty("name")
 	protected String name;
 	@JsonProperty("lastName")
@@ -17,6 +19,14 @@ public abstract class GenericUserDTO {
 	protected String email;
 	@JsonProperty("password")
 	protected String password;
+	
+	public String getID() {
+		return id;
+	}
+	
+	public void setID(String id) {
+		this.id = id;
+	}
 
 	public String getName() {
 		return name;

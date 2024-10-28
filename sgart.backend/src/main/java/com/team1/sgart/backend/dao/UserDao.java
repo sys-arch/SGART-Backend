@@ -34,11 +34,11 @@ public interface UserDao extends JpaRepository<User, Integer> {
     // Método para invertir el valor de "blocked" de un usuario
     @Modifying
     @Transactional
-    @Query("UPDATE User u SET u.blocked=NOT u.blocked WHERE u.email = :email")
+    @Query("UPDATE User u SET u.blocked=CASE u.blocked WHEN TRUE THEN FALSE ELSE TRUE END WHERE u.email = :email")
     void cambiarHabilitacionUsuario(@Param("email") String email);
 
     // Método para obtener la lista de usuarios que ya han sido validados.
-    @Query("SELECT u FROM User u where validated=true")
+    @Query("SELECT u FROM User u where u.validated=true")
 	      Optional<List<User>> getUsuariosValidados();
 
     default User updateUser(String email, User updatedUser) {
