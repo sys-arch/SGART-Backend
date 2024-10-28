@@ -1,0 +1,5 @@
+com\team1\sgart\backend\services\UserService.class
+com\team1\sgart\backend\dao\UserDao.class
+com\team1\sgart\backend\http\UserController.class
+com\team1\sgart\backend\App.class
+com\team1\sgart\backend\model\User.class
