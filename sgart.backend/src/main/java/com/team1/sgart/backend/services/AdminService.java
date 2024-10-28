@@ -58,4 +58,12 @@ public class AdminService {
 		// Verificar si el usuario ya está validado en la base de datos
 		return userDAO.isUsuarioValidado(user.getEmail());
 	}
+	
+	public void eliminarUsuarioPorId(Integer id) {
+        userDAO.deleteById(id);
+    }
+
+    public void eliminarUsuarioPorEmail(String email) {
+        userDAO.deleteByEmail(email);
+    }
 }
