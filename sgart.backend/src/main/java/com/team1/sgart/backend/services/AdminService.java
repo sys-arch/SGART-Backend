@@ -18,8 +18,7 @@ public class AdminService {
 	@Autowired
 	private UserDao userDAO;
 	
-	public List<UserDTO> getUsuariosValidados() {
-		List<User> users= userDAO.getUsuariosValidados().get();
+	public List<UserDTO> mapUser(List<User> users){
 		return users.stream().map(user -> {
 			UserDTO dto= new UserDTO();
 			dto.setID(user.getID());
@@ -33,6 +32,16 @@ public class AdminService {
 			dto.setHiringDate(user.getHiringDate());
 			return dto;
 		}).collect(Collectors.toList());
+	}
+	
+	public List<UserDTO> getUsuariosValidados() {
+		List<User> users= userDAO.getUsuariosValidados().get();
+		return mapUser(users);
+	}
+	
+	public List<UserDTO> getUsuariosSinValidar() {
+		List<User> users= userDAO.getUsuariosSinValidar().get();
+		return mapUser(users);
 	}
 
 	public void validarUsuario(String userEmail) {
