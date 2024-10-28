@@ -16,12 +16,12 @@ import org.springframework.stereotype.Service;
 import com.team1.sgart.backend.dao.CalendarEventDAO;
 import com.team1.sgart.backend.dao.DefaultWorkingHoursDAO;
 import com.team1.sgart.backend.dao.WorkingHoursNewScheduleDAO;
-import com.team1.sgart.backend.modules.CalendarEvent;
-import com.team1.sgart.backend.modules.CalendarEventDTO;
-import com.team1.sgart.backend.modules.DefaultWorkingHours;
-import com.team1.sgart.backend.modules.DefaultWorkingHoursDTO;
-import com.team1.sgart.backend.modules.WorkingHoursNewSchedule;
-import com.team1.sgart.backend.modules.WorkingHoursNewScheduleDTO;
+import com.team1.sgart.backend.model.CalendarEvent;
+import com.team1.sgart.backend.model.CalendarEventDTO;
+import com.team1.sgart.backend.model.DefaultWorkingHours;
+import com.team1.sgart.backend.model.DefaultWorkingHoursDTO;
+import com.team1.sgart.backend.model.WorkingHoursNewSchedule;
+import com.team1.sgart.backend.model.WorkingHoursNewScheduleDTO;
 
 @Service
 public class CalendarEventService {

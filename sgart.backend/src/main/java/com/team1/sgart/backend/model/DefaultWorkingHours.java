@@ -1,4 +1,4 @@
-package com.team1.sgart.backend.modules;
+package com.team1.sgart.backend.model;
 
 import java.time.LocalTime;
 

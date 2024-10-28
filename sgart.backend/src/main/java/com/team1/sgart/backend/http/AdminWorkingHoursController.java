@@ -17,10 +17,10 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 
+import com.team1.sgart.backend.model.CalendarEventDTO;
+import com.team1.sgart.backend.model.DefaultWorkingHoursDTO;
+import com.team1.sgart.backend.model.WorkingHoursNewScheduleDTO;
 import com.team1.sgart.backend.services.CalendarEventService;
-import com.team1.sgart.backend.modules.CalendarEventDTO;
-import com.team1.sgart.backend.modules.DefaultWorkingHoursDTO;
-import com.team1.sgart.backend.modules.WorkingHoursNewScheduleDTO;
 
 @RestController
 @RequestMapping("/administrador/eventos")
