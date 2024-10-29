@@ -52,12 +52,6 @@ public class AdminController {
     	}
     	return new ResponseEntity<>("Usuario cambiado con éxito", HttpStatus.OK);
     }
-    
-    @DeleteMapping("/eliminar/id/{id}")
-    public ResponseEntity<String> eliminarUsuarioPorId(@PathVariable Integer id) {
-        adminService.eliminarUsuarioPorId(id);
-        return new ResponseEntity<>("Usuario eliminado con éxito", HttpStatus.OK);
-    }
 
     @DeleteMapping("/eliminar/email/{email}")
     public ResponseEntity<String> eliminarUsuarioPorEmail(@PathVariable String email) {

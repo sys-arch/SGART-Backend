@@ -79,28 +79,9 @@ public class AdminServiceTest {
 		Mockito.verify(userDAO, Mockito.times(1)).validarUsuario(userEmail);
 	}
 
-	@Test
-	public void testEliminarUsuarioPorId_UsuarioExiste() {
-		Integer userId = 1;
-		lenient().when(userDAO.findById(userId)).thenReturn(Optional.of(new User()));
-
-		adminService.eliminarUsuarioPorId(userId);
-
-		verify(userDAO, times(1)).deleteById(userId);
-	}
 
 	/*
 	 * EN FRONT SE PASA ID O MAIL QUE SÍ EXISTE
-	 * 
-	 * @Test public void testEliminarUsuarioPorId_UsuarioNoExiste() { Integer userId
-	 * = 999; lenient().when(userDAO.findById(userId)).thenReturn(Optional.empty());
-	 * 
-	 * adminService.eliminarUsuarioPorId(userId);
-	 * 
-	 * verify(userDAO, times(0)).deleteById(userId); }
-	 */
-
-	/*
 	 * @Test public void testEliminarUsuarioPorEmail_UsuarioNoExiste() { String
 	 * userEmail = "nonexistent@example.com";
 	 * lenient().when(userDAO.findByEmail(userEmail)).thenReturn(Optional.empty());
@@ -118,4 +99,32 @@ public class AdminServiceTest {
 		verify(userDAO, times(1)).deleteByEmail(userEmail);
 	}
 
+	@Test
+    public void testBloquearUsuario_UsuarioNoBloqueado() {
+        String userEmail = "test@example.com";
+        User user = new User();
+        user.setBlocked(false); // Usuario inicialmente no bloqueado
+
+        lenient().when(userDAO.findByEmail(userEmail)).thenReturn(Optional.of(user));
+
+        adminService.cambiarHabilitacionUsuario(userEmail); // Cambia a bloqueado
+
+        // Verificar que se llama a cambiarHabilitacionUsuario en el DAO
+        verify(userDAO, times(1)).cambiarHabilitacionUsuario(userEmail);
+    }
+
+    @Test
+    public void testDesbloquearUsuario_UsuarioBloqueado() {
+        String userEmail = "test@example.com";
+        User user = new User();
+        user.setBlocked(true); // Usuario inicialmente bloqueado
+
+        lenient().when(userDAO.findByEmail(userEmail)).thenReturn(Optional.of(user));
+
+        adminService.cambiarHabilitacionUsuario(userEmail); // Cambia a desbloqueado
+
+        // Verificar que se llama a cambiarHabilitacionUsuario en el DAO
+        verify(userDAO, times(1)).cambiarHabilitacionUsuario(userEmail);
+    }
 }
+

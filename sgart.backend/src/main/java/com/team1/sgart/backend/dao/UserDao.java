@@ -16,7 +16,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
 @Repository
-public interface UserDao extends JpaRepository<User, Integer> {
+public interface UserDao extends JpaRepository<User, String> {
 
     Optional<User> findByEmail(String email);
 
@@ -71,8 +71,7 @@ public interface UserDao extends JpaRepository<User, Integer> {
     
     @Transactional
     void deleteByEmail(String email);  // Para eliminar por email
-    @Transactional
-    void deleteById(Integer id);  // O id si se da el caso
+
       
 }
 
