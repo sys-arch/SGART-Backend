@@ -99,4 +99,32 @@ public class AdminServiceTest {
 		verify(userDAO, times(1)).deleteByEmail(userEmail);
 	}
 
+	@Test
+    public void testBloquearUsuario_UsuarioNoBloqueado() {
+        String userEmail = "test@example.com";
+        User user = new User();
+        user.setBlocked(false); // Usuario inicialmente no bloqueado
+
+        lenient().when(userDAO.findByEmail(userEmail)).thenReturn(Optional.of(user));
+
+        adminService.cambiarHabilitacionUsuario(userEmail); // Cambia a bloqueado
+
+        // Verificar que se llama a cambiarHabilitacionUsuario en el DAO
+        verify(userDAO, times(1)).cambiarHabilitacionUsuario(userEmail);
+    }
+
+    @Test
+    public void testDesbloquearUsuario_UsuarioBloqueado() {
+        String userEmail = "test@example.com";
+        User user = new User();
+        user.setBlocked(true); // Usuario inicialmente bloqueado
+
+        lenient().when(userDAO.findByEmail(userEmail)).thenReturn(Optional.of(user));
+
+        adminService.cambiarHabilitacionUsuario(userEmail); // Cambia a desbloqueado
+
+        // Verificar que se llama a cambiarHabilitacionUsuario en el DAO
+        verify(userDAO, times(1)).cambiarHabilitacionUsuario(userEmail);
+    }
 }
+
