@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.zxing.BarcodeFormat;
@@ -20,7 +21,14 @@ import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
 @Service
 public class TwoFactorAuthService {
 
-    private final GoogleAuthenticator gAuth = new GoogleAuthenticator();
+    private final GoogleAuthenticator gAuth;
+    private UserDao userDao;
+    
+    @Autowired
+	public TwoFactorAuthService(UserDao userDao, GoogleAuthenticator gAuth) {
+		this.userDao = userDao;
+		this.gAuth = gAuth;
+	}
 
     // Método para generar la clave secreta que usará Google Authenticator
     public String generateSecretKey() {
@@ -50,11 +58,14 @@ public class TwoFactorAuthService {
     }
 
     public boolean validateTOTPFromDB(String email, String code) {
-        String secretKey = UserDao.obtenerAuthCodePorEmail(email);
+    	boolean isValid = false;
+        String secretKey = userDao.obtenerAuthCodePorEmail(email);
         if (secretKey == null) {
             throw new IllegalArgumentException("Secret key not found for user: " + email);
         }
+        
+        isValid = gAuth.authorize(secretKey, Integer.parseInt(code));
 
-        return gAuth.authorize(secretKey, Integer.parseInt(code));
+        return isValid;
     }
 }

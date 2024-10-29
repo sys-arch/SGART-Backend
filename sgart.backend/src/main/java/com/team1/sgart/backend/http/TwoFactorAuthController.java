@@ -80,6 +80,8 @@ public class TwoFactorAuthController {
                                      .body("{\"status\": \"invalid\"}");
             }
         } catch (Exception e) {
+        	System.err.println("Error: " + e.getClass().getName() + " - " + e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                                  .body("{\"error\": \"Error al validar el código TOTP\"}");
         }

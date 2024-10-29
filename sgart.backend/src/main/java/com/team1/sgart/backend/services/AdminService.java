@@ -14,9 +14,13 @@ import com.team1.sgart.backend.model.UserDTO;
 
 @Service
 public class AdminService {
-
-	@Autowired
+	
 	private UserDao userDAO;
+	
+	@Autowired
+	AdminService(UserDao userDao) {
+        this.userDAO = userDao;
+    }
 	
 	public List<UserDTO> mapUser(List<User> users){
 		return users.stream().map(user -> {

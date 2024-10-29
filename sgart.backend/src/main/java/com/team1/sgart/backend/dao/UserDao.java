@@ -1,19 +1,15 @@
 package com.team1.sgart.backend.dao;
+import com.team1.sgart.backend.model.User;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-<<<<<<< Updated upstream
 import java.util.function.Consumer;
-=======
->>>>>>> Stashed changes
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import com.team1.sgart.backend.model.User;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -40,9 +36,9 @@ public interface UserDao extends JpaRepository<User, Integer> {
     @Transactional
     @Query("UPDATE User u SET u.blocked=CASE u.blocked WHEN TRUE THEN FALSE ELSE TRUE END WHERE u.email = :email")
     void cambiarHabilitacionUsuario(@Param("email") String email);
-<<<<<<< Updated upstream
     
- // Método para obtener la lista de usuarios que quedan por validar.
+    // Método para obtener la lista de usuarios que quedan por validar.
+    @Transactional
     @Query("SELECT u FROM User u where u.validated=false")
 	      Optional<List<User>> getUsuariosSinValidar();
 
@@ -78,16 +74,11 @@ public interface UserDao extends JpaRepository<User, Integer> {
     @Transactional
     void deleteById(Integer id);  // O id si se da el caso
       
-=======
-
     // Método para obtener el authCode de un usuario
-    @Query("SELECT u.user_twoFactorAuthCode FROM SGART_UsersTable u WHERE u.user_email = :email")
-    static
-    String obtenerAuthCodePorEmail(@Param("email") String email) {
+    @Query("SELECT u.twoFactorAuthCode FROM User u WHERE u.email = :email")
+    String obtenerAuthCodePorEmail(@Param("email") String email);
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'obtenerAuthCodePorEmail'");
-    }
+        //(throw new UnsupportedOperationException("Unimplemented method 'obtenerAuthCodePorEmail'");
     
->>>>>>> Stashed changes
 }
 

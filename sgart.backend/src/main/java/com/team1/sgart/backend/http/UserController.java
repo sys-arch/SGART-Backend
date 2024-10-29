@@ -37,4 +37,11 @@ public class UserController {
 		userService.modificarUser(user);
 		return ResponseEntity.status(HttpStatus.OK).body("Usuario modificado correctamente");
 	}
+    
+    @PostMapping("/login")
+	public ResponseEntity<String> login(@RequestBody User user) {
+
+		userService.loginUser(user);
+		return ResponseEntity.status(HttpStatus.OK).body("Usuario logueado correctamente"); //Meter también el JSON del usuario
+	}
 }
