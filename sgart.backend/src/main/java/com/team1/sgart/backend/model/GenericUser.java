@@ -28,16 +28,10 @@ public abstract class GenericUser {
 	@Column(name = "user_password", nullable = false)
 	protected String password;
 	
-	/*
-	public String getID() {
+	public UUID getID() {
 		return id;
 	}
 	
-	public void setID(String id) {
-		this.id = id;
-	}
-	*/
-
 	public String getName() {
 		return name;
 	}
