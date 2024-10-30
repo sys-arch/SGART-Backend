@@ -4,6 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Column;
 import java.util.regex.Pattern;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
@@ -33,6 +35,7 @@ public class User extends GenericUser{
     @Column(name = "user_blockedStatus", nullable = false)
 	private boolean blocked;
     
+    @JsonProperty("twoFactorAuthCode")
     @Column(name = "user_twoFactorAuthCode", nullable = false)
     private String twoFactorAuthCode;
 

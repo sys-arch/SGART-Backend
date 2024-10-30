@@ -25,7 +25,7 @@ public class AdminService {
 	public List<UserDTO> mapUser(List<User> users){
 		return users.stream().map(user -> {
 			UserDTO dto= new UserDTO();
-			dto.setID(user.getID());
+			//dto.setID(user.getID());
 			dto.setEmail(user.getEmail());
 			dto.setName(user.getName());
 			dto.setLastName(user.getLastName());

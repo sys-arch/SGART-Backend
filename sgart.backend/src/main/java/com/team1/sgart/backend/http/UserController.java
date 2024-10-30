@@ -35,7 +35,7 @@ public class UserController {
 	public ResponseEntity<String> modificar(@RequestBody User user) {
 
 		userService.modificarUser(user);
-		return ResponseEntity.status(HttpStatus.OK).body("Usuario modificado correctamente");
+		return ResponseEntity.status(HttpStatus.OK).body("Perfil modificado correctamente");
 	}
     
     @PostMapping("/login")
