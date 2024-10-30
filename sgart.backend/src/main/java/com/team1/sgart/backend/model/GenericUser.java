@@ -1,15 +1,20 @@
 package com.team1.sgart.backend.model;
 
+import java.util.UUID;
+
 import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 
 @MappedSuperclass
 public abstract class GenericUser {
-
+	
 	@Id
-	@Column(name = "user_id")
-	protected String id;
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(name = "user_id", updatable = false, nullable = false)
+	private UUID id;
 
 	@Column(name = "user_name", nullable = false)
 	protected String name;
@@ -23,14 +28,10 @@ public abstract class GenericUser {
 	@Column(name = "user_password", nullable = false)
 	protected String password;
 	
-	public String getID() {
+	public UUID getID() {
 		return id;
 	}
 	
-	public void setID(String id) {
-		this.id = id;
-	}
-
 	public String getName() {
 		return name;
 	}

@@ -1,9 +1,10 @@
 package com.team1.sgart.backend.model;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import jakarta.persistence.Column;
 import java.util.regex.Pattern;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
@@ -33,9 +34,13 @@ public class User extends GenericUser{
 	
     @Column(name = "user_blockedStatus", nullable = false)
 	private boolean blocked;
+    
+    @JsonProperty("twoFactorAuthCode")
+    @Column(name = "user_twoFactorAuthCode", nullable = false)
+    private String twoFactorAuthCode;
 
 	public User(String email, String name, String lastName, String department, String center, String hiringDate,
-			String profile, String password, String passwordConfirm, boolean blocked, boolean validated) {
+			String profile, String password, String passwordConfirm, boolean blocked, boolean validated, String twoFactorAuthCode) {
 		this.email=email;
 		this.name = name;
 		this.lastName = lastName;
@@ -47,27 +52,13 @@ public class User extends GenericUser{
 		this.passwordConfirm = passwordConfirm;
 		this.blocked = blocked;
 		this.validated = validated;
+		this.twoFactorAuthCode = twoFactorAuthCode;
 	}
 
 	public User() {
 	}
 
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getLastName() {
-		return lastName;
-	}
-
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
-
+	
 	public String getDepartment() {
 		return department;
 	}
@@ -84,14 +75,6 @@ public class User extends GenericUser{
 		this.center = center;
 	}
 
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
 	public String getHiringDate() {
 		return hiringDate;
 	}
@@ -106,14 +89,6 @@ public class User extends GenericUser{
 
 	public void setProfile(String profile) {
 		this.profile = profile;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
 	}
 
 	public String getPasswordConfirm() {

@@ -14,14 +14,18 @@ import com.team1.sgart.backend.model.UserDTO;
 
 @Service
 public class AdminService {
-
-	@Autowired
+	
 	private UserDao userDAO;
+	
+	@Autowired
+	AdminService(UserDao userDao) {
+        this.userDAO = userDao;
+    }
 	
 	public List<UserDTO> mapUser(List<User> users){
 		return users.stream().map(user -> {
 			UserDTO dto= new UserDTO();
-			dto.setID(user.getID());
+			//dto.setID(user.getID());
 			dto.setEmail(user.getEmail());
 			dto.setName(user.getName());
 			dto.setLastName(user.getLastName());
