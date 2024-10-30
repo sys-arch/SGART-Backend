@@ -32,6 +32,10 @@ public abstract class GenericUser {
 		return id;
 	}
 	
+	public void setID(UUID id) {
+		this.id=id;
+	}
+	
 	public String getName() {
 		return name;
 	}
