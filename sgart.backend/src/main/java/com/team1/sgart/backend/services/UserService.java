@@ -19,8 +19,9 @@ public class UserService {
 	private AdminDao adminDao;
 	
 	@Autowired
-	UserService(UserDao userDao) {
+	UserService(UserDao userDao, AdminDao adminDao) {
         this.userDao = userDao;
+        this.adminDao = adminDao;
     }
 
 	public User registrarUser(User user) {
@@ -49,14 +50,18 @@ public class UserService {
 	}
 	
 	public GenericUser loginUser(User user) {
+		String email = user.getEmail();
+		String password = user.getPassword();
+		
 		if(!emailFormatoValido(user)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Formato del email incorrecto");
         }
-		else if (userDao.findByEmailAndPassword(user.getEmail(), user.getPassword()).isPresent()) {
+		else if (userDao.findByEmailAndPassword(email, password).isPresent()) {
 			user = userDao.findByEmail(user.getEmail()).get();
 			return user;
 		}
-		else if (adminDao.findByEmailAndPassword(user.getEmail(), user.getPassword()).isPresent())//Admin dao, buscar por email y password
+		
+		else if (adminDao.findByEmailAndPassword(email, password).isPresent())//Admin dao, buscar por email y password
         {
             Admin admin = adminDao.findByEmail(user.getEmail()).get();
             return admin;

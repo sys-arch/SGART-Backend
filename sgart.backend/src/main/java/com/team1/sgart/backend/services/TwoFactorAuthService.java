@@ -13,6 +13,7 @@ import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
+import com.team1.sgart.backend.dao.AdminDao;
 import com.team1.sgart.backend.dao.UserDao;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
@@ -23,10 +24,12 @@ public class TwoFactorAuthService {
 
     private final GoogleAuthenticator gAuth;
     private UserDao userDao;
+    private AdminDao adminDao;
     
     @Autowired
-	public TwoFactorAuthService(UserDao userDao, GoogleAuthenticator gAuth) {
+	public TwoFactorAuthService(UserDao userDao, AdminDao adminDao, GoogleAuthenticator gAuth) {
 		this.userDao = userDao;
+		this.adminDao = adminDao;
 		this.gAuth = gAuth;
 	}
 
@@ -59,12 +62,16 @@ public class TwoFactorAuthService {
 
     public boolean validateTOTPFromDB(String email, String code) {
     	boolean isValid = false;
-        String secretKey = userDao.obtenerAuthCodePorEmail(email);
-        if (secretKey == null) {
-            throw new IllegalArgumentException("Secret key not found for user: " + email);
+        String secretKeyUser = userDao.obtenerAuthCodePorEmail(email);
+        String secretKeyAdmin = adminDao.obtenerAuthCodePorEmail(email);
+		if (secretKeyAdmin != null) {
+			isValid = gAuth.authorize(secretKeyAdmin, Integer.parseInt(code));
+		} else if (secretKeyUser != null) {
+			isValid = gAuth.authorize(secretKeyUser, Integer.parseInt(code));
+		}
+		else {
+            throw new IllegalArgumentException("Secret key not found for email: " + email);
         }
-        
-        isValid = gAuth.authorize(secretKey, Integer.parseInt(code));
 
         return isValid;
     }

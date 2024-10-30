@@ -2,7 +2,7 @@ package com.team1.sgart.backend.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class UserDTO extends GenericUser{
+public class UserDTO extends GenericUserDTO{
 	
 	@JsonProperty("department")
 	private String department;
@@ -16,10 +16,7 @@ public class UserDTO extends GenericUser{
     private boolean validated = false;
 	@JsonProperty("blocked")
 	private boolean blocked;
-
-	public UserDTO() {
-	}
-
+	
 	public String getDepartment() {
 		return department;
 	}

@@ -1,5 +1,7 @@
 package com.team1.sgart.backend.model;
 
+import java.util.UUID;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
@@ -10,7 +12,7 @@ import jakarta.persistence.MappedSuperclass;
 public abstract class GenericUserDTO {
 
 	@JsonProperty("id")
-	protected String id;
+	protected UUID id;
 	@JsonProperty("name")
 	protected String name;
 	@JsonProperty("lastName")
@@ -20,12 +22,12 @@ public abstract class GenericUserDTO {
 	@JsonProperty("password")
 	protected String password;
 	
-	public String getID() {
+	public UUID getID() {
 		return id;
 	}
 	
-	public void setID(String id) {
-		this.id = id;
+	public void setID(UUID uuid) {
+		this.id = uuid;
 	}
 
 	public String getName() {
