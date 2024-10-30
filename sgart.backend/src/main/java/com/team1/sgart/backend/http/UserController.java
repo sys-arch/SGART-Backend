@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.team1.sgart.backend.model.User;
@@ -44,4 +45,13 @@ public class UserController {
 		userService.loginUser(user);
 		return ResponseEntity.status(HttpStatus.OK).body("Usuario logueado correctamente"); //Meter también el JSON del usuario
 	}
+	    @PostMapping("/verificar-email")
+    public ResponseEntity<String> verificarEmail(@RequestParam User user) {
+        boolean existe = userService.emailYaRegistrado(user);
+        if (existe) {
+            return ResponseEntity.status(HttpStatus.OK).body("El email ya está registrado");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("El email no está registrado");
+        }
+    }
 }
