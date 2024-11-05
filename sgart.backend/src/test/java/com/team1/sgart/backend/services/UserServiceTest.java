@@ -35,7 +35,7 @@ class UserServiceTest {
     @BeforeEach
     void setUp() {
     	user = new User("carlos.romero@example.com", "Carlos", "Romero Navarro", "Quality", "Ciudad Real", FECHA_CORRECTA, 
-                "Scrum Developer", PASSWORD_FUERTE, PASSWORD_FUERTE, false, false);
+                "Scrum Developer", PASSWORD_FUERTE, PASSWORD_FUERTE, false, false, "");
         
         Mockito.when(userDao.findByEmail(user.getEmail())).thenReturn(Optional.empty()); // Email no registrado
         Mockito.when(userDao.save(user)).thenReturn(user); // Simular guardado de usuario
