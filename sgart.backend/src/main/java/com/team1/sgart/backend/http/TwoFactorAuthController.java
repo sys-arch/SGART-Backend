@@ -118,7 +118,7 @@ public class TwoFactorAuthController {
 		String token = jwtTokenProvider.generatePasswordResetToken(user);
 		
 		//Enviamos el email
-		String recoveryLink = "http://localhost:9000/auth/reset-password?" + token; //Cambiar la URL en producción
+		String recoveryLink = "url hacia la pagina en react?" + token; //Cambiar la URL en producción
         emailService.sendPasswordResetEmail(user.getEmail(), recoveryLink);
         
         return ResponseEntity.status(HttpStatus.OK).body("{\"message\": \"Email de recuperación de contraseña enviado\"}");
