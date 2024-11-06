@@ -35,7 +35,7 @@ class UserControllerTest {
     @BeforeEach
     public void setUp() {
         user = new User("carlos.romero@example.com", "Carlos", "Romero Navarro", "Quality", "Ciudad Real", "01/01/2024", 
-                        "Scrum Developer", "password123@", "password123@", false, false);
+                        "Scrum Developer", "password123@", "password123@", false, false, "");
     }
 
     @Test

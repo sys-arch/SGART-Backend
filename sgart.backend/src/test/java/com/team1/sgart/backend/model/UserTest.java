@@ -14,7 +14,7 @@ class UserTest {
     @BeforeEach
     public void setUp() {
         user = new User("carlos.romero@example.com", "Carlos", "Romero Navarro", "Quality", "Ciudad Real", FECHA_CORRECTA, 
-                        "Scrum Developer", PASSWORD_FUERTE, PASSWORD_FUERTE, false, false);
+                        "Scrum Developer", PASSWORD_FUERTE, PASSWORD_FUERTE, false, false, "");
     }
 
     @Test
