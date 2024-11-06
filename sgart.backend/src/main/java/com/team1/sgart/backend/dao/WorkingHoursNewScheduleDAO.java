@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import com.team1.sgart.backend.model.WorkingHoursNewSchedule;
 
 @Repository
-public interface WorkingHoursNewScheduleDAO extends JpaRepository<WorkingHoursNewSchedule, UUID> {
+public interface WorkingHoursNewScheduleDao extends JpaRepository<WorkingHoursNewSchedule, UUID> {
     
 }
 
