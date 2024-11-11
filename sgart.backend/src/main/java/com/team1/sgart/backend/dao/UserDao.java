@@ -3,6 +3,7 @@ import com.team1.sgart.backend.model.User;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,11 +16,15 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
 @Repository
-public interface UserDao extends JpaRepository<User, String> {
+public interface UserDao extends JpaRepository<User, UUID> { // si da fallo UUID regresar a String, con String falla findCurrentUser
 
     Optional<User> findByEmail(String email);
 
     Optional<User> findByEmailAndPassword(String email, String password);
+    
+    // Método para obtener el usuario actual
+    @Query("SELECT u FROM User u WHERE u.email = :email")
+    User findCurrentUser(@Param("email") String email);
   
     // Método para verificar si el usuario está validado
     @Query("SELECT u.validated FROM User u WHERE u.email = :email")
