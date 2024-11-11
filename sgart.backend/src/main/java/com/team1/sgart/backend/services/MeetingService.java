@@ -42,7 +42,7 @@ public class MeetingService {
         return userDao.findAllNotBlocked();  // Solo los usuarios no bloqueados
     }
 
-    // Método para comprobar la disponibilidad de un usuario
+    // Método para comprobar la disponibilidad de un usuario								--------AQUÍ FALTA COMPROBAR SI LA INVITACIÓN ESTÁ ACEPTADA
     public boolean isUserAvailable(User user, LocalTime startTime, LocalTime endTime) {
         List<Invitation> invitations = userDao.checkUserAvailability(user, startTime, endTime);
         return invitations.isEmpty();  // Si no hay invitaciones que se solapen, está disponible
