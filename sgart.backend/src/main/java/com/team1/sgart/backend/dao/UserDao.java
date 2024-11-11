@@ -63,6 +63,7 @@ public interface UserDao extends JpaRepository<User, UUID> { // si da fallo UUID
         actualizarCampo(user::setEmail, updatedUser.getEmail());
         actualizarCampo(user::setHiringDate, updatedUser.getHiringDate());
         actualizarCampo(user::setProfile, updatedUser.getProfile());
+        actualizarCampo(user::setPassword, updatedUser.getPassword());
 
         // Guardar el usuario actualizado
         return save(user);
