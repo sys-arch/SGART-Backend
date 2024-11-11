@@ -37,7 +37,6 @@ public class Meeting {
         joinColumns = @JoinColumn(name = "meeting_id"),
         inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private List<User> attendees;//--------------------------------------revisar esto--------------------------------
 
     @Column(name = "meeting_location", nullable = false, length = 100)
     private String location;
@@ -129,7 +128,5 @@ public class Meeting {
 	public void setObservations(String observations) {
 		this.observations = observations;
 	}
-
-    // Getters y setters 
     
 }

@@ -9,6 +9,6 @@ import com.team1.sgart.backend.model.WorkingHoursNewSchedule;
 
 @Repository
 public interface WorkingHoursNewScheduleDao extends JpaRepository<WorkingHoursNewSchedule, UUID> {
-    
+    //PARA EVENTOS NO USAR
 }
 

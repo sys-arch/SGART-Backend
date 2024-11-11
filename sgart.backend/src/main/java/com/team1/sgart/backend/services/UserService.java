@@ -1,5 +1,9 @@
 package com.team1.sgart.backend.services;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -97,4 +101,13 @@ public class UserService {
 
 		return passwordValido;
 	}
+	
+    public List<User> getAvailableUsers() {
+        return userDao.findAllNotBlocked();  
+    }
+    
+    public Optional<User> getUserById(UUID id) {
+        return userDao.findById(id);
+    }
+    
 }
