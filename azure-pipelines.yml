@@ -22,15 +22,15 @@ stages:
   jobs:
   - job: JacocoJob
     steps:
-    - checkout: none
+    - checkout: self
     
     - task: Maven@4
       inputs:
         mavenPomFile: 'pom.xml'
-        goals: 'jacoco:report'
+        goals: 'clean verify'
         options: '-Djacoco.skip=false'
     
-    - script: Jacoco runs!
+    - script: echo Jacoco report generated!
 
 - stage: SonarQube
   jobs:
