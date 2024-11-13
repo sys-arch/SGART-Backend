@@ -47,6 +47,7 @@ public class MeetingController {
         return availableUsers.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(availableUsers);
     }
 
+    /*
     // Comprobar la disponibilidad de un usuario para una reunión
     @GetMapping("/check-availability/{userId}")
     public ResponseEntity<Boolean> checkUserAvailability(@PathVariable UUID userId, @RequestParam("startTime") LocalTime startTime, 
@@ -60,6 +61,7 @@ public class MeetingController {
             return ResponseEntity.notFound().build(); // Si el usuario no se encuentra
         }
     }
+*/
 
     // Invitar a un usuario a una reunión
     @PostMapping("/invite/{meetingId}/{userId}")
