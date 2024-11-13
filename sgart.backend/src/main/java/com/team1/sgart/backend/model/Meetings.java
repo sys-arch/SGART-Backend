@@ -6,6 +6,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Table;
+
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.UUID;
 
@@ -23,6 +25,9 @@ public class Meetings {
 
     @Column(name = "meeting_all_day", nullable = false)
     private boolean meetingAllDay;
+
+    @Column(name = "meeting_date", nullable = false)
+    private LocalDate meetingDate;
 
     @Column(name = "meeting_start_time", nullable = false)
     private LocalTime meetingStartTime;
@@ -89,5 +94,13 @@ public class Meetings {
 
     public void setOrganizerId(UUID organizerId) {
         this.organizerId = organizerId;
+    }
+
+    public LocalDate getMeetingDate() {
+        return meetingDate;
+    }
+
+    public void setMeetingDate(LocalDate meetingDate) {
+        this.meetingDate = meetingDate;
     }
 }

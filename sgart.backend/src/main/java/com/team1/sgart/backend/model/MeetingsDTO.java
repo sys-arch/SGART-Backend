@@ -1,5 +1,6 @@
 package com.team1.sgart.backend.model;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -14,6 +15,9 @@ public class MeetingsDTO {
 
     @JsonProperty("allDay")
     private boolean meetingAllDay;
+
+    @JsonProperty("meetingDate")
+    private LocalDate meetingDate;
 
     @JsonProperty("startTime")
     private LocalTime meetingStartTime;
@@ -57,6 +61,14 @@ public class MeetingsDTO {
 
     public void setMeetingAllDay(boolean meetingAllDay) {
         this.meetingAllDay = meetingAllDay;
+    }
+
+    public LocalDate getMeetingDate() {
+        return meetingDate;
+    }
+
+    public void setMeetingDate(LocalDate meetingDate) {
+        this.meetingDate = meetingDate;
     }
 
     public LocalTime getMeetingStartTime() {

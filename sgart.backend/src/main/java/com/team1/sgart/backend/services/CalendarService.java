@@ -30,7 +30,7 @@ public class CalendarService {
 
     public List<MeetingsDTO> loadMeetings() {
         List<Meetings> meetings = meetingsDao.findAll();
-
+    
         return meetings.stream().map(meeting -> {
             MeetingsDTO meetingsDTO = new MeetingsDTO();
             meetingsDTO.setMeetingId(meeting.getMeetingId());
@@ -39,10 +39,11 @@ public class CalendarService {
             meetingsDTO.setMeetingStartTime(meeting.getMeetingStartTime());
             meetingsDTO.setMeetingEndTime(meeting.getMeetingEndTime());
             meetingsDTO.setOrganizerId(meeting.getOrganizerId());
+            meetingsDTO.setMeetingDate(meeting.getMeetingDate());
             return meetingsDTO;
         }).collect(Collectors.toList());
     }
-
+    
 
     public List<InvitationsDTO> getDetailedInvitationsByMeetingId(UUID meetingId) {
         List<Object[]> results = invitationsDao.findDetailedInvitationsByMeetingId(meetingId);

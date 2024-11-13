@@ -34,7 +34,7 @@ public class AdminCalendarController {
         logger.info("[!] AdminCalendarController created");
     }
 
-    @GetMapping
+    @GetMapping("/loadMeetings")
     public ResponseEntity<List<MeetingsDTO>> getAllMeetings() {
         List<MeetingsDTO> meetingsList = calendarService.loadMeetings();
         return ResponseEntity.ok(meetingsList);
