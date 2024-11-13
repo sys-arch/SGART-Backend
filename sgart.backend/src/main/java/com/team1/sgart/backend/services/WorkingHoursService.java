@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class WorkingHoursService {
-        private static final Logger logger = LoggerFactory.getLogger(WorkingHoursService.class);
+    private static final Logger logger = LoggerFactory.getLogger(WorkingHoursService.class);
     private WorkingHoursDao workingHoursDao;
 
     @Autowired
