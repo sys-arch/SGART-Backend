@@ -44,7 +44,7 @@ stages:
   - job: SonarQubeJob
     steps:
     - checkout: none
-    - script: sonar-scanner -Dsonar.token=$(SQ_TOKEN) \ Dproject.settings= sgart.backend/sonar-project.properties
+    - script: sonar-scanner -Dsonar.token=$(SQ_TOKEN) -Dproject.settings= sgart.backend/sonar-project.properties
     - script: echo Sonarqube ok!
 
 
