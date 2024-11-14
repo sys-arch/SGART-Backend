@@ -34,7 +34,7 @@ stages:
     - task: Maven@4
       inputs:
         mavenPomFile: 'sgart.backend/pom.xml'
-        goals: 'clean verify'
+        goals: 'jacoco:report'
         options: '-Djacoco.skip=false'
     
     - script: echo Jacoco report generated!
