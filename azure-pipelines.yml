@@ -33,7 +33,7 @@ stages:
     
     - task: Maven@4
       inputs:
-        mavenPomFile: 'pom.xml'
+        mavenPomFile: 'sgart.backend/pom.xml'
         goals: 'clean verify'
         options: '-Djacoco.skip=false'
     
