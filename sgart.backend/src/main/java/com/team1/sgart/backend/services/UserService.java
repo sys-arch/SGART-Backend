@@ -56,16 +56,15 @@ public class UserService {
 		if(!emailFormatoValido(user)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Formato del email incorrecto");
         }
-		else if (userDao.findByEmailAndPassword(email, password).isPresent()) {
-			user = userDao.findByEmail(user.getEmail()).get();
-			return user;
-		}
-		
 		else if (adminDao.findByEmailAndPassword(email, password).isPresent())//Admin dao, buscar por email y password
         {
             Admin admin = adminDao.findByEmail(user.getEmail()).get();
             return admin;
         }
+		else if (userDao.findByEmailAndPassword(email, password).isPresent()) {
+			user = userDao.findByEmail(user.getEmail()).get();
+			return user;
+		}
 		else {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario o contraseña incorrectos");
 		}
