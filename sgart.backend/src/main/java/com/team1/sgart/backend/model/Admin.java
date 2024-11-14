@@ -1,15 +1,9 @@
 package com.team1.sgart.backend.model;
 
-import java.util.UUID;
-
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 
 @Entity
@@ -30,8 +24,13 @@ public class Admin extends GenericUser {
     private String twoFactorAuthCode;
 
 	
-	public Admin() {
+	public Admin(String name, String lastName, String email, String password) {
 		super();
+		this.name = name;
+		this.lastName = lastName;
+		this.email = email;
+		this.password = password;
+		
 	}
     // Getters y setters
 	
