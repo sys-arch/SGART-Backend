@@ -44,7 +44,11 @@ stages:
   - job: SonarQubeJob
     steps:
     - checkout: none
-    - script: sonar-scanner -Dsonar.token=$(SQ_TOKEN) -Dproject.settings=sgart.backend/sonar-project.properties
+    - script: |
+        sonar-scanner \ 
+        -Dsonar.token=$(SQ_TOKEN) \ 
+        -Dproject.settings=sgart.backend/sonar-project.properties \
+        -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
     - script: echo Sonarqube ok!
 
 
