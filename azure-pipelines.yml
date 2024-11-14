@@ -23,6 +23,13 @@ stages:
   - job: JacocoJob
     steps:
     - checkout: self
+    - script: |
+        echo "Cambiando a la rama develop"
+        git fetch origin develop
+        git checkout develop
+        git pull origin develop
+      displayName: 'Checkout develop branch'
+      
     
     - task: Maven@4
       inputs:
