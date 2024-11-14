@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +14,7 @@ import com.team1.sgart.backend.model.MeetingsDTO;
 import com.team1.sgart.backend.services.CalendarService;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -40,10 +40,17 @@ public class AdminCalendarController {
         return ResponseEntity.ok(meetingsList);
     }
 
-    @GetMapping("/detailed-invitations/{meetingId}")
-    public ResponseEntity<List<InvitationsDTO>> getDetailedInvitationsByMeetingId(@PathVariable UUID meetingId) {
-        List<InvitationsDTO> invitations = calendarService.getDetailedInvitationsByMeetingId(meetingId);
-        return ResponseEntity.ok(invitations);
-    }
+    @PostMapping("/invitados")
+    public ResponseEntity<List<InvitationsDTO>> getInvitees(@RequestBody Map<String, UUID> payload) {
+        UUID meetingId = payload.get("meetingId");
+        if (meetingId == null) {
+            return ResponseEntity.badRequest().build();
+        }
 
+        List<InvitationsDTO> invitees = calendarService.getDetailedInvitationsByMeetingId(meetingId);
+        if (invitees == null || invitees.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(invitees);
+    }
 }
