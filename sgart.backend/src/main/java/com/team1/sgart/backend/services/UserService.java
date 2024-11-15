@@ -1,9 +1,6 @@
 package com.team1.sgart.backend.services;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
+import com.team1.sgart.backend.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -11,9 +8,10 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.team1.sgart.backend.dao.AdminDao;
 import com.team1.sgart.backend.dao.UserDao;
-import com.team1.sgart.backend.model.Admin;
-import com.team1.sgart.backend.model.GenericUser;
-import com.team1.sgart.backend.model.User;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -60,16 +58,15 @@ public class UserService {
 		if(!emailFormatoValido(user)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Formato del email incorrecto");
         }
-		else if (userDao.findByEmailAndPassword(email, password).isPresent()) {
-			user = userDao.findByEmail(user.getEmail()).get();
-			return user;
-		}
-		
 		else if (adminDao.findByEmailAndPassword(email, password).isPresent())//Admin dao, buscar por email y password
         {
             Admin admin = adminDao.findByEmail(user.getEmail()).get();
             return admin;
         }
+		else if (userDao.findByEmailAndPassword(email, password).isPresent()) {
+			user = userDao.findByEmail(user.getEmail()).get();
+			return user;
+		}
 		else {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario o contraseña incorrectos");
 		}
@@ -101,13 +98,17 @@ public class UserService {
 
 		return passwordValido;
 	}
-	
-    public List<User> getAvailableUsers() {
-        return userDao.findAllNotBlocked();  
-    }
-    
-    public Optional<User> getUserById(UUID id) {
-        return userDao.findById(id);
-    }
-    
+
+	public List<UserAbsenceDTO> loadUsers() {
+		List<User> users = userDao.findAll();
+		return users.stream().map(user -> {
+			UserAbsenceDTO userAbsenceDTO = new UserAbsenceDTO();
+			userAbsenceDTO.setEmail(user.getEmail());
+			userAbsenceDTO.setFirstName(user.getName());
+			userAbsenceDTO.setLastName(user.getLastName());
+			userAbsenceDTO.setCenter(user.getCenter());
+			userAbsenceDTO.setProfile(user.getProfile());
+			return userAbsenceDTO;
+		}).collect(Collectors.toList());
+	}
 }
