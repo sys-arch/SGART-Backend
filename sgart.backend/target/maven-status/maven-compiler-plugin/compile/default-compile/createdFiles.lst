@@ -3,8 +3,10 @@ com/team1/sgart/backend/dao/AdminDao.class
 com/team1/sgart/backend/services/WorkingHoursService.class
 com/team1/sgart/backend/http/AdminCalendarController.class
 com/team1/sgart/backend/config/AppConfig.class
+com/team1/sgart/backend/http/AbsencesController.class
 com/team1/sgart/backend/services/UserService.class
 com/team1/sgart/backend/model/GenericUser.class
+com/team1/sgart/backend/dao/AbsencesDao.class
 com/team1/sgart/backend/http/AdminController.class
 com/team1/sgart/backend/model/Invitations.class
 com/team1/sgart/backend/App.class
@@ -14,6 +16,7 @@ com/team1/sgart/backend/model/WorkingHoursNewScheduleDTO.class
 com/team1/sgart/backend/dao/WorkingHoursNewScheduleDAO.class
 com/team1/sgart/backend/model/CalendarEventDTO.class
 com/team1/sgart/backend/model/InvitationsDTO.class
+com/team1/sgart/backend/model/Absences.class
 com/team1/sgart/backend/dao/CalendarEventDAO.class
 com/team1/sgart/backend/model/Admin.class
 com/team1/sgart/backend/model/UserDTO.class
@@ -32,9 +35,11 @@ com/team1/sgart/backend/model/WorkingHours.class
 com/team1/sgart/backend/dao/UserDao.class
 com/team1/sgart/backend/util/JwtTokenProvider.class
 com/team1/sgart/backend/model/User.class
+com/team1/sgart/backend/model/AbsencesDTO.class
 com/team1/sgart/backend/services/CalendarService.class
 com/team1/sgart/backend/model/PasswordResetDTO.class
 com/team1/sgart/backend/config/EmailConfig.class
 com/team1/sgart/backend/model/MeetingsDTO.class
+com/team1/sgart/backend/services/AbsencesService.class
 com/team1/sgart/backend/dao/InvitationsDao.class
 com/team1/sgart/backend/model/Meetings.class
