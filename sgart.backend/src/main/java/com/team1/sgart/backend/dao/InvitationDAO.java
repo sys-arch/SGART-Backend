@@ -13,10 +13,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface InvitationDAO extends JpaRepository<Invitation, Integer> {
-
-	//NO SE USA
-	List<Invitation> findActiveInvitationsInTimeRange(@Param("userId") UUID userId,
-			@Param("startTime") LocalTime startTime, @Param("endTime") LocalTime endTime,
-			@Param("activeStatuses") List<InvitationStatus> activeStatuses);
+	
 
 }

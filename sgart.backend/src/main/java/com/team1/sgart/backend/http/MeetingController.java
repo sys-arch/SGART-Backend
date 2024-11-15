@@ -66,17 +66,18 @@ public class MeetingController {
     // Invitar a un usuario a una reunión
     @PostMapping("/invite/{meetingId}/{userId}")
     public ResponseEntity<Invitation> inviteUserToMeeting(@PathVariable UUID meetingId, @PathVariable UUID userId) {
-        Optional<Meeting> meetingOpt = meetingService.getMeetingById(meetingId);  // Obtener la reunión
+        Optional<Meeting> meetingOpt = meetingService.getMeetingById(meetingId);
         Optional<User> userOpt = userService.getUserById(userId);
         
-        if (meetingOpt.isPresent() && userOpt.isPresent()) { // Si la reunión y el usuario existen
-            Meeting meeting = meetingOpt.get();	
+        if (meetingOpt.isPresent() && userOpt.isPresent()) {
+            Meeting meeting = meetingOpt.get();
             User user = userOpt.get();
-            Invitation invitation = meetingService.inviteUserToMeeting(meeting, user, InvitationStatus.PENDIENTE);// Invitar al usuario
+            Invitation invitation = meetingService.inviteUserToMeeting(meeting, user, InvitationStatus.PENDIENTE);
             return ResponseEntity.ok(invitation);
         } else {
             return ResponseEntity.notFound().build();
         }
     }
+    
 }
 

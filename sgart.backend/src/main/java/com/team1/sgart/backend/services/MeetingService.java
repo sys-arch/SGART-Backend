@@ -56,7 +56,7 @@ public class MeetingService {
     }
     // Obtener una reunión por su ID
     public Optional<Meeting> getMeetingById(UUID meetingId) {
-        return meetingDao.getMeetingById(meetingId);
+        return meetingDao.findById(meetingId);
     }
 
 }

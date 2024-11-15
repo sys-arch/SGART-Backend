@@ -105,14 +105,6 @@ public class Meeting {
 		this.organizer = organizer;
 	}
 
-	public List<User> getAttendees() {
-		return attendees;
-	}
-
-	public void setAttendees(List<User> attendees) {
-		this.attendees = attendees;
-	}
-
 	public String getLocation() {
 		return location;
 	}
