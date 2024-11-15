@@ -1,22 +1,15 @@
 package com.team1.sgart.backend.http;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import com.team1.sgart.backend.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.team1.sgart.backend.model.Admin;
-import com.team1.sgart.backend.model.AdminDTO;
-import com.team1.sgart.backend.model.GenericUser;
-import com.team1.sgart.backend.model.User;
-import com.team1.sgart.backend.model.UserDTO;
 import com.team1.sgart.backend.services.UserService;
 
 @RestController
@@ -97,5 +90,11 @@ public class UserController {
 		} else {
 			return ResponseEntity.status(HttpStatus.CONFLICT).body("El email está registrado");
 		}
+	}
+
+	@GetMapping("/cargarUsuarios")
+	public ResponseEntity<List<UserAbsenceDTO>> getAllUsers(){
+		List<UserAbsenceDTO> usersList = userService.loadUsers();
+		return ResponseEntity.ok(usersList);
 	}
 }
