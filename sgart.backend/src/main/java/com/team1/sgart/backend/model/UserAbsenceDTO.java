@@ -2,7 +2,12 @@ package com.team1.sgart.backend.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.UUID;
+
 public class UserAbsenceDTO {
+
+    @JsonProperty("id")
+    private UUID id;
 
     @JsonProperty("firstName")
     private String firstName;
@@ -18,6 +23,14 @@ public class UserAbsenceDTO {
 
     @JsonProperty("profile")
     private String profile;
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
 
     public String getFirstName() {
         return firstName;

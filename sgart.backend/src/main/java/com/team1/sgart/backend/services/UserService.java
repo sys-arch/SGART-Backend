@@ -104,6 +104,7 @@ public class UserService {
 		List<User> users = userDao.findAll();
 		return users.stream().map(user -> {
 			UserAbsenceDTO userAbsenceDTO = new UserAbsenceDTO();
+			userAbsenceDTO.setId(user.getID());
 			userAbsenceDTO.setEmail(user.getEmail());
 			userAbsenceDTO.setFirstName(user.getName());
 			userAbsenceDTO.setLastName(user.getLastName());
