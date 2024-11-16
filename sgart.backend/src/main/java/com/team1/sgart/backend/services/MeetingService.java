@@ -17,6 +17,7 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class MeetingService {
@@ -58,5 +59,14 @@ public class MeetingService {
     public Optional<Meeting> getMeetingById(UUID meetingId) {
         return meetingDao.findById(meetingId);
     }
-
+    // Obtetener asistentes de una reunión id
+    public List<User> getAttendeesForMeeting(Meeting meeting) {
+    List<Invitation> invitations = invitationDao.findByMeeting(meeting);
+    
+    // Filtramos aquellas las ACEPTADAS y devuelve los usuarios en una lista
+    return invitations.stream()
+            .filter(invitation -> invitation.getStatus() == InvitationStatus.ACEPTADA)
+            .map(Invitation::getUser)
+            .collect(Collectors.toList());
+    }
 }

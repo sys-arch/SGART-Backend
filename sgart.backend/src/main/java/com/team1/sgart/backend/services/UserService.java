@@ -11,6 +11,8 @@ import com.team1.sgart.backend.dao.UserDao;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -112,4 +114,9 @@ public class UserService {
 			return userAbsenceDTO;
 		}).collect(Collectors.toList());
 	}
+
+	public Optional<User> getUserById(UUID userId) {
+		return userDao.findById(userId);
+    }
+	
 }

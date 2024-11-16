@@ -18,6 +18,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.sql.Time;
 import java.time.LocalTime;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -25,6 +27,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -102,4 +105,30 @@ class MeetingControllerTest {
     }
 
 */
+    
+    @Test
+    void getAttendees_ShouldReturnListOfAttendees() throws Exception {
+        // Datos de prueba
+        UUID meetingId = UUID.randomUUID();
+        Meeting meeting = new Meeting();
+        User user1 = new User();
+        user1.setID(UUID.randomUUID());
+        user1.setName("John Doe");
+
+        User user2 = new User();
+        user2.setID(UUID.randomUUID());
+        user2.setName("Jane Doe");
+
+        List<User> attendees = Arrays.asList(user1, user2);
+
+        // Configurar los mocks
+        when(meetingService.getMeetingById(meetingId)).thenReturn(Optional.of(meeting));
+        when(meetingService.getAttendeesForMeeting(meeting)).thenReturn(attendees);
+
+        // Ejecutar la solicitud y verificar resultados
+        mockMvc.perform(get("/api/meetings/{meetingId}/attendees", meetingId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name").value("John Doe"))
+                .andExpect(jsonPath("$[1].name").value("Jane Doe"));
+    }
 }

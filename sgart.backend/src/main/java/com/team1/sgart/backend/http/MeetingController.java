@@ -79,5 +79,12 @@ public class MeetingController {
         }
     }
     
+    // Obtener los asistentes a una reunión 
+    @GetMapping("/{meetingId}/attendees")
+    public List<User> getAttendees(@PathVariable("meetingId") UUID meetingId) {
+        Meeting meeting = meetingService.getMeetingById(meetingId).orElseThrow(() -> new RuntimeException("ERROR: Reunión no encontrada"));
+        return meetingService.getAttendeesForMeeting(meeting);
+    }
+    
 }
 
