@@ -12,9 +12,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.web.servlet.MockMvc;
 
 import java.sql.Time;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -22,6 +26,10 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 
 @ExtendWith(MockitoExtension.class)
 class MeetingServiceTest {
@@ -37,6 +45,14 @@ class MeetingServiceTest {
 
     @InjectMocks
     private MeetingService meetingService;
+    
+
+    @Autowired
+    private MockMvc mockMvc;
+    
+    public MeetingServiceTest() {
+        MockitoAnnotations.openMocks(this);
+    }
 
     @Test
     void createMeeting_ShouldSaveAndReturnMeeting() {
@@ -105,7 +121,7 @@ class MeetingServiceTest {
         Meeting meeting = new Meeting();
         meeting.setId(meetingId);
 
-        when(meetingDao.getMeetingById(meetingId)).thenReturn(Optional.of(meeting));
+        when(((MeetingDAO) meetingDao).findById(meetingId)).thenReturn(Optional.of(meeting));
 
         // Llamada al servicio
         Optional<Meeting> result = meetingService.getMeetingById(meetingId);
@@ -113,6 +129,31 @@ class MeetingServiceTest {
         // Verificaciones
         assertTrue(result.isPresent());
         assertEquals(meetingId, result.get().getId());
-        verify(meetingDao, times(1)).getMeetingById(meetingId);
+        verify(meetingDao, times(1)).findById(meetingId);
     }
+    
+    @Test
+    void getAttendeesForMeeting_ShouldReturnAcceptedUsers() {
+        // Datos de prueba
+        Meeting meeting = new Meeting();
+        User user1 = new User();
+        User user2 = new User();
+        Invitation invitation1 = new Invitation(meeting, user1, InvitationStatus.ACEPTADA, false, null);
+        Invitation invitation2 = new Invitation(meeting, user2, InvitationStatus.ACEPTADA, false, null);
+        Invitation invitation3 = new Invitation(meeting, new User(), InvitationStatus.RECHAZADA, false, null);
+
+        List<Invitation> invitations = Arrays.asList(invitation1, invitation2, invitation3);
+
+        // Configurar el mock
+        when(invitationDao.findByMeeting(meeting)).thenReturn(invitations);
+
+        // Ejecutar el método
+        List<User> attendees = meetingService.getAttendeesForMeeting(meeting);
+
+        // Verificar resultados
+        assertEquals(2, attendees.size());
+        assertEquals(user1, attendees.get(0));
+        assertEquals(user2, attendees.get(1));
+    }
+
 }
