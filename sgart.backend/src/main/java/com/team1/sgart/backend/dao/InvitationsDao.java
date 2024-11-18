@@ -19,7 +19,8 @@ public interface InvitationsDao extends JpaRepository<Invitations, Integer> {
         WHERE i.meeting_id = :meetingId
         """, nativeQuery = true)
     List<Object[]> findDetailedInvitationsByMeetingId(@Param("meetingId") UUID meetingId);
-    
-    List<Invitations> findByMeetingId(UUID meetingId);
+
+    @Query("SELECT i FROM Invitations i WHERE i.meeting.meetingId = :meetingId")
+    List<Invitations> findByMeetingId(@Param("meetingId") UUID meetingId);
 
 }

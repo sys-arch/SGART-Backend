@@ -1,8 +1,8 @@
 package com.team1.sgart.backend.dao;
+
 import com.team1.sgart.backend.model.Invitations;
 import com.team1.sgart.backend.model.User;
 
-import java.sql.Time;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
@@ -19,28 +19,26 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
 @Repository
-public interface UserDao extends JpaRepository<User, UUID> { // si da fallo UUID regresar a String, con String falla findCurrentUser
+public interface UserDao extends JpaRepository<User, UUID> {
 
     Optional<User> findByEmail(String email);
 
     Optional<User> findByEmailAndPassword(String email, String password);
-    
+
     Optional<User> findById(UUID id);
-    
+
     // Método para obtener el usuario actual
     @Query("SELECT u FROM User u WHERE u.email = :email")
     User findCurrentUser(@Param("email") String email);
-    
+
     // Método para obtener todos los usuarios habilitados
     @Query("SELECT u FROM User u WHERE u.blocked = false")
     List<User> findAllNotBlocked();
-    
-    //ROSA NOTA: no tengo claro si esto acaba bien
+
     // Método para comprobar la disponibilidad de un usuario en una reunión
-    @Query("SELECT i FROM Invitation i WHERE i.user = :user AND i.meeting.startTime <= :endTime AND i.meeting.endTime >= :startTime")
+    @Query("SELECT i FROM Invitations i WHERE i.user = :user AND i.meeting.meetingStartTime <= :endTime AND i.meeting.meetingEndTime >= :startTime")
     List<Invitations> checkUserAvailability(@Param("user") User user, @Param("startTime") LocalTime startTime, @Param("endTime") LocalTime endTime);
 
-  
     // Método para verificar si el usuario está validado
     @Query("SELECT u.validated FROM User u WHERE u.email = :email")
     Boolean isUsuarioValidado(@Param("email") String email);
@@ -54,21 +52,21 @@ public interface UserDao extends JpaRepository<User, UUID> { // si da fallo UUID
     // Método para invertir el valor de "blocked" de un usuario
     @Modifying
     @Transactional
-    @Query("UPDATE User u SET u.blocked=CASE u.blocked WHEN TRUE THEN FALSE ELSE TRUE END WHERE u.email = :email")
+    @Query("UPDATE User u SET u.blocked = CASE u.blocked WHEN TRUE THEN FALSE ELSE TRUE END WHERE u.email = :email")
     void cambiarHabilitacionUsuario(@Param("email") String email);
-    
-    // Método para obtener la lista de usuarios que quedan por validar.
-    @Transactional
-    @Query("SELECT u FROM User u where u.validated=false")
-	      Optional<List<User>> getUsuariosSinValidar();
 
-    // Método para obtener la lista de usuarios que ya han sido validados.
-    @Query("SELECT u FROM User u where u.validated=true")
-	      Optional<List<User>> getUsuariosValidados();
+    // Método para obtener la lista de usuarios que quedan por validar
+    @Transactional
+    @Query("SELECT u FROM User u WHERE u.validated = false")
+    Optional<List<User>> getUsuariosSinValidar();
+
+    // Método para obtener la lista de usuarios que ya han sido validados
+    @Query("SELECT u FROM User u WHERE u.validated = true")
+    Optional<List<User>> getUsuariosValidados();
 
     default User updateUser(String email, User updatedUser) {
         User user = findByEmail(email)
-                        .orElseThrow(() -> new EntityNotFoundException("Usuario con email " + email + " no encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Usuario con email " + email + " no encontrado"));
 
         // Actualizar los campos
         actualizarCampo(user::setName, updatedUser.getName());
@@ -89,16 +87,11 @@ public interface UserDao extends JpaRepository<User, UUID> { // si da fallo UUID
             setter.accept(nuevoValor);
         }
     }
-    
-    @Transactional
-    void deleteByEmail(String email);  // Para eliminar por email
 
-      
+    @Transactional
+    void deleteByEmail(String email);
+
     // Método para obtener el authCode de un usuario
     @Query("SELECT u.twoFactorAuthCode FROM User u WHERE u.email = :email")
     String obtenerAuthCodePorEmail(@Param("email") String email);
-        // TODO Auto-generated method stub
-        //(throw new UnsupportedOperationException("Unimplemented method 'obtenerAuthCodePorEmail'");
-    
 }
-

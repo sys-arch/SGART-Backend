@@ -2,9 +2,11 @@ package com.team1.sgart.backend.services;
 
 import com.team1.sgart.backend.dao.InvitationsDao;
 import com.team1.sgart.backend.dao.MeetingsDao;
+import com.team1.sgart.backend.model.Invitations;
 import com.team1.sgart.backend.model.InvitationsDTO;
 import com.team1.sgart.backend.model.Meetings;
 import com.team1.sgart.backend.model.MeetingsDTO;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,7 @@ import java.util.stream.Collectors;
 @Service
 public class CalendarService {
     private static final Logger logger = LoggerFactory.getLogger(CalendarService.class);
+
     private final MeetingsDao meetingsDao;
     private final InvitationsDao invitationsDao;
 
@@ -29,7 +32,7 @@ public class CalendarService {
 
     public List<MeetingsDTO> loadMeetings() {
         List<Meetings> meetings = meetingsDao.findAll();
-    
+
         return meetings.stream().map(meeting -> {
             MeetingsDTO meetingsDTO = new MeetingsDTO();
             meetingsDTO.setMeetingId(meeting.getMeetingId());
@@ -42,11 +45,10 @@ public class CalendarService {
             return meetingsDTO;
         }).collect(Collectors.toList());
     }
-    
 
     public List<InvitationsDTO> getDetailedInvitationsByMeetingId(UUID meetingId) {
         List<Object[]> results = invitationsDao.findDetailedInvitationsByMeetingId(meetingId);
-    
+
         return results.stream().map(record -> {
             InvitationsDTO dto = new InvitationsDTO();
             dto.setInvitationId((Integer) record[0]);
@@ -59,5 +61,5 @@ public class CalendarService {
             return dto;
         }).collect(Collectors.toList());
     }
-    
+
 }
