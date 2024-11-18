@@ -2,7 +2,6 @@ package com.team1.sgart.backend.services;
 
 import com.team1.sgart.backend.dao.InvitationsDao;
 import com.team1.sgart.backend.dao.MeetingsDao;
-import com.team1.sgart.backend.model.Invitations;
 import com.team1.sgart.backend.model.InvitationsDTO;
 import com.team1.sgart.backend.model.Meetings;
 import com.team1.sgart.backend.model.MeetingsDTO;
