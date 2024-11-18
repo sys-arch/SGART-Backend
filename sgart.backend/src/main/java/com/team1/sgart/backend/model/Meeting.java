@@ -3,7 +3,6 @@ package com.team1.sgart.backend.model;
 import jakarta.persistence.*;
 
 import java.sql.Time;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
