@@ -1,9 +1,9 @@
 package com.team1.sgart.backend.http;
 
-import com.team1.sgart.backend.model.Meeting;
+import com.team1.sgart.backend.model.Meetings;
 import com.team1.sgart.backend.model.User;
-import com.team1.sgart.backend.model.Invitation;
 import com.team1.sgart.backend.model.InvitationStatus;
+import com.team1.sgart.backend.model.Invitations;
 import com.team1.sgart.backend.services.MeetingService;
 import com.team1.sgart.backend.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,16 +27,10 @@ public class MeetingController {
 
     // Crear una reunión
     @PostMapping("/create")
-    public ResponseEntity<Meeting> createMeeting(@RequestBody Meeting meeting) {
-        Meeting createdMeeting = meetingService.createMeeting(
-                meeting.getTitle(),
-                meeting.isAllDay(),
-                meeting.getStartTime(),
-                meeting.getEndTime(),
-                meeting.getOrganizer(),
-                meeting.getLocation(),
-                meeting.getObservations()
-        );
+    public ResponseEntity<Meetings> createMeeting(@RequestBody Meetings meeting) {
+        Meetings createdMeeting = meetingService.createMeeting(meeting.getMeetingTitle(), meeting.isMeetingAllDay(), meeting.getMeetingDate(), 
+        		meeting.getMeetingStartTime(), meeting.getMeetingEndTime(), meeting.getObservations(), meeting.getOrganizerId(), meeting.getLocation());
+        
         return ResponseEntity.ok(createdMeeting);
     }
 
@@ -65,14 +59,14 @@ public class MeetingController {
 
     // Invitar a un usuario a una reunión
     @PostMapping("/invite/{meetingId}/{userId}")
-    public ResponseEntity<Invitation> inviteUserToMeeting(@PathVariable UUID meetingId, @PathVariable UUID userId) {
-        Optional<Meeting> meetingOpt = meetingService.getMeetingById(meetingId);
+    public ResponseEntity<Invitations> inviteUserToMeeting(@PathVariable UUID meetingId, @PathVariable UUID userId) {
+        Optional<Meetings> meetingOpt = meetingService.getMeetingById(meetingId);
         Optional<User> userOpt = userService.getUserById(userId);
         
         if (meetingOpt.isPresent() && userOpt.isPresent()) {
-            Meeting meeting = meetingOpt.get();
+            Meetings meeting = meetingOpt.get();
             User user = userOpt.get();
-            Invitation invitation = meetingService.inviteUserToMeeting(meeting, user, InvitationStatus.PENDIENTE);
+            Invitations invitation = meetingService.inviteUserToMeeting(meeting, user, InvitationStatus.PENDIENTE);
             return ResponseEntity.ok(invitation);
         } else {
             return ResponseEntity.notFound().build();
@@ -81,8 +75,8 @@ public class MeetingController {
     
     // Obtener los asistentes a una reunión 
     @GetMapping("/{meetingId}/attendees")
-    public List<User> getAttendees(@PathVariable("meetingId") UUID meetingId) {
-        Meeting meeting = meetingService.getMeetingById(meetingId).orElseThrow(() -> new RuntimeException("ERROR: Reunión no encontrada"));
+    public List<UUID> getAttendees(@PathVariable("meetingId") UUID meetingId) {
+        Meetings meeting = meetingService.getMeetingById(meetingId).orElseThrow(() -> new RuntimeException("ERROR: Reunión no encontrada"));
         return meetingService.getAttendeesForMeeting(meeting);
     }
     

@@ -2,17 +2,19 @@ package com.team1.sgart.backend.services;
 
 import com.team1.sgart.backend.dao.UserDao;
 
-import com.team1.sgart.backend.dao.InvitationDAO;
+import com.team1.sgart.backend.dao.InvitationsDao;
+import com.team1.sgart.backend.dao.MeetingsDao;
 
-import com.team1.sgart.backend.dao.MeetingDAO;
-import com.team1.sgart.backend.model.Meeting;
+import com.team1.sgart.backend.model.Meetings;
 import com.team1.sgart.backend.model.User;
-import com.team1.sgart.backend.model.Invitation;
 import com.team1.sgart.backend.model.InvitationStatus;
+import com.team1.sgart.backend.model.Invitations;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Time;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
@@ -26,16 +28,17 @@ public class MeetingService {
     private UserDao userDao;
 
     @Autowired
-    private MeetingDAO meetingDao;
+    private MeetingsDao meetingDao;
 
     @Autowired
-    private InvitationDAO invitationDao;
+    private InvitationsDao invitationDao;
 
     // Método para crear la reunión
-    public Meeting createMeeting(String title, boolean allDay, Time startTime, Time endTime, User organizer, String location, String observations) {
-    	Meeting meeting = new Meeting(title, allDay, startTime, endTime, organizer, location, observations);
-        meetingDao.save(meeting);
-        return meeting;
+	public Meetings createMeeting(String meetingTittle, boolean meetingAllDay, LocalDate meetingDate, LocalTime meetingStartTime, LocalTime meetingEndTime, 
+			String observations, UUID organizerId, UUID location) {
+		Meetings meeting = new Meetings(meetingTittle, meetingAllDay, meetingDate, meetingStartTime, meetingEndTime, observations, organizerId, location);
+		return meetingDao.save(meeting);
+    	
     }
 
     // Método para obtener todos los usuarios habilitados
@@ -51,22 +54,25 @@ public class MeetingService {
     }
 */
     // Método para invitar a un usuario a una reunión
-    public Invitation inviteUserToMeeting(Meeting meeting, User user, InvitationStatus status) {
-        Invitation invitation = new Invitation(meeting, user, status, false, null);
+    public Invitations inviteUserToMeeting(Meetings meeting, User user, InvitationStatus status) {
+        Invitations invitation = new Invitations();
         return invitationDao.save(invitation);
     }
     // Obtener una reunión por su ID
-    public Optional<Meeting> getMeetingById(UUID meetingId) {
+    public Optional<Meetings> getMeetingById(UUID meetingId) {
         return meetingDao.findById(meetingId);
     }
-    // Obtetener asistentes de una reunión id
-    public List<User> getAttendeesForMeeting(Meeting meeting) {
-    List<Invitation> invitations = invitationDao.findByMeeting(meeting);
-    
-    // Filtramos aquellas las ACEPTADAS y devuelve los usuarios en una lista
-    return invitations.stream()
-            .filter(invitation -> invitation.getStatus() == InvitationStatus.ACEPTADA)
-            .map(Invitation::getUser)
-            .collect(Collectors.toList());
+ // Obtener asistentes de una reunión por su ID
+    public List<UUID> getAttendeesForMeeting(Meetings meeting) {
+        List<Invitations> invitations = invitationDao.findByMeetingId(meeting.getMeetingId());
+
+        // Filtramos aquellas con estado ACEPTADA y devolvemos los usuarios
+        return invitations.stream()
+                .filter(invitation -> invitation.getInvitationStatus() == InvitationStatus.ACEPTADA)
+                .map(Invitations::getUser)
+                .collect(Collectors.toList());
     }
+    
+    
+
 }

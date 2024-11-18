@@ -27,7 +27,7 @@ public class Invitations {
     private UUID userId;
 
     @Column(name = "invitation_status", nullable = false, length = 50)
-    private String invitationStatus;
+    private InvitationStatus invitationStatus;
 
     @Column(name = "user_attendance", nullable = false)
     private boolean userAttendance;
@@ -37,7 +37,7 @@ public class Invitations {
 
     public Invitations() {}
 
-    public Invitations(Meetings meeting, UUID user, String invitationStatus, boolean userAttendance, String rejectionReason) {
+    public Invitations(Meetings meeting, UUID user, InvitationStatus invitationStatus, boolean userAttendance, String rejectionReason) {
         this.meeting = meeting;
         this.userId = user;
         this.invitationStatus = invitationStatus;
@@ -69,11 +69,11 @@ public class Invitations {
         this.userId = user;
     }
 
-    public String getInvitationStatus() {
+    public InvitationStatus getInvitationStatus() {
         return invitationStatus;
     }
 
-    public void setInvitationStatus(String invitationStatus) {
+    public void setInvitationStatus(InvitationStatus invitationStatus) {
         this.invitationStatus = invitationStatus;
     }
 

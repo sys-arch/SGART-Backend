@@ -1,5 +1,5 @@
 package com.team1.sgart.backend.dao;
-import com.team1.sgart.backend.model.Invitation;
+import com.team1.sgart.backend.model.Invitations;
 import com.team1.sgart.backend.model.User;
 
 import java.sql.Time;
@@ -38,7 +38,7 @@ public interface UserDao extends JpaRepository<User, UUID> { // si da fallo UUID
     //ROSA NOTA: no tengo claro si esto acaba bien
     // Método para comprobar la disponibilidad de un usuario en una reunión
     @Query("SELECT i FROM Invitation i WHERE i.user = :user AND i.meeting.startTime <= :endTime AND i.meeting.endTime >= :startTime")
-    List<Invitation> checkUserAvailability(@Param("user") User user, @Param("startTime") LocalTime startTime, @Param("endTime") LocalTime endTime);
+    List<Invitations> checkUserAvailability(@Param("user") User user, @Param("startTime") LocalTime startTime, @Param("endTime") LocalTime endTime);
 
   
     // Método para verificar si el usuario está validado
