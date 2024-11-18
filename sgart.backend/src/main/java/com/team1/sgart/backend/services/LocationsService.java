@@ -36,8 +36,18 @@ public class LocationsService {
     }
 
     public String getLocationById(UUID locationId) {
-        String locationName = locationsDao.findLocationNameById(locationId);
+        if (locationId == null) {
+            logger.warn("El ID de ubicación proporcionado es null.");
+            return "Ubicación no especificada";
+        }
+        logger.info("Buscando ubicación con ID: {}", locationId);
+        String locationName = locationsDao.findLocationNameById(locationId.toString());
+        if (locationName == null) {
+            logger.warn("Ubicación no encontrada para el ID: {}", locationId);
+            return "Ubicación no especificada";
+        }
+        logger.info("Ubicación encontrada: {}", locationName);
         return locationName;
-
     }
+    
 }

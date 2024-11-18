@@ -7,11 +7,9 @@ import org.springframework.stereotype.Repository;
 
 import com.team1.sgart.backend.model.Locations;
 
-import java.util.UUID;
-
 @Repository
 public interface LocationsDao extends JpaRepository<Locations, String> {
-    @Query("SELECT l.locationName FROM Locations l WHERE l.locationId = :locationId")
-    String findLocationNameById(@Param("locationId") UUID locationId);
+    @Query(value = "SELECT location_name FROM SGART_LocationsTable WHERE location_id = :locationId", nativeQuery = true)
+    String findLocationNameById(@Param("locationId") String locationId);
 
 }
