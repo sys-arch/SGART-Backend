@@ -1,15 +1,8 @@
 package com.team1.sgart.backend.model;
 
+import jakarta.persistence.*;
+import java.time.LocalTime;
 import java.util.UUID;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.JoinColumn;
 
 @Entity
 @Table(name = "SGART_InvitationsTable")
@@ -23,11 +16,12 @@ public class Invitations {
     @JoinColumn(name = "meeting_id", nullable = false)
     private Meetings meeting;
 
-    @Column(name = "user_id", nullable = false)
-    private UUID userId;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(name = "invitation_status", nullable = false, length = 50)
-    private InvitationStatus invitationStatus;
+    private String invitationStatus;
 
     @Column(name = "user_attendance", nullable = false)
     private boolean userAttendance;
@@ -35,15 +29,19 @@ public class Invitations {
     @Column(name = "rejection_reason", length = 255)
     private String rejectionReason;
 
+    // Constructor vacío
     public Invitations() {}
 
-    public Invitations(Meetings meeting, UUID user, InvitationStatus invitationStatus, boolean userAttendance, String rejectionReason) {
+    // Constructor con parámetros
+    public Invitations(Meetings meeting, User user, String invitationStatus, boolean userAttendance, String rejectionReason) {
         this.meeting = meeting;
-        this.userId = user;
+        this.user = user;
         this.invitationStatus = invitationStatus;
         this.userAttendance = userAttendance;
         this.rejectionReason = rejectionReason;
     }
+
+    // Getters y setters
 
     public int getInvitationId() {
         return invitationId;
@@ -61,19 +59,19 @@ public class Invitations {
         this.meeting = meeting;
     }
 
-    public UUID getUser() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUser(UUID user) {
-        this.userId = user;
+    public void setUser(User user) {
+        this.user = user;
     }
 
-    public InvitationStatus getInvitationStatus() {
+    public String getInvitationStatus() {
         return invitationStatus;
     }
 
-    public void setInvitationStatus(InvitationStatus invitationStatus) {
+    public void setInvitationStatus(String invitationStatus) {
         this.invitationStatus = invitationStatus;
     }
 
@@ -92,5 +90,4 @@ public class Invitations {
     public void setRejectionReason(String rejectionReason) {
         this.rejectionReason = rejectionReason;
     }
-
 }

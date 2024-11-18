@@ -29,7 +29,7 @@ public class MeetingController {
     @PostMapping("/create")
     public ResponseEntity<Meetings> createMeeting(@RequestBody Meetings meeting) {
         Meetings createdMeeting = meetingService.createMeeting(meeting.getMeetingTitle(), meeting.isMeetingAllDay(), meeting.getMeetingDate(), 
-        		meeting.getMeetingStartTime(), meeting.getMeetingEndTime(), meeting.getObservations(), meeting.getOrganizerId(), meeting.getLocation());
+        		meeting.getMeetingStartTime(), meeting.getMeetingEndTime(), meeting.getMeetingObservations(), meeting.getOrganizerId(), meeting.getLocationId());
         
         return ResponseEntity.ok(createdMeeting);
     }
@@ -62,7 +62,7 @@ public class MeetingController {
     public ResponseEntity<Invitations> inviteUserToMeeting(@PathVariable UUID meetingId, @PathVariable UUID userId) {
         Optional<Meetings> meetingOpt = meetingService.getMeetingById(meetingId);
         Optional<User> userOpt = userService.getUserById(userId);
-        
+
         if (meetingOpt.isPresent() && userOpt.isPresent()) {
             Meetings meeting = meetingOpt.get();
             User user = userOpt.get();

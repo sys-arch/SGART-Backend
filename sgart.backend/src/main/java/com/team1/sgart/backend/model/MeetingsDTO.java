@@ -28,15 +28,26 @@ public class MeetingsDTO {
     @JsonProperty("organizerId")
     private UUID organizerId;
 
+    @JsonProperty("observations")
+    private String meetingObservations;
+
+    @JsonProperty("locationId")
+    private UUID locationId;
+
     public MeetingsDTO() {}
 
-    public MeetingsDTO(UUID meetingId, String meetingTitle, boolean meetingAllDay, LocalTime meetingStartTime, LocalTime meetingEndTime, UUID organizerId) {
+    public MeetingsDTO(UUID meetingId, String meetingTitle, boolean meetingAllDay, LocalDate meetingDate,
+                       LocalTime meetingStartTime, LocalTime meetingEndTime, String meetingObservations,
+                       UUID organizerId, UUID locationId) {
         this.meetingId = meetingId;
         this.meetingTitle = meetingTitle;
         this.meetingAllDay = meetingAllDay;
+        this.meetingDate = meetingDate;
         this.meetingStartTime = meetingStartTime;
         this.meetingEndTime = meetingEndTime;
+        this.meetingObservations = meetingObservations;
         this.organizerId = organizerId;
+        this.locationId = locationId;
     }
 
     public UUID getMeetingId() {
@@ -95,4 +106,19 @@ public class MeetingsDTO {
         this.organizerId = organizerId;
     }
 
+    public String getMeetingObservations() {
+        return meetingObservations;
+    }
+
+    public void setMeetingObservations(String meetingObservations) {
+        this.meetingObservations = meetingObservations;
+    }
+
+    public UUID getLocationId() {
+        return locationId;
+    }
+
+    public void setLocationId(UUID locationId) {
+        this.locationId = locationId;
+    }
 }
