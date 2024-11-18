@@ -1,6 +1,8 @@
 package com.team1.sgart.backend.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.team1.sgart.backend.model.Admin;
+import com.team1.sgart.backend.model.GenericUser;
 import com.team1.sgart.backend.model.User;
 import com.team1.sgart.backend.services.UserService;
 
@@ -23,19 +25,22 @@ class UserControllerTest {
 	
 	private static final String URLREGISTRAR = "/users/registro";
 	private static final String URLMODIFICAR = "/users/modificar";
-
+	private static final String URLLOGIN = "/users/login";
+	
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
     private UserService userService;
-
+    
     private User user;
-
+    private Admin admin;
+    
     @BeforeEach
     public void setUp() {
         user = new User("carlos.romero@example.com", "Carlos", "Romero Navarro", "Quality", "Ciudad Real", "01/01/2024", 
                         "Scrum Developer", "password123@", "password123@", false, false, "");
+        admin = new Admin("test", "admin", "test@admin.com", "adminPassword123");
     }
 
     @Test
@@ -102,7 +107,7 @@ class UserControllerTest {
         mockMvc.perform(post(URLMODIFICAR).contentType(MediaType.APPLICATION_JSON)
                 .content(userJson))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Usuario modificado correctamente"));
+                .andExpect(content().string("Perfil modificado correctamente"));
     }
 
     @Test
@@ -130,5 +135,53 @@ class UserControllerTest {
         mockMvc.perform(post(URLMODIFICAR).contentType(MediaType.APPLICATION_JSON)
                 .content(userJson))
                 .andExpect(status().isNotFound());
+    }
+    
+    @Test
+    void loginUsuarioValidoDevuelve200() throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String userJson = objectMapper.writeValueAsString(user);
+
+        GenericUser genericUser = user; // Usuario de tipo User
+        Mockito.when(userService.loginUser(Mockito.any(User.class))).thenReturn(genericUser);
+
+        mockMvc.perform(post(URLLOGIN)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(userJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.type").value("user"))
+                .andExpect(jsonPath("$.user").exists());
+    }
+
+    @Test
+    void loginAdminValidoDevuelve200() throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String userJson = objectMapper.writeValueAsString(user);
+
+        // Simulando un login exitoso con un administrador
+        GenericUser genericUser = admin; // Usuario de tipo Admin
+        Mockito.when(userService.loginUser(Mockito.any(User.class))).thenReturn(genericUser);
+
+        mockMvc.perform(post(URLLOGIN)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(userJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.type").value("admin"))
+                .andExpect(jsonPath("$.admin").exists());
+    }
+
+    @Test
+    void loginUsuarioNoExistenteDevuelve401() throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String userJson = objectMapper.writeValueAsString(user);
+
+        // Simulando un usuario no encontrado (respondería un error 401)
+        Mockito.when(userService.loginUser(Mockito.any(User.class))).thenReturn(null);
+
+        mockMvc.perform(post(URLLOGIN)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(userJson))
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().string("Usuario no encontrado"));
     }
 }

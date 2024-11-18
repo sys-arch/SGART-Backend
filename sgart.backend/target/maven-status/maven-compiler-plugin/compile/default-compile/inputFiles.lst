@@ -13,6 +13,7 @@
 /Users/albertoc.monje/Documents/GitHub/SGART-Backend/sgart.backend/src/main/java/com/team1/sgart/backend/model/CalendarEvent.java
 /Users/albertoc.monje/Documents/GitHub/SGART-Backend/sgart.backend/src/main/java/com/team1/sgart/backend/model/UserDTO.java
 /Users/albertoc.monje/Documents/GitHub/SGART-Backend/sgart.backend/src/main/java/com/team1/sgart/backend/model/GenericUser.java
+/Users/albertoc.monje/Documents/GitHub/SGART-Backend/sgart.backend/src/main/java/com/team1/sgart/backend/http/AbsencesController.java
 /Users/albertoc.monje/Documents/GitHub/SGART-Backend/sgart.backend/src/main/java/com/team1/sgart/backend/dao/CalendarEventDAO.java
 /Users/albertoc.monje/Documents/GitHub/SGART-Backend/sgart.backend/src/main/java/com/team1/sgart/backend/http/AdminWorkingHoursController.java
 /Users/albertoc.monje/Documents/GitHub/SGART-Backend/sgart.backend/src/main/java/com/team1/sgart/backend/http/UserController.java
@@ -23,13 +24,16 @@
 /Users/albertoc.monje/Documents/GitHub/SGART-Backend/sgart.backend/src/main/java/com/team1/sgart/backend/model/Invitations.java
 /Users/albertoc.monje/Documents/GitHub/SGART-Backend/sgart.backend/src/main/java/com/team1/sgart/backend/model/MeetingsDTO.java
 /Users/albertoc.monje/Documents/GitHub/SGART-Backend/sgart.backend/src/main/java/com/team1/sgart/backend/App.java
+/Users/albertoc.monje/Documents/GitHub/SGART-Backend/sgart.backend/src/main/java/com/team1/sgart/backend/services/AbsencesService.java
 /Users/albertoc.monje/Documents/GitHub/SGART-Backend/sgart.backend/src/main/java/com/team1/sgart/backend/model/WorkingHoursNewSchedule.java
 /Users/albertoc.monje/Documents/GitHub/SGART-Backend/sgart.backend/src/main/java/com/team1/sgart/backend/services/EmailService.java
 /Users/albertoc.monje/Documents/GitHub/SGART-Backend/sgart.backend/src/main/java/com/team1/sgart/backend/http/AdminCalendarController.java
 /Users/albertoc.monje/Documents/GitHub/SGART-Backend/sgart.backend/src/main/java/com/team1/sgart/backend/model/GenericUserDTO.java
+/Users/albertoc.monje/Documents/GitHub/SGART-Backend/sgart.backend/src/main/java/com/team1/sgart/backend/model/Absences.java
 /Users/albertoc.monje/Documents/GitHub/SGART-Backend/sgart.backend/src/main/java/com/team1/sgart/backend/services/AdminService.java
 /Users/albertoc.monje/Documents/GitHub/SGART-Backend/sgart.backend/src/main/java/com/team1/sgart/backend/dao/UserDao.java
 /Users/albertoc.monje/Documents/GitHub/SGART-Backend/sgart.backend/src/main/java/com/team1/sgart/backend/dao/WorkingHoursDao.java
+/Users/albertoc.monje/Documents/GitHub/SGART-Backend/sgart.backend/src/main/java/com/team1/sgart/backend/model/AbsencesDTO.java
 /Users/albertoc.monje/Documents/GitHub/SGART-Backend/sgart.backend/src/main/java/com/team1/sgart/backend/services/UserService.java
 /Users/albertoc.monje/Documents/GitHub/SGART-Backend/sgart.backend/src/main/java/com/team1/sgart/backend/model/WorkingHours.java
 /Users/albertoc.monje/Documents/GitHub/SGART-Backend/sgart.backend/src/main/java/com/team1/sgart/backend/model/CalendarEventDTO.java
@@ -37,4 +41,5 @@
 /Users/albertoc.monje/Documents/GitHub/SGART-Backend/sgart.backend/src/main/java/com/team1/sgart/backend/model/WorkingHoursNewScheduleDTO.java
 /Users/albertoc.monje/Documents/GitHub/SGART-Backend/sgart.backend/src/main/java/com/team1/sgart/backend/config/AppConfig.java
 /Users/albertoc.monje/Documents/GitHub/SGART-Backend/sgart.backend/src/main/java/com/team1/sgart/backend/dao/AdminDao.java
+/Users/albertoc.monje/Documents/GitHub/SGART-Backend/sgart.backend/src/main/java/com/team1/sgart/backend/dao/AbsencesDao.java
 /Users/albertoc.monje/Documents/GitHub/SGART-Backend/sgart.backend/src/main/java/com/team1/sgart/backend/services/TwoFactorAuthService.java

@@ -1,8 +1,12 @@
 package com.team1.sgart.backend.dao;
+import com.team1.sgart.backend.model.Invitations;
 import com.team1.sgart.backend.model.User;
 
+import java.sql.Time;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,11 +19,27 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
 @Repository
-public interface UserDao extends JpaRepository<User, String> {
+public interface UserDao extends JpaRepository<User, UUID> { // si da fallo UUID regresar a String, con String falla findCurrentUser
 
     Optional<User> findByEmail(String email);
 
     Optional<User> findByEmailAndPassword(String email, String password);
+    
+    Optional<User> findById(UUID id);
+    
+    // Método para obtener el usuario actual
+    @Query("SELECT u FROM User u WHERE u.email = :email")
+    User findCurrentUser(@Param("email") String email);
+    
+    // Método para obtener todos los usuarios habilitados
+    @Query("SELECT u FROM User u WHERE u.blocked = false")
+    List<User> findAllNotBlocked();
+    
+    //ROSA NOTA: no tengo claro si esto acaba bien
+    // Método para comprobar la disponibilidad de un usuario en una reunión
+    @Query("SELECT i FROM Invitation i WHERE i.user = :user AND i.meeting.startTime <= :endTime AND i.meeting.endTime >= :startTime")
+    List<Invitations> checkUserAvailability(@Param("user") User user, @Param("startTime") LocalTime startTime, @Param("endTime") LocalTime endTime);
+
   
     // Método para verificar si el usuario está validado
     @Query("SELECT u.validated FROM User u WHERE u.email = :email")

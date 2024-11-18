@@ -17,7 +17,7 @@ public class Meetings {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "meeting_id")
+    @Column(name = "meeting_id", columnDefinition = "uniqueidentifier")
     private UUID meetingId;
 
     @Column(name = "meeting_title", nullable = false, length = 255)
@@ -34,21 +34,52 @@ public class Meetings {
 
     @Column(name = "meeting_end_time", nullable = false)
     private LocalTime meetingEndTime;
+    
+    @Column(name = "observations", columnDefinition = "TEXT")
+    private String observations;
 
     @Column(name = "organizer_id", nullable = false)
     private UUID organizerId;
+    
+    @Column(name = "location_id", nullable = false)
+    private UUID location;
 
+    
     public Meetings() {}
 
-    public Meetings(String meetingTitle, boolean meetingAllDay, LocalTime meetingStartTime, LocalTime meetingEndTime, UUID organizerId) {
-        this.meetingTitle = meetingTitle;
-        this.meetingAllDay = meetingAllDay;
-        this.meetingStartTime = meetingStartTime;
-        this.meetingEndTime = meetingEndTime;
-        this.organizerId = organizerId;
-    }
+    public Meetings(String meetingTitle, boolean meetingAllDay, LocalDate meetingDate,
+			LocalTime meetingStartTime, LocalTime meetingEndTime, String observations, UUID organizerId,
+			UUID location) {
+		
+		this.meetingTitle = meetingTitle;
+		this.meetingAllDay = meetingAllDay;
+		this.meetingDate = meetingDate;
+		this.meetingStartTime = meetingStartTime;
+		this.meetingEndTime = meetingEndTime;
+		this.observations = observations;
+		this.organizerId = organizerId;
+		this.location = location;
+	}
 
-    public UUID getMeetingId() {
+
+
+	public String getObservations() {
+		return observations;
+	}
+
+	public void setObservations(String observations) {
+		this.observations = observations;
+	}
+
+	public UUID getLocation() {
+		return location;
+	}
+
+	public void setLocation(UUID location) {
+		this.location = location;
+	}
+
+	public UUID getMeetingId() {
         return meetingId;
     }
 
