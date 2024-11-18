@@ -20,5 +20,6 @@ public interface InvitationsDao extends JpaRepository<Invitations, Integer> {
         """, nativeQuery = true)
     List<Object[]> findDetailedInvitationsByMeetingId(@Param("meetingId") UUID meetingId);
     
+    List<Invitations> findByMeetingId(UUID meetingId);
 
 }
