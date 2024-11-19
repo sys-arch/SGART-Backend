@@ -46,15 +46,11 @@ public interface MeetingDAO extends JpaRepository<Meeting, UUID> {
     }
     
     @Query("SELECT m FROM Meeting m WHERE " +
-    	       "m.title = :title AND " +
     	       "m.startTime = :startTime AND " +
     	       "m.endTime = :endTime AND " +
-    	       "m.location = :location AND " +
     	       "(m.organizer = :organizer OR :organizer MEMBER OF m.attendees)")
-    List<Meeting> findConflictingMeetings(@Param("title") String title,
-    	                                      @Param("startTime") Time startTime,
+    List<Meeting> findConflictingMeetings(@Param("startTime") Time startTime,
     	                                      @Param("endTime") Time endTime,
-    	                                      @Param("location") String location,
     	                                      @Param("organizer") User organizer);
 
     
