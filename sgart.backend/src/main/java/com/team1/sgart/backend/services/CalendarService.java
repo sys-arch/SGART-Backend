@@ -32,7 +32,7 @@ public class CalendarService {
 
     public List<MeetingsDTO> loadMeetings() {
         List<Meetings> meetings = meetingsDao.findAll();
-    
+
         return meetings.stream().map(meeting -> {
             MeetingsDTO meetingsDTO = new MeetingsDTO();
             meetingsDTO.setMeetingId(meeting.getMeetingId());
@@ -43,16 +43,17 @@ public class CalendarService {
             meetingsDTO.setOrganizerId(meeting.getOrganizerId());
             meetingsDTO.setMeetingDate(meeting.getMeetingDate());
             meetingsDTO.setMeetingObservations(meeting.getMeetingObservations());
-    
+
             logger.info("Procesando reunión con ID: {}", meeting.getMeetingId());
-    
+
             String locationName = locationsService.getLocationById(meeting.getLocationId());
             logger.info("Asignando ubicación '{}' a la reunión '{}'", locationName, meeting.getMeetingTitle());
             meetingsDTO.setLocationName(locationName);
-    
+
             return meetingsDTO;
         }).collect(Collectors.toList());
     }
+
     public List<InvitationsDTO> getDetailedInvitationsByMeetingId(UUID meetingId) {
         List<Object[]> results = invitationsDao.findDetailedInvitationsByMeetingId(meetingId);
 
@@ -68,4 +69,41 @@ public class CalendarService {
             return dto;
         }).collect(Collectors.toList());
     }
+
+    public List<MeetingsDTO> getMeetingsByUserId(UUID userId) {
+        List<UUID> meetingIds = getMeetingIdsByUserId(userId);
+        List<Meetings> meetings = getMeetingsByIds(meetingIds);
+        return convertMeetingsToDTO(meetings);
+    }
+
+    private List<UUID> getMeetingIdsByUserId(UUID userId) {
+        return invitationsDao.findByUserId(userId).stream()
+                .map(invitation -> invitation.getMeeting().getMeetingId())
+                .collect(Collectors.toList());
+    }
+    
+    private List<Meetings> getMeetingsByIds(List<UUID> meetingIds) {
+        return meetingsDao.findAllById(meetingIds);
+    }
+
+    private List<MeetingsDTO> convertMeetingsToDTO(List<Meetings> meetings) {
+        return meetings.stream().map(meeting -> {
+            MeetingsDTO meetingsDTO = new MeetingsDTO();
+            meetingsDTO.setMeetingId(meeting.getMeetingId());
+            meetingsDTO.setMeetingTitle(meeting.getMeetingTitle());
+            meetingsDTO.setMeetingAllDay(meeting.isMeetingAllDay());
+            meetingsDTO.setMeetingStartTime(meeting.getMeetingStartTime());
+            meetingsDTO.setMeetingEndTime(meeting.getMeetingEndTime());
+            meetingsDTO.setOrganizerId(meeting.getOrganizerId());
+            meetingsDTO.setMeetingDate(meeting.getMeetingDate());
+            meetingsDTO.setMeetingObservations(meeting.getMeetingObservations());
+    
+
+            String locationName = locationsService.getLocationById(meeting.getLocationId());
+            meetingsDTO.setLocationName(locationName);
+    
+            return meetingsDTO;
+        }).collect(Collectors.toList());
+    }
+    
 }
