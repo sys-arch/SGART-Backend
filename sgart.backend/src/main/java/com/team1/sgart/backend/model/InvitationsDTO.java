@@ -29,9 +29,9 @@ public class InvitationsDTO {
     public InvitationsDTO() {
     }
 
-    public InvitationsDTO(int invitationId, UUID meetingId, UUID userId, String 
-    userName, String invitationStatus,
-            boolean userAttendance, String rejectionReason) {
+    public InvitationsDTO(int invitationId, UUID meetingId, UUID userId, String
+                                  userName, String invitationStatus,
+                          boolean userAttendance, String rejectionReason) {
         this.invitationId = invitationId;
         this.meetingId = meetingId;
         this.userId = userId;
