@@ -7,9 +7,6 @@ import com.team1.sgart.backend.model.WorkingHours;
 
 @Repository
 public interface WorkingHoursDao extends JpaRepository<WorkingHours, Integer> {
-	
-	// Método para obtener el horario laboral
-	WorkingHours findWorkingHours();
 
 }
 

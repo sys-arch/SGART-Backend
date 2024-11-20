@@ -4,11 +4,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+import com.team1.sgart.backend.dao.AdminDao;
 import com.team1.sgart.backend.dao.UserDao;
+import com.team1.sgart.backend.model.Admin;
+import com.team1.sgart.backend.model.AdminDTO;
 import com.team1.sgart.backend.model.User;
 import com.team1.sgart.backend.model.UserDTO;
 
@@ -16,10 +23,12 @@ import com.team1.sgart.backend.model.UserDTO;
 public class AdminService {
 	
 	private UserDao userDAO;
+	private AdminDao adminDAO;
 	
 	@Autowired
-	AdminService(UserDao userDao) {
+	AdminService(UserDao userDao, AdminDao adminDao) {
         this.userDAO = userDao;
+        this.adminDAO = adminDao;
     }
 	
 	public List<UserDTO> mapUser(List<User> users){
@@ -39,6 +48,19 @@ public class AdminService {
 		}).collect(Collectors.toList());
 	}
 	
+	public List<AdminDTO> mapAdmin(List<Admin> admins){
+		return admins.stream().map(admin -> {
+			AdminDTO dto= new AdminDTO();
+			dto.setID(admin.getID());
+			dto.setEmail(admin.getEmail());
+			dto.setName(admin.getName());
+			dto.setLastName(admin.getLastName());
+			dto.setCenter(admin.getCenter());
+			dto.setBlocked(admin.getBlocked());
+			return dto;
+		}).collect(Collectors.toList());
+	}
+	
 	public List<UserDTO> getUsuariosValidados() {
 		List<User> users= userDAO.getUsuariosValidados().get();
 		return mapUser(users);
@@ -50,7 +72,6 @@ public class AdminService {
 	}
 
 	public void validarUsuario(String userEmail) {
-
 		// Buscar al usuario por email
 		User user = userDAO.findByEmail(userEmail)
 				.orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
@@ -64,9 +85,13 @@ public class AdminService {
 	}
 	
 	public void cambiarHabilitacionUsuario(String userEmail){
-		if(!userDAO.findByEmail(userEmail).isPresent())
-			throw new IllegalArgumentException();
-        userDAO.cambiarHabilitacionUsuario(userEmail);
+		if(!emailUserEstaRegistrado(userEmail)) {
+			if(!emailAdminEstaRegistrado(userEmail))
+				throw new IllegalArgumentException();
+			else
+				adminDAO.cambiarHabilitacionAdmin(userEmail);
+		} else
+			userDAO.cambiarHabilitacionUsuario(userEmail);
     }
 
 	private boolean isUserValidated(User user) {
@@ -75,6 +100,39 @@ public class AdminService {
 	}
 
     public void eliminarUsuarioPorEmail(String email) {
-        userDAO.deleteByEmail(email);
+    	if(!emailUserEstaRegistrado(email)) {
+			if(!emailAdminEstaRegistrado(email))
+				throw new IllegalArgumentException();
+			else
+				adminDAO.deleteByEmail(email);
+		} else
+			userDAO.deleteByEmail(email);
     }
+
+	public List<AdminDTO> getAdmins() {
+		List<Admin> admins= adminDAO.findAll();
+		return mapAdmin(admins);
+	}
+
+	public void modificarAdmin(Admin admin) {
+		String email = admin.getEmail();
+		if(!emailAdminEstaRegistrado(email)) 
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "El email no está registrado");
+		adminDAO.updateAdmin(email, admin);
+	}
+	
+	public UUID crearAdmin(Admin admin) {
+		String email = admin.getEmail();
+		if(emailAdminEstaRegistrado(email)) 
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El email ya está registrado");
+		adminDAO.save(admin);
+		return adminDAO.findByEmail(admin.getEmail()).get().getID();
+	}
+	
+	private boolean emailUserEstaRegistrado(String email) {
+		return userDAO.findByEmail(email).isPresent();
+	}
+	public boolean emailAdminEstaRegistrado(String email) {
+		return adminDAO.findByEmail(email).isPresent();
+	}
 }

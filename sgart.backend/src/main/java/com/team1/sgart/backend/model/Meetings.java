@@ -1,12 +1,6 @@
 package com.team1.sgart.backend.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Table;
-
+import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.UUID;
@@ -17,17 +11,17 @@ public class Meetings {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "meeting_id")
+    @Column(name = "meeting_id", columnDefinition = "uniqueidentifier")
     private UUID meetingId;
 
     @Column(name = "meeting_title", nullable = false, length = 255)
     private String meetingTitle;
 
-    @Column(name = "meeting_all_day", nullable = false)
-    private boolean meetingAllDay;
-
     @Column(name = "meeting_date", nullable = false)
     private LocalDate meetingDate;
+
+    @Column(name = "meeting_all_day", nullable = false)
+    private boolean meetingAllDay;
 
     @Column(name = "meeting_start_time", nullable = false)
     private LocalTime meetingStartTime;
@@ -35,19 +29,32 @@ public class Meetings {
     @Column(name = "meeting_end_time", nullable = false)
     private LocalTime meetingEndTime;
 
-    @Column(name = "organizer_id", nullable = false)
+    @Column(name = "meeting_observations", nullable = false, length = 255)
+    private String meetingObservations;
+
+    @Column(name = "organizer_id", nullable = false, columnDefinition = "uniqueidentifier")
     private UUID organizerId;
 
+    @Column(name = "location_id", nullable = false, columnDefinition = "uniqueidentifier")
+    private UUID locationId;
+
+    // Default constructor
     public Meetings() {}
 
-    public Meetings(String meetingTitle, boolean meetingAllDay, LocalTime meetingStartTime, LocalTime meetingEndTime, UUID organizerId) {
+    // Constructor with parameters
+    public Meetings(String meetingTitle, LocalDate meetingDate, boolean meetingAllDay, LocalTime meetingStartTime,
+                    LocalTime meetingEndTime, String meetingObservations, UUID organizerId, UUID locationId) {
         this.meetingTitle = meetingTitle;
+        this.meetingDate = meetingDate;
         this.meetingAllDay = meetingAllDay;
         this.meetingStartTime = meetingStartTime;
         this.meetingEndTime = meetingEndTime;
+        this.meetingObservations = meetingObservations;
         this.organizerId = organizerId;
+        this.locationId = locationId;
     }
 
+    // Getters and setters
     public UUID getMeetingId() {
         return meetingId;
     }
@@ -62,6 +69,14 @@ public class Meetings {
 
     public void setMeetingTitle(String meetingTitle) {
         this.meetingTitle = meetingTitle;
+    }
+
+    public LocalDate getMeetingDate() {
+        return meetingDate;
+    }
+
+    public void setMeetingDate(LocalDate meetingDate) {
+        this.meetingDate = meetingDate;
     }
 
     public boolean isMeetingAllDay() {
@@ -88,6 +103,14 @@ public class Meetings {
         this.meetingEndTime = meetingEndTime;
     }
 
+    public String getMeetingObservations() {
+        return meetingObservations;
+    }
+
+    public void setMeetingObservations(String meetingObservations) {
+        this.meetingObservations = meetingObservations;
+    }
+
     public UUID getOrganizerId() {
         return organizerId;
     }
@@ -96,11 +119,11 @@ public class Meetings {
         this.organizerId = organizerId;
     }
 
-    public LocalDate getMeetingDate() {
-        return meetingDate;
+    public UUID getLocationId() {
+        return locationId;
     }
 
-    public void setMeetingDate(LocalDate meetingDate) {
-        this.meetingDate = meetingDate;
+    public void setLocationId(UUID locationId) {
+        this.locationId = locationId;
     }
 }

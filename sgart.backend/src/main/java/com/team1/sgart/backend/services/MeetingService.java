@@ -1,23 +1,20 @@
 package com.team1.sgart.backend.services;
 
 import com.team1.sgart.backend.dao.UserDao;
-
-import com.team1.sgart.backend.dao.InvitationDAO;
-
-import com.team1.sgart.backend.dao.MeetingDAO;
-import com.team1.sgart.backend.model.Meeting;
+import com.team1.sgart.backend.dao.InvitationsDao;
+import com.team1.sgart.backend.dao.MeetingsDao;
+import com.team1.sgart.backend.model.Meetings;
 import com.team1.sgart.backend.model.User;
-
-import jakarta.persistence.EntityNotFoundException;
-
-import com.team1.sgart.backend.model.Invitation;
 import com.team1.sgart.backend.model.InvitationStatus;
+import com.team1.sgart.backend.model.Invitations;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.sql.Time;
+import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
@@ -27,63 +24,62 @@ import java.util.stream.Collectors;
 @Service
 public class MeetingService {
 
-	private UserDao userDao;
-	private MeetingDAO meetingDao;
-	private InvitationDAO invitationDao;
-
-	@Autowired
-	public MeetingService(UserDao userDao, MeetingDAO meetingDao, InvitationDAO invitationDao) {
+    private UserDao userDao;
+    private MeetingsDao meetingDao;
+    private InvitationsDao invitationsDao;
+    
+    @Autowired
+	public MeetingService(UserDao userDao, MeetingsDao meetingDao, InvitationsDao invitationDao) {
 		this.userDao = userDao;
 		this.meetingDao = meetingDao;
-		this.invitationDao = invitationDao;
+		this.invitationsDao = invitationDao;
 	}
 
-	// Método para crear la reunión
-	public Meeting createMeeting(String title, boolean allDay, Time startTime, Time endTime, User organizer,
-			String location, String observations) {
-		Meeting meeting = new Meeting(title, allDay, startTime, endTime, organizer, location, observations);
-		meetingDao.save(meeting);
-		return meeting;
-	}
+    // Método para crear la reunión
+    public Meetings createMeeting(String meetingTitle, boolean meetingAllDay, LocalDate meetingDate, LocalTime meetingStartTime,
+                                  LocalTime meetingEndTime, String observations, UUID organizerId, UUID locationId) {
+        Meetings meeting = new Meetings(meetingTitle, meetingDate, meetingAllDay, meetingStartTime, meetingEndTime, observations, organizerId, locationId);
+        return meetingDao.save(meeting);
+    }
 
-	// Método para obtener todos los usuarios habilitados
-	public List<User> getAvailableUsers() {
-		return userDao.findAllNotBlocked(); // Solo los usuarios no bloqueados
-	}
+    // Método para obtener todos los usuarios habilitados
+    public List<User> getAvailableUsers() {
+        return userDao.findAllNotBlocked(); // Solo los usuarios no bloqueados
+    }
 
-	/*
-	 * NO SE USA // Método para comprobar la disponibilidad de un usuario public
-	 * boolean isUserAvailable(User user, LocalTime startTime, LocalTime endTime) {
-	 * List<Invitation> invitations = userDao.checkUserAvailability(user, startTime,
-	 * endTime); return invitations.isEmpty(); // Si no hay invitaciones que se
-	 * solapen, está disponible }
-	 */
-	// Método para invitar a un usuario a una reunión
-	public Invitation inviteUserToMeeting(Meeting meeting, User user, InvitationStatus status) {
-		Invitation invitation = new Invitation(meeting, user, status, false, null);
-		return invitationDao.save(invitation);
-	}
+    // Método para invitar a un usuario a una reunión
+    public Invitations inviteUserToMeeting(Meetings meeting, User user, InvitationStatus status) {
+        Invitations invitation = new Invitations(meeting, user, status.name(), false, null);
+        return invitationsDao.save(invitation);
+    }
 
-	// Obtener una reunión por su ID
-	public Optional<Meeting> getMeetingById(UUID meetingId) {
-		return meetingDao.findById(meetingId);
-	}
+    // Obtener una reunión por su ID
+    public Optional<Meetings> getMeetingById(UUID meetingId) {
+        return meetingDao.findById(meetingId);
+    }
 
-	// Obtetener asistentes de una reunión id
-	public List<User> getAttendeesForMeeting(Meeting meeting) {
-		List<Invitation> invitations = invitationDao.findByMeeting(meeting);
+    // Obtener asistentes de una reunión por su ID
+    public List<UUID> getAttendeesForMeeting(Meetings meeting) {
+        List<Invitations> invitations = invitationsDao.findByMeetingId(meeting.getMeetingId());
 
-		// Filtramos aquellas las ACEPTADAS y devuelve los usuarios en una lista
-		return invitations.stream().filter(invitation -> invitation.getStatus() == InvitationStatus.ACEPTADA)
-				.map(Invitation::getUser).collect(Collectors.toList());
-	}
+        // Filtramos aquellas con estado ACEPTADA y devolvemos los usuarios
+        return invitations.stream()
+                .filter(invitation -> InvitationStatus.valueOf(invitation.getInvitationStatus()) == InvitationStatus.ACEPTADA)
+                .map(invitation -> invitation.getUser().getID())
+                .collect(Collectors.toList());
+    }
 
-	// Modificamos las reuniones
-	public void modifyMeeting(UUID idMeeting, Meeting updatedMeeting) {
-		Meeting meeting;
+    // Obtener detalles de las invitaciones por ID de reunión
+    public List<Object[]> getDetailedInvitationsForMeeting(UUID meetingId) {
+        return invitationsDao.findDetailedInvitationsByMeetingId(meetingId);
+    }
+    
+    // Modificar las reuniones
+    public void modifyMeeting(UUID idMeeting, Meetings updatedMeeting) {
+		Meetings meeting;
 		//Comprobamos si la reunión existe
 		if (!meetingDao.findById(idMeeting).isPresent()) {
-			throw new EntityNotFoundException("Meeting " + idMeeting + " no encontrado");
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "El organizador tiene una reunión en el nuevo tramo");
 		}
 		
 		else {
@@ -91,21 +87,28 @@ public class MeetingService {
 		}
 				
 		//Se revisan las reuniones del organizador, si tiene una reunión en el nuevo tramo, error de no permitido
-		List<Meeting> conflictingMeetings = meetingDao.findConflictingMeetings(updatedMeeting.getStartTime(), updatedMeeting.getEndTime(),
-				updatedMeeting.getOrganizer());
+		List<UUID> conflictingMeetings = meetingDao.findConflictingMeetings(updatedMeeting.getMeetingDate(),
+				updatedMeeting.getMeetingStartTime(), updatedMeeting.getMeetingEndTime());
 		if (!conflictingMeetings.isEmpty()) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, "El organizador tiene una reunión en el nuevo tramo");
 		}
-		//Comprobar que queden más de 24 h para la hora de inicio de la reunión
-		else if(isWithin24Hours(Time.valueOf(LocalTime.now()), updatedMeeting.getStartTime())) {
+		else if(isWithin24Hours(LocalTime.now(), updatedMeeting.getMeetingStartTime())) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, "No se puede modificar una reunión con menos de 24 horas de antelación");
 		}
 		else 
-		{	// Se revisan las reuniones de los invitados, si tienen una reunión en el nuevo tramo, se elimina al invitado de la reunión
-			List<User> attendees = getAttendeesForMeeting(meeting);
-			for (User attendee : attendees) {
-				conflictingMeetings = meetingDao.findConflictingMeetings(updatedMeeting.getStartTime(), updatedMeeting.getEndTime(),
-						attendee);
+		{
+			// Se revisan las reuniones de los invitados, si tienen una reunión en el nuevo tramo, se elimina al invitado de la reunión
+			List<UUID> attendees = invitationsDao.findUserIdsByMeetingId(meeting.getMeetingId()); //Crear método para extraer de la tabla de invitaciones
+			for (UUID attendee : attendees) {
+				for (UUID idMeetingSearch : conflictingMeetings) {
+					// Si el usuario tiene una reunión en el nuevo tramo, se elimina de la reunión
+					if (invitationsDao.checkUserHaveMeeting(attendee, idMeetingSearch) > 0) {
+						// Eliminar al invitado de la tabla de reuniones
+						invitationsDao.deleteByMeetingIdAndUserId(attendee, idMeetingSearch);
+					}
+				}
+				conflictingMeetings = meetingDao.findConflictingMeetings(updatedMeeting.getMeetingDate(),
+						updatedMeeting.getMeetingStartTime(), updatedMeeting.getMeetingEndTime());
 				if (!conflictingMeetings.isEmpty()) {
 					//Eliminar al invitado de la tabla de reunioines
 				}
@@ -115,17 +118,12 @@ public class MeetingService {
 		meetingDao.updateMeeting(meeting, updatedMeeting);
 	}
 
-		public static boolean isWithin24Hours(Time now, Time targetTime) {
-	        // Se convierten a milisegundos
-	        long nowMillis = now.getTime();
-	        long targetMillis = targetTime.getTime();
+    public boolean isWithin24Hours(LocalTime now, LocalTime targetTime) {
+        // Calculamos la duración entre los dos tiempos
+        Duration duration = Duration.between(now, targetTime);
+        // Obtenemos la diferencia en horas absolutas
+        long hoursDifference = Math.abs(duration.toHours());
+        return hoursDifference < 24;
+    }
 
-	        // Calculamos la diferencia en milisegundos
-	        long differenceMillis = Math.abs(nowMillis - targetMillis);
-
-	        // Convertimos la diferencia a horas
-	        long hoursDifference = differenceMillis / (1000 * 60 * 60);
-
-	        return hoursDifference < 24;
-	    }
 }
