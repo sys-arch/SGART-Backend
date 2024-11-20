@@ -1,11 +1,14 @@
 package com.team1.sgart.backend.http;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.team1.sgart.backend.model.AbsencesDTO;
 import com.team1.sgart.backend.services.AbsencesService;
+
+import jakarta.servlet.http.HttpSession;
 
 import java.util.List;
 import java.util.UUID;
@@ -27,10 +30,11 @@ public class AbsencesController {
         logger.info("[!] AdminAbsencesController created");
     }
 
-    @GetMapping("/loadAbsences/{userId}")
-    public ResponseEntity<List<AbsencesDTO>> getAbsencesByUser(@PathVariable UUID userId) {
+    @GetMapping("/loadAbsences")
+    public ResponseEntity<List<AbsencesDTO>> getAbsencesByUser(HttpSession session) {
+        UUID userId = (UUID) session.getAttribute("userId");
         if (userId == null) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         List<AbsencesDTO> absencesList = absencesService.getAbsencesByUser(userId);
@@ -39,7 +43,6 @@ public class AbsencesController {
         }
         return ResponseEntity.ok(absencesList);
     }
-
 
     @PostMapping("/newAbsence")
     public ResponseEntity<AbsencesDTO> createAbsence(@RequestBody AbsencesDTO absenceDto) {

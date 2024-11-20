@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 
 import com.team1.sgart.backend.services.UserService;
 
+import jakarta.servlet.http.HttpSession;
+
 @RestController
 @RequestMapping("users")
 @CrossOrigin("*")
@@ -39,12 +41,15 @@ public class UserController {
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<Object> login(@RequestBody User user) {
+	public ResponseEntity<Object> login(@RequestBody User user, HttpSession session) {
 		GenericUser genericUser = userService.loginUser(user);
 		Map<String, Object> response = new HashMap<>();
 
 		if (genericUser instanceof User) {
 			User userLogged = (User) genericUser;
+			// Guardar el ID del usuario en la sesión
+			session.setAttribute("userId", userLogged.getID());
+
 			UserDTO userDTO = new UserDTO();
 			userDTO.setID(userLogged.getID());
 			userDTO.setName(userLogged.getName());
@@ -62,10 +67,9 @@ public class UserController {
 			response.put("type", "user");
 
 			return ResponseEntity.ok(response);
-		}
-
-		else if (genericUser instanceof Admin) {
+		} else if (genericUser instanceof Admin) {
 			Admin adminLogged = (Admin) genericUser;
+			session.setAttribute("userId", adminLogged.getID()); // Guardar el ID del administrador
 			AdminDTO adminDTO = new AdminDTO();
 			adminDTO.setID(adminLogged.getID());
 			adminDTO.setName(adminLogged.getName());
@@ -93,7 +97,7 @@ public class UserController {
 	}
 
 	@GetMapping("/cargarUsuarios")
-	public ResponseEntity<List<UserAbsenceDTO>> getAllUsers(){
+	public ResponseEntity<List<UserAbsenceDTO>> getAllUsers() {
 		List<UserAbsenceDTO> usersList = userService.loadUsers();
 		return ResponseEntity.ok(usersList);
 	}

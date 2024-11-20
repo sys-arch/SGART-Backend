@@ -1,15 +1,17 @@
 package com.team1.sgart.backend.http;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.team1.sgart.backend.model.MeetingsDTO;
 import com.team1.sgart.backend.services.CalendarService;
+
+import jakarta.servlet.http.HttpSession;
 
 import java.util.List;
 import java.util.UUID;
@@ -31,9 +33,13 @@ public class UserCalendarController {
         logger.info("[!] UserCalendarController created");
     }
 
-    @GetMapping("/{userId}/meetings")
-    public ResponseEntity<List<MeetingsDTO>> loadMeetings(@PathVariable UUID userId) {
-        logger.info("Loading meetings for user: {}", userId);
+    @GetMapping("/meetings")
+    public ResponseEntity<List<MeetingsDTO>> loadMeetings(HttpSession session) {
+        UUID userId = (UUID) session.getAttribute("userId");
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         List<MeetingsDTO> meetings = calendarService.getMeetingsByUserId(userId);
         return ResponseEntity.ok(meetings);
     }
