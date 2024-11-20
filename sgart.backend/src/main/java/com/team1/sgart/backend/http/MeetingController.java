@@ -17,14 +17,18 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/meetings")
+@RequestMapping("meetings")
+@CrossOrigin("*")
 public class MeetingController {
 
-    @Autowired
-    private MeetingService meetingService;
-
-    @Autowired
+    private MeetingService meetingService;   
     private UserService userService;
+    
+    @Autowired
+	public MeetingController(MeetingService meetingService, UserService userService) {
+		this.meetingService = meetingService;
+		this.userService = userService;
+	}
 
     // Crear una reunión
     @PostMapping("/create")

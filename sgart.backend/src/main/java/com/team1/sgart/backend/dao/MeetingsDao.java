@@ -1,13 +1,11 @@
 package com.team1.sgart.backend.dao;
 
 import com.team1.sgart.backend.model.Meetings;
-import com.team1.sgart.backend.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -43,7 +41,15 @@ public interface MeetingsDao extends JpaRepository<Meetings, UUID> {
 		}
 	}
 
-	@Query("SELECT m.meetingId FROM Meetings m WHERE m.meetingDate = :meetingDate AND (m.meetingStartTime < :meetingEndTime AND m.meetingEndTime > :meetingStartTime)")
+	@Query(value = """
+			SELECT m.meeting_id 
+			FROM SGART_MeetingsTable m
+			WHERE m.meeting_date = :meetingDate
+			AND (
+				CAST(CAST(:meetingDate AS DATETIME) + CAST(m.meeting_start_time AS DATETIME) AS DATETIME) < :meetingEndTime
+				AND CAST(CAST(:meetingDate AS DATETIME) + CAST(m.meeting_end_time AS DATETIME) AS DATETIME) > :meetingStartTime
+			 );
+				""", nativeQuery = true)
 	List<UUID> findConflictingMeetings(@Param("meetingDate") LocalDate meetingDate,
 			@Param("meetingStartTime") LocalTime meetingStartTime, @Param("meetingEndTime") LocalTime meetingEndTime);
 

@@ -84,21 +84,20 @@ public class MeetingService {
 		
 		else {
 			 meeting = meetingDao.findById(idMeeting).get();
-		}
-				
+		}	
 		//Se revisan las reuniones del organizador, si tiene una reunión en el nuevo tramo, error de no permitido
 		List<UUID> conflictingMeetings = meetingDao.findConflictingMeetings(updatedMeeting.getMeetingDate(),
 				updatedMeeting.getMeetingStartTime(), updatedMeeting.getMeetingEndTime());
 		if (!conflictingMeetings.isEmpty()) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, "El organizador tiene una reunión en el nuevo tramo");
 		}
-		else if(isWithin24Hours(LocalTime.now(), updatedMeeting.getMeetingStartTime())) {
+		else if(isWithin24Hours(LocalTime.now(), updatedMeeting.getMeetingStartTime(), LocalDate.now(), updatedMeeting.getMeetingDate())) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, "No se puede modificar una reunión con menos de 24 horas de antelación");
 		}
 		else 
 		{
 			// Se revisan las reuniones de los invitados, si tienen una reunión en el nuevo tramo, se elimina al invitado de la reunión
-			List<UUID> attendees = invitationsDao.findUserIdsByMeetingId(meeting.getMeetingId()); //Crear método para extraer de la tabla de invitaciones
+			List<UUID> attendees = invitationsDao.findUserIdsByMeetingId(idMeeting); //Crear método para extraer de la tabla de invitaciones
 			for (UUID attendee : attendees) {
 				for (UUID idMeetingSearch : conflictingMeetings) {
 					// Si el usuario tiene una reunión en el nuevo tramo, se elimina de la reunión
@@ -118,12 +117,23 @@ public class MeetingService {
 		meetingDao.updateMeeting(meeting, updatedMeeting);
 	}
 
-    public boolean isWithin24Hours(LocalTime now, LocalTime targetTime) {
-        // Calculamos la duración entre los dos tiempos
-        Duration duration = Duration.between(now, targetTime);
-        // Obtenemos la diferencia en horas absolutas
-        long hoursDifference = Math.abs(duration.toHours());
-        return hoursDifference < 24;
+    public boolean isWithin24Hours(LocalTime nowTime, LocalTime targetTime, LocalDate nowDate, LocalDate targetDate) {
+        
+    	long hoursDifference = 0;
+    	long daysBetween = nowDate.until(targetDate).getDays();
+    	boolean available = false;
+    	//Comprobamos si el día de la reunión es el mismo que el actual o es el siguiente
+    	if (daysBetween == 1 ) {
+			// Calculamos la duración entre los dos tiempos
+	        Duration duration = Duration.between(nowTime, targetTime);
+	        // Obtenemos la diferencia en horas absolutas
+	        hoursDifference = Math.abs(duration.toHours());
+			if (hoursDifference < 24) {
+				available = true;
+			}
+		}
+    	
+    	return available;
     }
 
 }
