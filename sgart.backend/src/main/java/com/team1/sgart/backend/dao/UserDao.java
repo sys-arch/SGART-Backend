@@ -37,7 +37,8 @@ public interface UserDao extends JpaRepository<User, UUID> {
 
     // Método para comprobar la disponibilidad de un usuario en una reunión
     @Query("SELECT i FROM Invitations i WHERE i.user = :user AND i.meeting.meetingStartTime <= :endTime AND i.meeting.meetingEndTime >= :startTime")
-    List<Invitations> checkUserAvailability(@Param("user") User user, @Param("startTime") LocalTime startTime, @Param("endTime") LocalTime endTime);
+    List<Invitations> checkUserAvailability(@Param("user") User user, @Param("startTime") LocalTime startTime,
+            @Param("endTime") LocalTime endTime);
 
     // Método para verificar si el usuario está validado
     @Query("SELECT u.validated FROM User u WHERE u.email = :email")
@@ -94,4 +95,8 @@ public interface UserDao extends JpaRepository<User, UUID> {
     // Método para obtener el authCode de un usuario
     @Query("SELECT u.twoFactorAuthCode FROM User u WHERE u.email = :email")
     String obtenerAuthCodePorEmail(@Param("email") String email);
+
+    @Query("SELECT CONCAT(u.name, ' ', u.lastName) FROM User u WHERE u.id = :id")
+    String findUserFullNameById(@Param("id") UUID id);
+
 }

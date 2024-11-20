@@ -2,6 +2,7 @@ package com.team1.sgart.backend.services;
 
 import com.team1.sgart.backend.dao.InvitationsDao;
 import com.team1.sgart.backend.dao.MeetingsDao;
+import com.team1.sgart.backend.dao.UserDao;
 import com.team1.sgart.backend.model.InvitationsDTO;
 import com.team1.sgart.backend.model.Meetings;
 import com.team1.sgart.backend.model.MeetingsDTO;
@@ -21,18 +22,19 @@ public class CalendarService {
     private final MeetingsDao meetingsDao;
     private final InvitationsDao invitationsDao;
     private final LocationsService locationsService;
+    private final UserDao userDao;
 
     @Autowired
-    public CalendarService(MeetingsDao meetingsDao, InvitationsDao invitationsDao, LocationsService locationsService) {
+    public CalendarService(MeetingsDao meetingsDao, InvitationsDao invitationsDao, LocationsService locationsService, UserDao userDao) {
         this.meetingsDao = meetingsDao;
         this.invitationsDao = invitationsDao;
         this.locationsService = locationsService;
+        this.userDao = userDao;
         logger.info("[!] CalendarService created");
     }
-
     public List<MeetingsDTO> loadMeetings() {
         List<Meetings> meetings = meetingsDao.findAll();
-
+    
         return meetings.stream().map(meeting -> {
             MeetingsDTO meetingsDTO = new MeetingsDTO();
             meetingsDTO.setMeetingId(meeting.getMeetingId());
@@ -40,16 +42,16 @@ public class CalendarService {
             meetingsDTO.setMeetingAllDay(meeting.isMeetingAllDay());
             meetingsDTO.setMeetingStartTime(meeting.getMeetingStartTime());
             meetingsDTO.setMeetingEndTime(meeting.getMeetingEndTime());
-            meetingsDTO.setOrganizerId(meeting.getOrganizerId());
             meetingsDTO.setMeetingDate(meeting.getMeetingDate());
             meetingsDTO.setMeetingObservations(meeting.getMeetingObservations());
-
-            logger.info("Procesando reunión con ID: {}", meeting.getMeetingId());
-
+    
+            // Obtener el nombre completo del organizador
+            String organizerFullName = userDao.findUserFullNameById(meeting.getOrganizerId());
+            meetingsDTO.setOrganizerName(organizerFullName); // Cambiar el atributo en el DTO
+    
             String locationName = locationsService.getLocationById(meeting.getLocationId());
-            logger.info("Asignando ubicación '{}' a la reunión '{}'", locationName, meeting.getMeetingTitle());
             meetingsDTO.setLocationName(locationName);
-
+    
             return meetingsDTO;
         }).collect(Collectors.toList());
     }
