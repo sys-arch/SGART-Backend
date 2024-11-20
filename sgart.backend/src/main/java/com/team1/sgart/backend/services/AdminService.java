@@ -125,14 +125,14 @@ public class AdminService {
 		String email = admin.getEmail();
 		if(emailAdminEstaRegistrado(email)) 
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El email ya está registrado");
-		adminDAO.crearAdmin(admin);
+		adminDAO.save(admin);
 		return adminDAO.findByEmail(admin.getEmail()).get().getID();
 	}
 	
 	private boolean emailUserEstaRegistrado(String email) {
 		return userDAO.findByEmail(email).isPresent();
 	}
-	private boolean emailAdminEstaRegistrado(String email) {
+	public boolean emailAdminEstaRegistrado(String email) {
 		return adminDAO.findByEmail(email).isPresent();
 	}
 }

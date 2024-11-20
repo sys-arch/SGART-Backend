@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import java.util.UUID;
 
 import com.team1.sgart.backend.model.Admin;
 import com.team1.sgart.backend.model.User;
@@ -14,7 +15,7 @@ import com.team1.sgart.backend.model.User;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
-public interface AdminDao extends  JpaRepository<Admin, String> {
+public interface AdminDao extends  JpaRepository<Admin, UUID> {
     Optional<Admin> findByEmail(String email);
     Optional<Admin> findByEmailAndPassword(String email, String password);
     
@@ -53,6 +54,6 @@ public interface AdminDao extends  JpaRepository<Admin, String> {
     
 	@Modifying
     @Transactional
-    @Query("INSERT INTO Admin (name, lastName, email, password, center) VALUES (:#{#a.name}, :#{#a.lastName}, :#{#a.email}, :#{#a.password}, :#{#a.center})")
+    @Query("INSERT INTO Admin (name, lastName, email, password, center, twoFactorAuthCode) VALUES (:#{#a.name}, :#{#a.lastName}, :#{#a.email}, :#{#a.password}, :#{#a.center}, :#{#a.twoFactorAuthCode})")
     void crearAdmin(@Param("a") Admin a);
 }

@@ -82,5 +82,15 @@ public class AdminController {
         adminService.eliminarUsuarioPorEmail(email);
         return new ResponseEntity<>("Perfil eliminado con éxito", HttpStatus.OK);
     }
+    
+    @PostMapping("/verificarEmail")
+	public ResponseEntity<String> verificarEmail(@RequestBody Admin admin) {
+		boolean existe = adminService.emailAdminEstaRegistrado(admin.getEmail());
+		if (!existe) {
+			return ResponseEntity.status(HttpStatus.OK).body("El email no está registrado");
+		} else {
+			return ResponseEntity.status(HttpStatus.CONFLICT).body("El email está registrado");
+		}
+	}
 }
 
