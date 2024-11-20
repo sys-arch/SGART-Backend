@@ -52,13 +52,13 @@ public interface InvitationsDao extends JpaRepository<Invitations, Integer> {
     
     @Modifying
     @Transactional
-    @Query(value = "DELETE FROM SGART_InvitationsTable WHERE MEETING_ID = :meetingId AND USER_ID = :userId")
+    @Query(value = "DELETE FROM Invitations i WHERE meeting = :meetingId AND user = :userId")
     void deleteByMeetingIdAndUserId(@Param("meetingId") UUID meetingId, @Param("userId") UUID userId);
     
-	@Query(value = "SELECT COUNT(*) FROM SGART_InvitationsTable "
-			+ "WHERE MEETING_ID = :meetingId AND USER_ID = :userId")
+	@Query(value = "SELECT COUNT(*) FROM Invitations i "
+			+ "WHERE meeting = :meetingId AND user = :userId")
 	int checkUserHaveMeeting(@Param("meetingId") UUID meetingId, @Param("userId") UUID userId);
 	
-	@Query(value = "SELECT INVITATION_ID FROM SGART_InvitationsTable WHERE MEETING_ID = :meetingId")
+	@Query(value = "SELECT invitation_id FROM Invitations i WHERE meeting = :meetingId")
 	List<UUID> findUserIdsByMeetingId(@Param("meetingId") UUID meetingId);
 }
