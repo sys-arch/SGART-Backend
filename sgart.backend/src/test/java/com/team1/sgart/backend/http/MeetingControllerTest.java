@@ -3,9 +3,6 @@ package com.team1.sgart.backend.http;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team1.sgart.backend.dao.InvitationsDao;
 import com.team1.sgart.backend.dao.MeetingsDao;
-import com.team1.sgart.backend.model.Invitations;
-import com.team1.sgart.backend.model.Admin;
-import com.team1.sgart.backend.model.InvitationStatus;
 import com.team1.sgart.backend.model.Meetings;
 import com.team1.sgart.backend.model.User;
 import com.team1.sgart.backend.services.MeetingService;
@@ -24,7 +21,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Arrays;
@@ -32,7 +28,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -110,7 +105,7 @@ class MeetingControllerTest {
         meeting.setMeetingObservations("Reunión importante");
 
         // Simular comportamiento del servicio
-        Mockito.when(meetingService.createMeeting(anyString(), anyBoolean(), any(), any(), any(), any(), any()))
+        Mockito.when(meetingService.createMeeting(anyString(), anyBoolean(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(meeting);
 
         // Ejecutar la petición y verificar resultados
@@ -166,7 +161,7 @@ class MeetingControllerTest {
         user2.setID(UUID.randomUUID());
         user2.setName("Jane Doe");
 
-        List<User> attendees = Arrays.asList(user1, user2);
+        List<UUID> attendees = Arrays.asList(user1.getID() , user2.getID());
 
         // Configurar los mocks
         when(meetingService.getMeetingById(meetingId)).thenReturn(Optional.of(meeting));
