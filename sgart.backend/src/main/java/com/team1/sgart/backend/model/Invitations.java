@@ -1,6 +1,9 @@
 package com.team1.sgart.backend.model;
 
 import jakarta.persistence.*;
+import java.time.LocalTime;
+import java.util.UUID;
+
 
 @Entity
 @Table(name = "SGART_InvitationsTable")

@@ -49,16 +49,16 @@ public interface InvitationsDao extends JpaRepository<Invitations, Integer> {
         @Param("newStatus") String newStatus,
         @Param("comment") String comment
     );
-    
+
     @Modifying
     @Transactional
     @Query(value = "DELETE FROM SGART_InvitationsTable WHERE meeting_id = :meetingId AND user_id = :userId", nativeQuery = true)
     void deleteByMeetingIdAndUserId(@Param("meetingId") UUID meetingId, @Param("userId") UUID userId);
     
-	@Query(value = "SELECT COUNT(*) FROM SGART_InvitationsTable "
+  	@Query(value = "SELECT COUNT(*) FROM SGART_InvitationsTable "
 			+ "WHERE meeting_id = :meetingId AND user_id = :userId", nativeQuery = true)
-	int checkUserHaveMeeting(@Param("meetingId") UUID meetingId, @Param("userId") UUID userId);
+  	int checkUserHaveMeeting(@Param("meetingId") UUID meetingId, @Param("userId") UUID userId);
 	
-	@Query(value = "SELECT user_id FROM SGART_InvitationsTable WHERE meeting_id = :meetingId", nativeQuery = true)
-	List<UUID> findUserIdsByMeetingId(@Param("meetingId") UUID meetingId);
+	  @Query(value = "SELECT user_id FROM SGART_InvitationsTable WHERE meeting_id = :meetingId", nativeQuery = true)
+	  List<UUID> findUserIdsByMeetingId(@Param("meetingId") UUID meetingId);
 }

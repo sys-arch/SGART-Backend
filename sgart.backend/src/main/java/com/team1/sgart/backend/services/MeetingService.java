@@ -34,6 +34,12 @@ public class MeetingService {
 		this.meetingDao = meetingDao;
 		this.invitationsDao = invitationDao;
 	}
+  
+    @Autowired
+    private MeetingsDao meetingDao;
+
+    @Autowired
+    private InvitationsDao invitationDao;
 
     // Método para crear la reunión
     public Meetings createMeeting(String meetingTitle, boolean meetingAllDay, LocalDate meetingDate, LocalTime meetingStartTime,
@@ -50,7 +56,11 @@ public class MeetingService {
     // Método para invitar a un usuario a una reunión
     public Invitations inviteUserToMeeting(Meetings meeting, User user, InvitationStatus status) {
         Invitations invitation = new Invitations(meeting, user, status.name(), false, null);
+
         return invitationsDao.save(invitation);
+
+        return invitationDao.save(invitation);
+
     }
 
     // Obtener una reunión por su ID
@@ -60,7 +70,11 @@ public class MeetingService {
 
     // Obtener asistentes de una reunión por su ID
     public List<UUID> getAttendeesForMeeting(Meetings meeting) {
+
         List<Invitations> invitations = invitationsDao.findByMeetingId(meeting.getMeetingId());
+
+        List<Invitations> invitations = invitationDao.findByMeetingId(meeting.getMeetingId());
+
 
         // Filtramos aquellas con estado ACEPTADA y devolvemos los usuarios
         return invitations.stream()

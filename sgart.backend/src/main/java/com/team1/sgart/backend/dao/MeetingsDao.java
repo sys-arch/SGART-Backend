@@ -54,3 +54,4 @@ public interface MeetingsDao extends JpaRepository<Meetings, UUID> {
 			@Param("meetingStartTime") LocalTime meetingStartTime, @Param("meetingEndTime") LocalTime meetingEndTime);
 
 }
+
