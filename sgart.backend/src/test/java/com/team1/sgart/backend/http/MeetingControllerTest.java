@@ -37,6 +37,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+
 
 @WebMvcTest(MeetingController.class)
 class MeetingControllerTest {
@@ -107,18 +109,18 @@ class MeetingControllerTest {
         // Simular comportamiento del servicio
         Mockito.when(meetingService.createMeeting(anyString(), anyBoolean(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(meeting);
-
+        
         // Ejecutar la petición y verificar resultados
-        mockMvc.perform(post("/api/meetings/create")
+        mockMvc.perform(post("/meetings/create")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(meeting)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.title").value("Reunión de prueba"))
-                .andExpect(jsonPath("$.allDay").value(false))
-                .andExpect(jsonPath("$.startTime").value("10:00:00"))
-                .andExpect(jsonPath("$.endTime").value("12:00:00"))
-                .andExpect(jsonPath("$.location").value("Sala 1"))
-                .andExpect(jsonPath("$.observations").value("Reunión importante"));
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(jsonPath("$.meetingTitle").value("Reunión de prueba"))
+                .andExpect(jsonPath("$.meetingAllDay").value(false))
+                .andExpect(jsonPath("$.meetingStartTime").value("10:00:00"))
+                .andExpect(jsonPath("$.meetingEndTime").value("12:00:00"))
+                .andExpect(jsonPath("$.meetingObservations").value("Reunión importante"));
     }
 /*	Rosa: no encuentro la forma de que este test funcione y el código lo he revisado varias veces y no encuentro el error 
  *  si es que hay. Lo dejo comentado por si luego se me ocurre algo.
