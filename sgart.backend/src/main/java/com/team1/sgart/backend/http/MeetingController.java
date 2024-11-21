@@ -6,24 +6,29 @@ import com.team1.sgart.backend.model.InvitationStatus;
 import com.team1.sgart.backend.model.Invitations;
 import com.team1.sgart.backend.services.MeetingService;
 import com.team1.sgart.backend.services.UserService;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/meetings")
+@RequestMapping("meetings")
+@CrossOrigin("*")
 public class MeetingController {
 
-    @Autowired
-    private MeetingService meetingService;
-
-    @Autowired
+    private MeetingService meetingService;   
     private UserService userService;
+    
+    @Autowired
+	public MeetingController(MeetingService meetingService, UserService userService) {
+		this.meetingService = meetingService;
+		this.userService = userService;
+	}
 
     // Crear una reunión
     @PostMapping("/create")
@@ -78,6 +83,14 @@ public class MeetingController {
     public List<UUID> getAttendees(@PathVariable("meetingId") UUID meetingId) {
         Meetings meeting = meetingService.getMeetingById(meetingId).orElseThrow(() -> new RuntimeException("ERROR: Reunión no encontrada"));
         return meetingService.getAttendeesForMeeting(meeting);
+    }
+    
+    // Editar una reunión
+    @PostMapping("/modify/{meetingId}")
+	public ResponseEntity<String> editMeeting(@PathVariable UUID meetingId, @RequestBody Meetings changeMeeting) {
+		
+        meetingService.modifyMeeting(meetingId, changeMeeting);
+        return ResponseEntity.status(HttpStatus.OK).body("Reunión modificada correctamente");
     }
     
 }

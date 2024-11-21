@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalTime;
 import java.util.UUID;
 
+
 @Entity
 @Table(name = "SGART_InvitationsTable")
 public class Invitations {
