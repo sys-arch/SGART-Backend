@@ -49,4 +49,13 @@ public interface InvitationsDao extends JpaRepository<Invitations, Integer> {
         @Param("newStatus") String newStatus,
         @Param("comment") String comment
     );
+
+    @Query(value = "SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END " +
+           "FROM SGART_InvitationsTable " +
+           "WHERE MEETING_ID = :meetingId AND USER_ID = :userId", 
+           nativeQuery = true)
+    boolean existsByUserIdAndMeetingId(
+        @Param("userId") UUID userId, 
+        @Param("meetingId") UUID meetingId
+    );
 }

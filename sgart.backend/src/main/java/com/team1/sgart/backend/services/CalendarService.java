@@ -108,4 +108,8 @@ public class CalendarService {
         }).collect(Collectors.toList());
     }
     
+    public boolean isUserAuthorizedForMeeting(UUID userId, UUID meetingId) {
+        return invitationsDao.existsByUserIdAndMeetingId(userId, meetingId);
+    }
+    
 }
