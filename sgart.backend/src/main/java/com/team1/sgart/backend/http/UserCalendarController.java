@@ -38,32 +38,33 @@ public class UserCalendarController {
     
     @GetMapping("/meetings")
     public ResponseEntity<List<MeetingsDTO>> loadMeetings(HttpSession session) {
-            UUID userId = (UUID) session.getAttribute("userId");
-            logger.info("User ID: {}", userId);
-            if (userId == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            }
-    
-            // Obtener reuniones asociadas al usuario
-            List<MeetingsDTO> meetings = calendarService.getMeetingsByUserId(userId);
-            return ResponseEntity.ok(meetings);
+        UUID userId = (UUID) session.getAttribute("userId");
+        logger.info("User ID: {}", userId);
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-    
-        @PostMapping("/invitados")
-        public ResponseEntity<List<InvitationsDTO>> loadInvitees(@RequestBody UUID meetingId, HttpSession session) {
-            UUID userId = (UUID) session.getAttribute("userId");
-            if (userId == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            }
-    
-            // Validar que el usuario esté autorizado para ver los detalles de la reunión
-            if (!calendarService.isUserAuthorizedForMeeting(userId, meetingId)) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            }
-    
-            // Obtener los detalles de las invitaciones para la reunión
-            List<InvitationsDTO> invitees = calendarService.getDetailedInvitationsByMeetingId(meetingId);
+
+        // Obtener reuniones asociadas al usuario
+        List<MeetingsDTO> meetings = calendarService.getMeetingsByUserId(userId);
+        return ResponseEntity.ok(meetings);
+    }
+
+    @PostMapping("/invitados")
+    public ResponseEntity<List<InvitationsDTO>> loadInvitees(@RequestBody UUID meetingId, HttpSession session) {
+        UUID userId = (UUID) session.getAttribute("userId");
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        // Validar que el usuario esté autorizado para ver los detalles de la reunión
+        if (!calendarService.isUserAuthorizedForMeeting(userId, meetingId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        // Obtener los detalles de las invitaciones para la reunión
+        List<InvitationsDTO> invitees = calendarService.getDetailedInvitationsByMeetingId(meetingId);
         return ResponseEntity.ok(invitees);
     }
+    
     
 }

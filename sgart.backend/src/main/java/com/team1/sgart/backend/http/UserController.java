@@ -19,7 +19,12 @@ import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("users")
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+@CrossOrigin(
+    origins = "http://localhost:3000",
+    allowCredentials = "true",
+    methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE},
+    allowedHeaders = "*"
+)
 public class UserController {
 
 	private static final Logger logger = LoggerFactory.getLogger(UserController.class);
@@ -134,4 +139,16 @@ public ResponseEntity<Object> login(@RequestBody User user, HttpSession session)
 		List<UserAbsenceDTO> usersList = userService.loadUsers();
 		return ResponseEntity.ok(usersList);
 	}
+
+    @GetMapping("/current/userId")
+    public ResponseEntity<Map<String, UUID>> getCurrentUserId(HttpSession session) {
+        UUID userId = (UUID) session.getAttribute("userId");
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        Map<String, UUID> response = new HashMap<>();
+        response.put("userId", userId);
+        return ResponseEntity.ok(response);
+    }
+
 }

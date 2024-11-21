@@ -58,4 +58,6 @@ public interface InvitationsDao extends JpaRepository<Invitations, Integer> {
         @Param("userId") UUID userId, 
         @Param("meetingId") UUID meetingId
     );
+
+    
 }
