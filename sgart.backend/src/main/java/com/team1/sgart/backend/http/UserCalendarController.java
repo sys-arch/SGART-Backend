@@ -39,6 +39,7 @@ public class UserCalendarController {
     @GetMapping("/meetings")
     public ResponseEntity<List<MeetingsDTO>> loadMeetings(HttpSession session) {
             UUID userId = (UUID) session.getAttribute("userId");
+            logger.info("User ID: {}", userId);
             if (userId == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
