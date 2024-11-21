@@ -25,27 +25,21 @@ import java.util.stream.Collectors;
 public class MeetingService {
 
     private UserDao userDao;
-    private MeetingsDao meetingDao;
+    private MeetingsDao meetingsDao;
     private InvitationsDao invitationsDao;
     
     @Autowired
-	public MeetingService(UserDao userDao, MeetingsDao meetingDao, InvitationsDao invitationDao) {
+	public MeetingService(UserDao userDao, MeetingsDao meetingsDao, InvitationsDao invitationsDao) {
 		this.userDao = userDao;
-		this.meetingDao = meetingDao;
-		this.invitationsDao = invitationDao;
+		this.meetingsDao = meetingsDao;
+		this.invitationsDao = invitationsDao;
 	}
-  
-    @Autowired
-    private MeetingsDao meetingDao;
-
-    @Autowired
-    private InvitationsDao invitationDao;
 
     // Método para crear la reunión
     public Meetings createMeeting(String meetingTitle, boolean meetingAllDay, LocalDate meetingDate, LocalTime meetingStartTime,
                                   LocalTime meetingEndTime, String observations, UUID organizerId, UUID locationId) {
         Meetings meeting = new Meetings(meetingTitle, meetingDate, meetingAllDay, meetingStartTime, meetingEndTime, observations, organizerId, locationId);
-        return meetingDao.save(meeting);
+        return meetingsDao.save(meeting);
     }
 
     // Método para obtener todos los usuarios habilitados
@@ -55,26 +49,20 @@ public class MeetingService {
 
     // Método para invitar a un usuario a una reunión
     public Invitations inviteUserToMeeting(Meetings meeting, User user, InvitationStatus status) {
-        Invitations invitation = new Invitations(meeting, user, status.name(), false, null);
+        Invitations invitation = new Invitations(meeting, user, status, false, "");
 
         return invitationsDao.save(invitation);
-
-        return invitationDao.save(invitation);
-
     }
 
     // Obtener una reunión por su ID
     public Optional<Meetings> getMeetingById(UUID meetingId) {
-        return meetingDao.findById(meetingId);
+        return meetingsDao.findById(meetingId);
     }
 
     // Obtener asistentes de una reunión por su ID
     public List<UUID> getAttendeesForMeeting(Meetings meeting) {
 
         List<Invitations> invitations = invitationsDao.findByMeetingId(meeting.getMeetingId());
-
-        List<Invitations> invitations = invitationDao.findByMeetingId(meeting.getMeetingId());
-
 
         // Filtramos aquellas con estado ACEPTADA y devolvemos los usuarios
         return invitations.stream()
@@ -92,15 +80,15 @@ public class MeetingService {
     public void modifyMeeting(UUID idMeeting, Meetings updatedMeeting) {
 		Meetings meeting;
 		//Comprobamos si la reunión existe
-		if (!meetingDao.findById(idMeeting).isPresent()) {
+		if (!meetingsDao.findById(idMeeting).isPresent()) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "El organizador tiene una reunión en el nuevo tramo");
 		}
 		
 		else {
-			 meeting = meetingDao.findById(idMeeting).get();
+			 meeting = meetingsDao.findById(idMeeting).get();
 		}	
 		//Se revisan las reuniones del organizador, si tiene una reunión en el nuevo tramo, error de no permitido
-		List<UUID> conflictingMeetings = meetingDao.findConflictingMeetings(updatedMeeting.getMeetingDate(),
+		List<UUID> conflictingMeetings = meetingsDao.findConflictingMeetings(updatedMeeting.getMeetingDate(),
 				updatedMeeting.getMeetingStartTime(), updatedMeeting.getMeetingEndTime());
 		if (!conflictingMeetings.isEmpty()) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, "El organizador tiene una reunión en el nuevo tramo");
@@ -120,7 +108,7 @@ public class MeetingService {
 						invitationsDao.deleteByMeetingIdAndUserId(attendee, idMeetingSearch);
 					}
 				}
-				conflictingMeetings = meetingDao.findConflictingMeetings(updatedMeeting.getMeetingDate(),
+				conflictingMeetings = meetingsDao.findConflictingMeetings(updatedMeeting.getMeetingDate(),
 						updatedMeeting.getMeetingStartTime(), updatedMeeting.getMeetingEndTime());
 				if (!conflictingMeetings.isEmpty()) {
 					//Eliminar al invitado de la tabla de reunioines
@@ -128,7 +116,7 @@ public class MeetingService {
 			}
 		}
 		
-		meetingDao.updateMeeting(meeting, updatedMeeting);
+		meetingsDao.updateMeeting(meeting, updatedMeeting);
 	}
 
     public boolean isWithin24Hours(LocalTime nowTime, LocalTime targetTime, LocalDate nowDate, LocalDate targetDate) {

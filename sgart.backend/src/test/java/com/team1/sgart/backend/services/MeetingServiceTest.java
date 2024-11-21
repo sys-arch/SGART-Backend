@@ -15,12 +15,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Arrays;
@@ -32,9 +29,6 @@ import java.util.Collections;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 class MeetingServiceTest {
@@ -117,9 +111,8 @@ class MeetingServiceTest {
 		// Datos de prueba
 		User user = new User("user@example.com", "User", "Test", null, null, null, null, null, null, false, false,
 				null);
-		Meetings meeting = new Meetings("Project Kickoff", LocalDate.parse("2024-12-15"),LocalTime.parse("09:00"),  false, LocalTime.parse("10:00"),
-				"", user.getID(), UUID.randomUUID());
-		Invitations invitation = new Invitations(meeting, user, InvitationStatus.PENDIENTE, false, null);
+		Meetings meeting = new Meetings("Project Kickoff", LocalDate.parse("2024-12-15"), false, LocalTime.parse("09:00"), LocalTime.parse("10:00"),				"", user.getID(), UUID.randomUUID());
+		Invitations invitation = new Invitations(meeting, user, InvitationStatus.PENDIENTE, false, "");
 
 		when(invitationDao.save(any(Invitations.class))).thenReturn(invitation);
 
@@ -128,7 +121,7 @@ class MeetingServiceTest {
 
 		// Verificaciones
 		assertNotNull(createdInvitation);
-		assertEquals(InvitationStatus.PENDIENTE, createdInvitation.getStatusCode());
+		assertEquals(InvitationStatus.PENDIENTE, createdInvitation.getInvitationStatus());
 		assertEquals(meeting, createdInvitation.getMeeting());
 		assertEquals(user, createdInvitation.getUser());
 		verify(invitationDao, times(1)).save(any(Invitations.class));
@@ -139,16 +132,16 @@ class MeetingServiceTest {
 		// Datos de prueba
 		UUID meetingId = UUID.randomUUID();
 		Meetings meeting = new Meetings();
-		meeting.setId(meetingId);
+		meeting.setMeetingId(meetingId);
 
 		when(((MeetingsDao) meetingDao).findById(meetingId)).thenReturn(Optional.of(meeting));
 
 		// Llamada al servicio
-		Optional<Meeting> result = meetingService.getMeetingById(meetingId);
+		Optional<Meetings> result = meetingService.getMeetingById(meetingId);
 
 		// Verificaciones
 		assertTrue(result.isPresent());
-		assertEquals(meetingId, result.get().getId());
+		assertEquals(meetingId, result.get().getMeetingId());
 		verify(meetingDao, times(1)).findById(meetingId);
 	}
 
@@ -165,10 +158,10 @@ class MeetingServiceTest {
 		List<Invitations> invitations = Arrays.asList(invitation1, invitation2, invitation3);
 
 		// Configurar el mock
-		when(invitationDao.findByMeetingId(meeting)).thenReturn(invitations);
+		when(invitationDao.findByMeetingId(meeting.getMeetingId())).thenReturn(invitations);
 
 		// Ejecutar el método
-		List<User> attendees = meetingService.getAttendeesForMeeting(meeting);
+		List<UUID> attendees = meetingService.getAttendeesForMeeting(meeting);
 
 		// Verificar resultados
 		assertEquals(2, attendees.size());
