@@ -19,12 +19,6 @@ import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("users")
-@CrossOrigin(
-    origins = "http://localhost:3000",
-    allowCredentials = "true",
-    methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE},
-    allowedHeaders = "*"
-)
 public class UserController {
 
 	private static final Logger logger = LoggerFactory.getLogger(UserController.class);

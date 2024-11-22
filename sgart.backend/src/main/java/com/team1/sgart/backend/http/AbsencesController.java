@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/administrador/ausencias")
-@CrossOrigin(origins = "http://localhost:3000")
 public class AbsencesController {
 
     private static final Logger logger = LoggerFactory.getLogger(AbsencesController.class);

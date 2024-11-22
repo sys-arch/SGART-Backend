@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/usuarios/calendarios")
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class UserCalendarController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserCalendarController.class);
@@ -66,5 +65,17 @@ public class UserCalendarController {
         return ResponseEntity.ok(invitees);
     }
     
+    @GetMapping("/organized-meetings")
+    public ResponseEntity<List<MeetingsDTO>> loadOrganizedMeetings(HttpSession session) {
+        UUID userId = (UUID) session.getAttribute("userId");
+        logger.info("User ID: {}", userId);
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        // Obtener reuniones organizadas por el usuario
+        List<MeetingsDTO> meetings = calendarService.getOrganizedMeetingsByUserId(userId);
+        return ResponseEntity.ok(meetings);
+    }
     
 }

@@ -112,4 +112,29 @@ public class CalendarService {
         return invitationsDao.existsByUserIdAndMeetingId(userId, meetingId);
     }
     
+    public List<MeetingsDTO> getOrganizedMeetingsByUserId(UUID userId) {
+        List<Meetings> meetings = meetingsDao.findByOrganizerId(userId);
+        
+        return meetings.stream().map(meeting -> {
+            MeetingsDTO meetingsDTO = new MeetingsDTO();
+            meetingsDTO.setMeetingId(meeting.getMeetingId());
+            meetingsDTO.setMeetingTitle(meeting.getMeetingTitle());
+            meetingsDTO.setMeetingAllDay(meeting.isMeetingAllDay());
+            meetingsDTO.setMeetingStartTime(meeting.getMeetingStartTime());
+            meetingsDTO.setMeetingEndTime(meeting.getMeetingEndTime());
+            meetingsDTO.setMeetingDate(meeting.getMeetingDate());
+            meetingsDTO.setMeetingObservations(meeting.getMeetingObservations());
+            
+            // Obtener el nombre completo del organizador
+            String organizerFullName = userDao.findUserFullNameById(meeting.getOrganizerId());
+            meetingsDTO.setOrganizerName(organizerFullName);
+            
+            // Obtener el nombre de la ubicación
+            String locationName = locationsService.getLocationById(meeting.getLocationId());
+            meetingsDTO.setLocationName(locationName);
+            
+            return meetingsDTO;
+        }).collect(Collectors.toList());
+    }
+    
 }

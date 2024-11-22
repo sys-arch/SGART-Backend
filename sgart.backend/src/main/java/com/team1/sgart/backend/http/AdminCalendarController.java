@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/administrador/calendarios")
-@CrossOrigin(origins = "http://localhost:3000")
 public class AdminCalendarController {
 
     private static final Logger logger = LoggerFactory.getLogger(AdminCalendarController.class);
