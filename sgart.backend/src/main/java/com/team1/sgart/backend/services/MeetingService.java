@@ -81,7 +81,7 @@ public class MeetingService {
 		Meetings meeting;
 		//Comprobamos si la reunión existe
 		if (!meetingsDao.findById(idMeeting).isPresent()) {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "El organizador tiene una reunión en el nuevo tramo");
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Reunión no encontrada");
 		}
 		
 		else {
