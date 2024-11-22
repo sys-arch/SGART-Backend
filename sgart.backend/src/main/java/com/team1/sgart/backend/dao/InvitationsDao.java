@@ -59,5 +59,24 @@ public interface InvitationsDao extends JpaRepository<Invitations, Integer> {
         @Param("meetingId") UUID meetingId
     );
 
-    
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Transactional
+    @Query(value = "UPDATE SGART_InvitationsTable " +
+           "SET USER_ATTENDANCE = 1 " +
+           "WHERE MEETING_ID = :meetingId AND USER_ID = :userId", 
+           nativeQuery = true)
+    int updateUserAttendance(
+        @Param("meetingId") UUID meetingId, 
+        @Param("userId") UUID userId
+    );
+
+    @Query(value = "SELECT CASE WHEN USER_ATTENDANCE = 1 THEN 1 ELSE 0 END " +
+           "FROM SGART_InvitationsTable " +
+           "WHERE MEETING_ID = :meetingId AND USER_ID = :userId", 
+           nativeQuery = true)
+    Integer getUserAttendance(
+        @Param("meetingId") UUID meetingId, 
+        @Param("userId") UUID userId
+    );
+
 }

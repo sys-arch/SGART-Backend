@@ -53,4 +53,43 @@ public class InvitationsController {
         }
     }
 
+    @PutMapping("/{meetingId}/attendance")
+    public ResponseEntity<?> updateUserAttendance(
+            @PathVariable UUID meetingId,
+            HttpSession session) {
+        UUID userId = (UUID) session.getAttribute("userId");
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        try {
+            boolean updated = invitationsService.updateUserAttendance(meetingId, userId);
+            return updated ? ResponseEntity.ok().build()
+                    : ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            logger.error("Error updating user attendance: {}", e.getMessage());
+            return ResponseEntity.badRequest().body("Error updating user attendance");
+        }
+    }
+
+    @GetMapping("/{meetingId}/attendance")
+    public ResponseEntity<?> getUserAttendance(
+            @PathVariable UUID meetingId,
+            HttpSession session) {
+        UUID userId = (UUID) session.getAttribute("userId");
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        try {
+            Integer attendance = invitationsService.getUserAttendance(meetingId, userId);
+            return attendance != null 
+                ? ResponseEntity.ok(attendance)
+                : ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            logger.error("Error getting user attendance: {}", e.getMessage());
+            return ResponseEntity.badRequest().body("Error getting user attendance");
+        }
+    }
+
 }
