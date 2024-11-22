@@ -92,6 +92,34 @@ public class MeetingController {
         meetingService.modifyMeeting(meetingId, changeMeeting);
         return ResponseEntity.status(HttpStatus.OK).body("Reunión modificada correctamente");
     }
+
+    //Organizador cancela reunión
+    @DeleteMapping("/{meetingId}")
+    public ResponseEntity<Void> cancelMeeting(@PathVariable UUID meetingId) {
+        try {
+            meetingService.cancelMeetingByOrganizer(meetingId);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).build();
+        }
+    }
     
+    //Cancelar reunión si todas las invitaciones son rechazadas
+    @PostMapping("/cancel/rejected")
+    public ResponseEntity<String> cancelMeetingIfAllInvitationsRejected(
+            @RequestParam UUID meetingId,
+            @RequestParam UUID excludedUserId) {
+        try {
+            boolean result = meetingService.cancelMeetingIfAllInvitationsRejected(meetingId, excludedUserId);
+            if (result) {
+                return ResponseEntity.ok("Reunión cancelada debido a que todas las invitaciones fueron rechazadas");
+            } else {
+                return ResponseEntity.status(HttpStatus.SC_BAD_REQUEST)
+                        .body("La reunión sigue adelante, hay invitaciones pendientes o aceptadas");
+            }
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(ex.getMessage());
+        }
+    }	
 }
 
