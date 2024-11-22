@@ -34,9 +34,6 @@ public class MeetingService {
 		this.meetingDao = meetingDao;
 		this.invitationsDao = invitationDao;
 	}
-  
-    @Autowired
-    private MeetingsDao meetingDao;
 
     @Autowired
     private InvitationsDao invitationDao;
@@ -59,8 +56,6 @@ public class MeetingService {
 
         return invitationsDao.save(invitation);
 
-        return invitationDao.save(invitation);
-
     }
 
     // Obtener una reunión por su ID
@@ -72,8 +67,6 @@ public class MeetingService {
     public List<UUID> getAttendeesForMeeting(Meetings meeting) {
 
         List<Invitations> invitations = invitationsDao.findByMeetingId(meeting.getMeetingId());
-
-        List<Invitations> invitations = invitationDao.findByMeetingId(meeting.getMeetingId());
 
 
         // Filtramos aquellas con estado ACEPTADA y devolvemos los usuarios
