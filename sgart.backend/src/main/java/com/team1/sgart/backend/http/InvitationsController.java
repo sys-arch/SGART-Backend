@@ -17,8 +17,6 @@ import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/invitations")
-@CrossOrigin(origins = "http://localhost:3000")
-
 public class InvitationsController {
 
     private static final Logger logger = LoggerFactory.getLogger(InvitationsController.class);
@@ -30,7 +28,7 @@ public class InvitationsController {
         logger.info("[!] InvitationsController created");
     }
 
-    @PatchMapping("/{meetingId}/status")
+    @PutMapping("/{meetingId}/status")
     public ResponseEntity<?> updateInvitationStatus(
             @PathVariable UUID meetingId,
             @RequestBody Map<String, String> requestBody,
