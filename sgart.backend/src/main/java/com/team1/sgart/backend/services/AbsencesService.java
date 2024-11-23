@@ -23,6 +23,14 @@ public class AbsencesService {
         this.absencesDao = absencesDao;
         logger.info("[!] AbsencesService created");
     }
+    
+    public List<AbsencesDTO> getAllAbsences() {
+    	List<Absences> absencesList = absencesDao.findAll();
+
+        return absencesList.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+	}
 
     public List<AbsencesDTO> getAbsencesByUser(UUID userId) {
         List<Absences> absencesList = absencesDao.findByUserId(userId);

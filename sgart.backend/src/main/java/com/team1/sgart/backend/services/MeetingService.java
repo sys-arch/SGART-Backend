@@ -2,11 +2,13 @@ package com.team1.sgart.backend.services;
 
 import com.team1.sgart.backend.dao.UserDao;
 import com.team1.sgart.backend.dao.InvitationsDao;
+import com.team1.sgart.backend.dao.LocationsDao;
 import com.team1.sgart.backend.dao.MeetingsDao;
 import com.team1.sgart.backend.model.Meetings;
 import com.team1.sgart.backend.model.User;
 import com.team1.sgart.backend.model.InvitationStatus;
 import com.team1.sgart.backend.model.Invitations;
+import com.team1.sgart.backend.model.Locations;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,13 +30,19 @@ public class MeetingService {
     private UserDao userDao;
     private MeetingsDao meetingsDao;
     private InvitationsDao invitationsDao;
+    private LocationsDao locationsDao;
+
     
     @Autowired
-	public MeetingService(UserDao userDao, MeetingsDao meetingsDao, InvitationsDao invitationsDao) {
-		this.userDao = userDao;
-		this.meetingsDao = meetingsDao;
-		this.invitationsDao = invitationsDao;
-	}
+    public MeetingService(UserDao userDao, MeetingsDao meetingDao, InvitationsDao invitationDao, LocationsDao locationsDao) {
+      this.userDao = userDao;
+      this.meetingDao = meetingDao;
+      this.invitationsDao = invitationDao;
+      this.locationsDao = locationsDao;
+    }
+
+    @Autowired
+    private InvitationsDao invitationDao;
 
     // Método para crear la reunión
     public Meetings createMeeting(String meetingTitle, boolean meetingAllDay, LocalDate meetingDate, LocalTime meetingStartTime,
@@ -47,6 +55,11 @@ public class MeetingService {
     public List<User> getAvailableUsers() {
         return userDao.findAllNotBlocked(); // Solo los usuarios no bloqueados
     }
+    
+    // Método para obtener todas las localizaciones
+  	public List<Locations> getLocations() {
+  		return locationsDao.findAll();
+  	}
 
     // Método para invitar a un usuario a una reunión
     public Invitations inviteUserToMeeting(Meetings meeting, User user, InvitationStatus status) {
@@ -64,7 +77,7 @@ public class MeetingService {
     public List<UUID> getAttendeesForMeeting(Meetings meeting) {
 
         List<Invitations> invitations = invitationsDao.findByMeetingId(meeting.getMeetingId());
-
+      
         // Filtramos aquellas con estado ACEPTADA y devolvemos los usuarios
         return invitations.stream()
                 .filter(invitation -> InvitationStatus.valueOf(invitation.getInvitationStatus()) == InvitationStatus.ACEPTADA)
@@ -119,27 +132,53 @@ public class MeetingService {
 		
 		meetingsDao.updateMeeting(meeting, updatedMeeting);
 	}
-/*
-    public boolean isWithin24Hours(LocalTime nowTime, LocalTime targetTime, LocalDate nowDate, LocalDate targetDate) {
-        
-    	long hoursDifference = 0;
-    	long daysBetween = nowDate.until(targetDate).getDays();
-    	boolean available = false;
-    	//Comprobamos si el día de la reunión es el mismo que el actual o es el siguiente
-    	if (daysBetween == 1 ) {
-			// Calculamos la duración entre los dos tiempos
-	        Duration duration = Duration.between(nowTime, targetTime);
-	        // Obtenemos la diferencia en horas absolutas
-	        hoursDifference = Math.abs(duration.toHours());
-			if (hoursDifference < 24) {
-				available = true;
-			}
+  
+	// Método para cancelar una reunión MANUAL por organizador
+	public boolean cancelMeetingByOrganizer(UUID meetingId) {
+		// Recuperamos la reunión por su ID
+		Optional<Meetings> meetingOpt = meetingDao.findById(meetingId);
+		if (meetingOpt.isEmpty()) {
+			throw new RuntimeException("Reunión no encontrada");
 		}
-    	
-    	return available;
-    }
- */   
-    public boolean isWithin24Hours(LocalTime nowTime, LocalTime targetTime, LocalDate nowDate, LocalDate targetDate) {
+
+		Meetings meeting = meetingOpt.get();
+		meetingDao.delete(meeting); // cancelada = eliminada
+
+		return true;
+	}
+	/*
+	// Método para cancelar una reunión si todas las invitaciones están rechazadas
+	public boolean cancelMeetingIfAllInvitationsRejected(UUID meetingId, UUID excludedInvitationId) {
+		
+		// Recuperamos todas las invitaciones EXCEPTO la que se está procesando por si no se ha guardado Rechazada aún
+		List<Invitations> invitations = invitationDao.findByMeetingIdAndInvitationIdNot(meetingId, excludedInvitationId);
+
+
+		if (invitations.isEmpty()) {
+			throw new RuntimeException("No se encontraron invitaciones para la reunión");
+		}
+
+		// Verificamos que todas las invitaciones están rechazadas
+		boolean allRejected = invitations.stream()
+				.allMatch(invitation -> invitation.getInvitationStatus().equals(InvitationStatus.RECHAZADA))
+		  if (allRejected) {
+// ------------------------------------------------------------------------------------Esto es igual que cancelMeetingByOrganizer se podría juntar :P
+        Optional<Meetings> meetingOpt = meetingDao.findById(meetingId);
+        if (meetingOpt.isEmpty()) {
+          throw new RuntimeException("Reunión no encontrada");
+        }
+
+        Meetings meeting = meetingOpt.get();
+        meetingDao.delete(meeting);
+        return true;
+        //--------------------------------------------------------------------------
+		}
+
+		return false;
+	}
+	*/
+    
+  public boolean isWithin24Hours(LocalTime nowTime, LocalTime targetTime, LocalDate nowDate, LocalDate targetDate) {
         LocalDateTime nowDateTime = LocalDateTime.of(nowDate, nowTime);
         LocalDateTime targetDateTime = LocalDateTime.of(targetDate, targetTime);
         
@@ -147,6 +186,5 @@ public class MeetingService {
         long hoursDifference = duration.toHours();
         
         return hoursDifference < 24;
-    }
-
+    }  
 }

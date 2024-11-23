@@ -236,5 +236,125 @@ class MeetingServiceTest {
 		assertEquals("No se puede modificar una reunión con menos de 24 horas de antelación", exception.getReason());
 		verify(meetingDao, never()).updateMeeting(any(), any());
 	}
+    //TDD cancelar reunión por organizador
+    @Test //TDD
+    void testCancelMeetingByOrganizer_Success() {
+    	// Datos de prueba
+        UUID meetingId = UUID.randomUUID();
+        //UUID organizerId = UUID.randomUUID();
+        Meetings meeting = new Meetings();
+        meeting.setMeetingId(meetingId);
+        
+        // Configurar el mock para que devuelva la reunión
+        when(meetingDao.findById(meetingId)).thenReturn(Optional.of(meeting));
 
+        // Ejecutar el método
+        boolean result = meetingService.cancelMeetingByOrganizer(meetingId);
+
+        // Verificar comportamiento y resultado
+        assertTrue(result);
+        verify(meetingDao, times(1)).findById(meetingId);
+        verify(meetingDao, times(1)).delete(meeting);
+    }
+    
+    //TDD cancelar reunión por organizador
+    @Test 
+    void testCancelMeetingByOrganizer_MeetingNotFound() {
+    	// Datos de prueba
+        UUID meetingId = UUID.randomUUID();
+        //UUID organizerId = UUID.randomUUID();
+        Meetings meeting = new Meetings();
+        meeting.setMeetingId(meetingId);
+        
+        // Configurar el mock para que no encuentre la reunión
+        when(meetingDao.findById(meetingId)).thenReturn(Optional.empty());
+
+        // Ejecutar el método y verificar excepción
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> 
+            meetingService.cancelMeetingByOrganizer(meetingId)
+        );
+        assertEquals("Reunión no encontrada", exception.getMessage());
+
+        // Verificar comportamiento
+        verify(meetingDao, times(1)).findById(meetingId);
+        verify(meetingDao, never()).delete(any(Meetings.class));
+    }
+    
+    //TDD cancelar reunión, ahora automágico
+    @Test
+    void testCancelMeetingIfAllInvitationsRejected_Success() {
+    	
+    	UUID meetingId = UUID.randomUUID();
+    	Meetings meeting = new Meetings();
+    	User excludedUser = new User();
+    	
+    	meeting.setMeetingId(meetingId);
+    	excludedUser.setID(UUID.randomUUID());
+        
+    	List<Invitations> invitations;
+        
+    	Invitations invitation1 = new Invitations();
+    	Invitations invitation2 = new Invitations();
+    	Invitations invitation3 = new Invitations();
+        
+    	invitation1.setInvitationStatus(InvitationStatus.RECHAZADA);
+        invitation2.setInvitationStatus(InvitationStatus.RECHAZADA);
+        invitation3.setInvitationStatus(InvitationStatus.PENDIENTE);
+        invitation3.setUser(excludedUser);
+        
+        invitation1.setMeeting(meeting);
+        invitation2.setMeeting(meeting);
+        
+        invitations = List.of(invitation1, invitation2);
+        
+        // Configurar mock para devolver las invitaciones y la reunión
+        when(invitationDao.findByMeetingIdAndInvitationIdNot(meetingId, excludedUser.getID()))
+        .thenReturn(invitations);
+        when(meetingDao.findById(meetingId)).thenReturn(Optional.of(meeting));
+
+        // Ejecutar el método
+        boolean result = meetingService.cancelMeetingIfAllInvitationsRejected(meetingId, excludedUser.getID());
+
+        // Verificar comportamiento y resultado
+        assertTrue(result); //allRejected = true
+        verify(meetingDao, times(1)).delete(meeting);
+    }
+    
+    //TDD cancelar reunión, ahora automágico
+    @Test
+    void testCancelMeetingIfAllInvitationsRejected_NotAllRejected() {
+        UUID meetingId = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
+
+        Meetings meeting = new Meetings();
+        meeting.setMeetingId(meetingId);
+        
+        User excludedUser = new User();
+        excludedUser.setID(UUID.randomUUID());
+
+        Invitations invitation1 = new Invitations();
+        Invitations invitation2 = new Invitations();
+        Invitations invitation3 = new Invitations();
+
+        invitation1.setInvitationStatus(InvitationStatus.RECHAZADA);
+        invitation2.setInvitationStatus(InvitationStatus.ACEPTADA);
+        invitation3.setInvitationStatus(InvitationStatus.RECHAZADA);
+        invitation3.setUser(new User());
+
+        invitation1.setMeeting(meeting);
+        invitation2.setMeeting(meeting);
+
+        List<Invitations> invitations = List.of(invitation1, invitation2);
+
+        // Configurar mock para devolver las invitaciones y la reunión
+        when(invitationDao.findByMeetingIdAndInvitationIdNot(meetingId, excludedUser.getID()))
+        .thenReturn(invitations);
+
+        // Ejecutar el método
+        boolean result = meetingService.cancelMeetingIfAllInvitationsRejected(meetingId, excludedUser.getID());
+
+        // Verificar comportamiento y resultado
+        assertFalse(result); //allRejected = false, tenemos una aceptada ^
+        verify(meetingDao, never()).delete(meeting); //no se borra
+    }
 }

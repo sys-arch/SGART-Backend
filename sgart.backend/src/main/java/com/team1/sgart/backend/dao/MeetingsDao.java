@@ -16,7 +16,13 @@ import java.util.function.Consumer;
 @Repository
 public interface MeetingsDao extends JpaRepository<Meetings, UUID> {
 
+
+    @Query("SELECT m FROM Meetings m WHERE m.organizerId = :userId")
+    List<Meetings> findByOrganizerId(@Param("userId") UUID userId);
+
+
 	// Método para obtener una reunión por su ID
+	@SuppressWarnings("null")
 	Optional<Meetings> findById(UUID meetingId);
 
 	// Método para editar una reunión
