@@ -42,6 +42,12 @@ public class UserController {
 		userService.modificarUser(user);
 		return ResponseEntity.status(HttpStatus.OK).body("Perfil modificado correctamente");
 	}
+	
+	@PostMapping("/modificarPerfil")
+	public ResponseEntity<String> modificarPerfil(@RequestBody UserDTO changesInUser) {
+		userService.modificarPerfilUser(changesInUser);
+		return ResponseEntity.status(HttpStatus.OK).body("Perfil modificado correctamente");
+	}
 
 @PostMapping("/login")
 public ResponseEntity<Object> login(@RequestBody User user, HttpSession session) {

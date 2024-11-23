@@ -9,10 +9,10 @@ import org.springframework.web.server.ResponseStatusException;
 import com.team1.sgart.backend.dao.AdminDao;
 import com.team1.sgart.backend.dao.UserDao;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,11 +46,40 @@ public class UserService {
 		String email = user.getEmail();
 		if(!emailYaRegistrado(user)) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "El email no está registrado");
-		}else if (!emailFormatoValido(user)) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Formato del email incorrecto");
-		} else {
-			userDao.updateUser(email, user);
 		}
+		else if (!emailFormatoValido(user)) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Formato del email incorrecto");
+		} 
+		else {
+			Optional<User> userToModify = userDao.findByEmail(email);
+			if(userToModify.isPresent()) {
+				User updatedUser = userToModify.get();
+				actualizarCampo(user::setName, updatedUser.getName());
+			    actualizarCampo(user::setLastName, updatedUser.getLastName());
+			    actualizarCampo(user::setDepartment, updatedUser.getDepartment());
+			    actualizarCampo(user::setCenter, updatedUser.getCenter());
+			    actualizarCampo(user::setEmail, updatedUser.getEmail());
+			    actualizarCampo(user::setHiringDate, updatedUser.getHiringDate());
+			    actualizarCampo(user::setProfile, updatedUser.getProfile());
+			    userDao.save(updatedUser);
+			}
+		}
+	}
+	
+	public void modificarPerfilUser(UserDTO changesInUser) {
+		UUID userId = changesInUser.getID();
+		Optional<User> userToModify = userDao.findById(userId);
+		if(userToModify.isPresent()) {
+            User updatedUser = userToModify.get();
+            actualizarCampo(updatedUser::setName, changesInUser.getName());
+            actualizarCampo(updatedUser::setLastName, changesInUser.getLastName());
+            actualizarCampo(updatedUser::setDepartment, changesInUser.getDepartment());
+            actualizarCampo(updatedUser::setCenter, changesInUser.getCenter());
+            actualizarCampo(updatedUser::setProfile, changesInUser.getProfile());
+            userDao.save(updatedUser);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado");
+        }	
 	}
 	
 	public GenericUser loginUser(User user) {
@@ -114,6 +143,12 @@ public class UserService {
 			return userAbsenceDTO;
 		}).collect(Collectors.toList());
 	}
+	
+	private <T> void actualizarCampo(Consumer<T> setter, T nuevoValor) {
+        if (nuevoValor != null && !(nuevoValor instanceof String str && str.isEmpty())) {
+            setter.accept(nuevoValor);
+        }
+    }
 
 	public Optional<User> getUserById(UUID userId) {
 		return userDao.findById(userId);

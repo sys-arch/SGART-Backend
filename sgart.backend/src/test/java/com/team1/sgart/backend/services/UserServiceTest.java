@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,7 @@ import com.team1.sgart.backend.dao.UserDao;
 import com.team1.sgart.backend.model.Admin;
 import com.team1.sgart.backend.model.GenericUser;
 import com.team1.sgart.backend.model.User;
+import com.team1.sgart.backend.model.UserDTO;
 
 @SpringBootTest
 class UserServiceTest {
@@ -40,6 +42,7 @@ class UserServiceTest {
 
     private User user;
     private Admin admin;
+    private UserDTO jsonPerfilModificado;
 
     @BeforeEach
     void setUp() {
@@ -47,6 +50,13 @@ class UserServiceTest {
                 "Scrum Developer", PASSWORD_FUERTE, PASSWORD_FUERTE, false, false, "");
     	
     	admin = new Admin("admin", "example", "admin@example.com", PASSWORD_FUERTE);
+    	
+    	jsonPerfilModificado.setID(UUID.randomUUID());
+    	jsonPerfilModificado.setName("John");
+    	jsonPerfilModificado.setLastName("Marston");
+    	jsonPerfilModificado.setDepartment("Quality");
+    	jsonPerfilModificado.setCenter("Royal City");
+    	jsonPerfilModificado.setProfile("Scrum Master");
         
         Mockito.when(userDao.findByEmail(user.getEmail())).thenReturn(Optional.empty()); // Email no registrado
         Mockito.when(userDao.save(user)).thenReturn(user); // Simular guardado de usuario
@@ -172,6 +182,38 @@ class UserServiceTest {
         );
 
         assertEquals("Formato del email incorrecto", exception.getReason());
+    }
+    
+    @Test
+    void testModificarPerfilUserExistente() {
+                
+        Optional<User> optionalUser = Optional.of(user);
+        
+        User userPerfilModificado = new User();
+        userPerfilModificado.setID(user.getID());
+        userPerfilModificado.setName(jsonPerfilModificado.getName());
+        userPerfilModificado.setLastName(jsonPerfilModificado.getLastName());
+        userPerfilModificado.setDepartment(jsonPerfilModificado.getDepartment());
+        userPerfilModificado.setCenter(jsonPerfilModificado.getCenter());
+        userPerfilModificado.setProfile(jsonPerfilModificado.getProfile());
+                
+        Mockito.when(userDao.findById(user.getID())).thenReturn(optionalUser); // Simular que el usuario existe
+        Mockito.when(userDao.save(userPerfilModificado)).thenReturn(userPerfilModificado);
+
+        userService.modificarPerfilUser(jsonPerfilModificado);
+        assertEquals("John", userPerfilModificado.getName()); // Verificar que el perfil ha sido actualizado
+    }
+
+    @Test
+    void testModificarPerfilUserNoExistente() {
+    	User userModificado = new User();
+    	userModificado.setID(UUID.randomUUID());
+        userModificado.setName(NUEVO_NOMBRE);
+        userModificado.setEmail("romero@example.com");
+
+        assertThrows(ResponseStatusException.class, () -> 
+            userService.modificarUser(userModificado)
+        );
     }
 
 }

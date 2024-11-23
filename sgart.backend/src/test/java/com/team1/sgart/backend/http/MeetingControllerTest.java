@@ -1,22 +1,27 @@
 package com.team1.sgart.backend.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.team1.sgart.backend.dao.InvitationDAO;
-import com.team1.sgart.backend.model.Invitation;
-import com.team1.sgart.backend.model.InvitationStatus;
-import com.team1.sgart.backend.model.Meeting;
+import com.team1.sgart.backend.dao.InvitationsDao;
+import com.team1.sgart.backend.dao.MeetingsDao;
+import com.team1.sgart.backend.model.Meetings;
 import com.team1.sgart.backend.model.User;
 import com.team1.sgart.backend.services.MeetingService;
 import com.team1.sgart.backend.services.UserService;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.sql.Time;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
@@ -29,6 +34,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -42,28 +48,64 @@ class MeetingControllerTest {
     private MeetingService meetingService;
     
     @MockBean
-    private InvitationDAO invitationDao;
+    private InvitationsDao invitationDao;
 
     @MockBean
     private UserService userService;
+    
+    @Mock
+    private MeetingsDao meetingDao;
 
     @Autowired
     private ObjectMapper objectMapper;
+    
+    private Meetings existingMeeting;
+    private Meetings updatedMeeting;
+    
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+
+        // Datos iniciales para una reunión existente
+        existingMeeting = new Meetings(
+                "Initial Meeting", 
+                LocalDate.now().plusDays(1), 
+                false, 
+                LocalTime.of(9, 0), 
+                LocalTime.of(10, 0), 
+                "Initial Observations", 
+                UUID.randomUUID(), 
+                UUID.randomUUID()
+        );
+        existingMeeting.setMeetingId(UUID.randomUUID());
+
+        // Datos para una reunión actualizada
+        updatedMeeting = new Meetings(
+                "Updated Meeting", 
+                LocalDate.now().plusDays(2), 
+                false, 
+                LocalTime.of(10, 0), 
+                LocalTime.of(11, 0), 
+                "Updated Observations", 
+                existingMeeting.getOrganizerId(), 
+                existingMeeting.getLocationId()
+        );
+    }
 
     @Test
     void createMeeting_ShouldReturnMeeting() throws Exception {
         // Preparar datos de prueba
-        Meeting meeting = new Meeting();
-        meeting.setTitle("Reunión de prueba");
-        meeting.setAllDay(false);
-        meeting.setStartTime(Time.valueOf(LocalTime.of(10, 0, 0)));
-        meeting.setEndTime(Time.valueOf(LocalTime.of(12, 0, 0)));
-        meeting.setOrganizer(new User());
-        meeting.setLocation("Sala 1");
-        meeting.setObservations("Reunión importante");
+        Meetings meeting = new Meetings();
+        meeting.setMeetingTitle("Reunión de prueba");
+        meeting.setMeetingAllDay(false);
+        meeting.setMeetingStartTime(LocalTime.of(10, 0, 0));
+        meeting.setMeetingEndTime(LocalTime.of(12, 0, 0));
+        meeting.setOrganizerId(UUID.randomUUID());
+        meeting.setLocationId(UUID.randomUUID());
+        meeting.setMeetingObservations("Reunión importante");
 
         // Simular comportamiento del servicio
-        Mockito.when(meetingService.createMeeting(anyString(), anyBoolean(), any(), any(), any(), any(), any()))
+        Mockito.when(meetingService.createMeeting(anyString(), anyBoolean(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(meeting);
 
         // Ejecutar la petición y verificar resultados
@@ -110,7 +152,7 @@ class MeetingControllerTest {
     void getAttendees_ShouldReturnListOfAttendees() throws Exception {
         // Datos de prueba
         UUID meetingId = UUID.randomUUID();
-        Meeting meeting = new Meeting();
+        Meetings meeting = new Meetings();
         User user1 = new User();
         user1.setID(UUID.randomUUID());
         user1.setName("John Doe");
@@ -119,7 +161,7 @@ class MeetingControllerTest {
         user2.setID(UUID.randomUUID());
         user2.setName("Jane Doe");
 
-        List<User> attendees = Arrays.asList(user1, user2);
+        List<UUID> attendees = Arrays.asList(user1.getID() , user2.getID());
 
         // Configurar los mocks
         when(meetingService.getMeetingById(meetingId)).thenReturn(Optional.of(meeting));
@@ -131,4 +173,65 @@ class MeetingControllerTest {
                 .andExpect(jsonPath("$[0].name").value("John Doe"))
                 .andExpect(jsonPath("$[1].name").value("Jane Doe"));
     }
+    
+    //Devuelve 200
+    @Test
+    void editMeetingValidRequestReturns200() throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String meetingJson = objectMapper.writeValueAsString(updatedMeeting);
+        UUID meetingId = existingMeeting.getMeetingId();
+
+        Mockito.doNothing().when(meetingService).modifyMeeting(meetingId, updatedMeeting);
+
+        // Act & Assert
+        mockMvc.perform(post("/modify/" + meetingId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(meetingJson))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Reunión modificada correctamente"));
+
+        Mockito.verify(meetingService, Mockito.times(1)).modifyMeeting(meetingId, updatedMeeting);
+    }
+    
+    //Devuelve 404
+    @Test
+    void editMeetingMeetingNotFoundReturns404() throws Exception {
+        
+        ObjectMapper objectMapper = new ObjectMapper();
+        String meetingJson = objectMapper.writeValueAsString(updatedMeeting);
+        UUID meetingId = existingMeeting.getMeetingId();
+        
+        Mockito.doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Reunión no encontrada"))
+                .when(meetingService).modifyMeeting(meetingId, updatedMeeting);
+
+        mockMvc.perform(post("/modify/" + meetingId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(meetingJson))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("Reunión no encontrada"));
+
+        Mockito.verify(meetingService, Mockito.times(1)).modifyMeeting(meetingId, updatedMeeting);
+    }
+    
+    //Devuelve 409
+    @Test
+    void editMeetingConflictReturns409() throws Exception {
+        // Arrange
+        ObjectMapper objectMapper = new ObjectMapper();
+        String meetingJson = objectMapper.writeValueAsString(updatedMeeting);
+        UUID meetingId = existingMeeting.getMeetingId();
+
+        Mockito.doThrow(new ResponseStatusException(HttpStatus.CONFLICT, "El organizador tiene una reunión en el nuevo tramo"))
+                .when(meetingService).modifyMeeting(meetingId, updatedMeeting);
+
+        // Act & Assert
+        mockMvc.perform(post("/modify/" + meetingId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(meetingJson))
+                .andExpect(status().isConflict())
+                .andExpect(content().string("El organizador tiene una reunión en el nuevo tramo"));
+
+        Mockito.verify(meetingService, Mockito.times(1)).modifyMeeting(meetingId, updatedMeeting);
+    }
+    
 }

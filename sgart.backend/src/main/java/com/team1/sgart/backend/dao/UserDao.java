@@ -65,30 +65,6 @@ public interface UserDao extends JpaRepository<User, UUID> {
     @Query("SELECT u FROM User u WHERE u.validated = true")
     Optional<List<User>> getUsuariosValidados();
 
-    default User updateUser(String email, User updatedUser) {
-        User user = findByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException("Usuario con email " + email + " no encontrado"));
-
-        // Actualizar los campos
-        actualizarCampo(user::setName, updatedUser.getName());
-        actualizarCampo(user::setLastName, updatedUser.getLastName());
-        actualizarCampo(user::setDepartment, updatedUser.getDepartment());
-        actualizarCampo(user::setCenter, updatedUser.getCenter());
-        actualizarCampo(user::setEmail, updatedUser.getEmail());
-        actualizarCampo(user::setHiringDate, updatedUser.getHiringDate());
-        actualizarCampo(user::setProfile, updatedUser.getProfile());
-        actualizarCampo(user::setPassword, updatedUser.getPassword());
-
-        // Guardar el usuario actualizado
-        return save(user);
-    }
-
-    private <T> void actualizarCampo(Consumer<T> setter, T nuevoValor) {
-        if (nuevoValor != null && !(nuevoValor instanceof String str && str.isEmpty())) {
-            setter.accept(nuevoValor);
-        }
-    }
-
     @Transactional
     void deleteByEmail(String email);
 

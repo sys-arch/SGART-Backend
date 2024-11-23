@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team1.sgart.backend.model.Admin;
 import com.team1.sgart.backend.model.GenericUser;
 import com.team1.sgart.backend.model.User;
+import com.team1.sgart.backend.model.UserDTO;
 import com.team1.sgart.backend.services.UserService;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -26,6 +27,7 @@ class UserControllerTest {
 	private static final String URLREGISTRAR = "/users/registro";
 	private static final String URLMODIFICAR = "/users/modificar";
 	private static final String URLLOGIN = "/users/login";
+	private static final String URLMODIFICAR_PERFIL = "/users/modificarPerfil";
 	
     @Autowired
     private MockMvc mockMvc;
@@ -35,12 +37,21 @@ class UserControllerTest {
     
     private User user;
     private Admin admin;
+    private String changesInProfile;
     
     @BeforeEach
     public void setUp() {
         user = new User("carlos.romero@example.com", "Carlos", "Romero Navarro", "Quality", "Ciudad Real", "01/01/2024", 
                         "Scrum Developer", "password123@", "password123@", false, false, "");
         admin = new Admin("test", "admin", "test@admin.com", "adminPassword123");
+        changesInProfile = "{"
+                + "\"name\":\"John\","
+                + "\"lastName\": \"Marston\","
+                + "\"department\":\"Quality\""
+                + "\"center\":\"Royal City\""
+                + "\"profile\":\"Scrum Master\""
+                + "\"id\":\"\""
+                + "}";
     }
 
     @Test
@@ -183,5 +194,28 @@ class UserControllerTest {
                 .content(userJson))
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().string("Usuario no encontrado"));
+    }
+    
+    // Tests para el método modificar perfil
+    @Test
+    void usuarioModificarPerfilDevuelve200() throws Exception {
+    	UserDTO userDTO = new UserDTO();
+    	        
+        Mockito.doNothing().when(userService).modificarPerfilUser(userDTO);
+        mockMvc.perform(post(URLMODIFICAR_PERFIL).contentType(MediaType.APPLICATION_JSON)
+                .content(changesInProfile))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Perfil modificado correctamente"));
+    }
+
+    @Test
+    void usuarioNoExistenteModificarPerfilDevuelve404() throws Exception {
+           	
+        Mockito.doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"))
+                .when(userService).modificarPerfilUser(Mockito.any(UserDTO.class));
+        
+        mockMvc.perform(post(URLMODIFICAR_PERFIL).contentType(MediaType.APPLICATION_JSON)
+                .content(changesInProfile))
+                .andExpect(status().isNotFound());
     }
 }

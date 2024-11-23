@@ -15,7 +15,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @RestController
+
 @RequestMapping("/administrador/ausencias")
+
 public class AbsencesController {
 
     private static final Logger logger = LoggerFactory.getLogger(AbsencesController.class);
@@ -25,6 +27,15 @@ public class AbsencesController {
     public AbsencesController(AbsencesService absencesService) {
         this.absencesService = absencesService;
         logger.info("[!] AdminAbsencesController created");
+    }
+    
+    @GetMapping("/loadAbsences")
+    public ResponseEntity<List<AbsencesDTO>> getAllAbsenses() {
+        List<AbsencesDTO> absencesList = absencesService.getAllAbsences();
+        if (absencesList == null || absencesList.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(absencesList);
     }
 
     @GetMapping("/loadAbsences/{userId}")
