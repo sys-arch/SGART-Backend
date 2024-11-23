@@ -4,6 +4,7 @@ import com.team1.sgart.backend.model.Meetings;
 import com.team1.sgart.backend.model.User;
 import com.team1.sgart.backend.model.InvitationStatus;
 import com.team1.sgart.backend.model.Invitations;
+import com.team1.sgart.backend.model.Locations;
 import com.team1.sgart.backend.services.MeetingService;
 import com.team1.sgart.backend.services.UserService;
 
@@ -17,8 +18,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("meetings")
-@CrossOrigin("*")
+@RequestMapping("api/meetings")
 public class MeetingController {
 
     private MeetingService meetingService;   
@@ -44,6 +44,12 @@ public class MeetingController {
     public ResponseEntity<List<User>> getAvailableUsers() {
         List<User> availableUsers = meetingService.getAvailableUsers();
         return availableUsers.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(availableUsers);
+    }
+    
+    @GetMapping("/locations")
+    public ResponseEntity<List<Locations>> getLocations() {
+        List<Locations> locations = meetingService.getLocations();
+        return locations.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(locations);
     }
 
     /*

@@ -2,11 +2,13 @@ package com.team1.sgart.backend.services;
 
 import com.team1.sgart.backend.dao.UserDao;
 import com.team1.sgart.backend.dao.InvitationsDao;
+import com.team1.sgart.backend.dao.LocationsDao;
 import com.team1.sgart.backend.dao.MeetingsDao;
 import com.team1.sgart.backend.model.Meetings;
 import com.team1.sgart.backend.model.User;
 import com.team1.sgart.backend.model.InvitationStatus;
 import com.team1.sgart.backend.model.Invitations;
+import com.team1.sgart.backend.model.Locations;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,12 +29,15 @@ public class MeetingService {
     private UserDao userDao;
     private MeetingsDao meetingDao;
     private InvitationsDao invitationsDao;
+    private LocationsDao locationsDao;
+
     
     @Autowired
-	public MeetingService(UserDao userDao, MeetingsDao meetingDao, InvitationsDao invitationDao) {
+	public MeetingService(UserDao userDao, MeetingsDao meetingDao, InvitationsDao invitationDao, LocationsDao locationsDao) {
 		this.userDao = userDao;
 		this.meetingDao = meetingDao;
 		this.invitationsDao = invitationDao;
+		this.locationsDao = locationsDao;
 	}
 
     @Autowired
@@ -49,6 +54,11 @@ public class MeetingService {
     public List<User> getAvailableUsers() {
         return userDao.findAllNotBlocked(); // Solo los usuarios no bloqueados
     }
+    
+    // Método para obtener todas las localizaciones
+  	public List<Locations> getLocations() {
+  		return locationsDao.findAll();
+  	}
 
     // Método para invitar a un usuario a una reunión
     public Invitations inviteUserToMeeting(Meetings meeting, User user, InvitationStatus status) {
@@ -155,7 +165,7 @@ public class MeetingService {
 
 		return true;
 	}
-
+	/*
 	// Método para cancelar una reunión si todas las invitaciones están rechazadas
 	public boolean cancelMeetingIfAllInvitationsRejected(UUID meetingId, UUID excludedInvitationId) {
 		
@@ -186,4 +196,5 @@ public class MeetingService {
 
 		return false;
 	}
+	*/
 }
