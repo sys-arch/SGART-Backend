@@ -22,6 +22,7 @@ public interface MeetingsDao extends JpaRepository<Meetings, UUID> {
 
 
 	// Método para obtener una reunión por su ID
+	@SuppressWarnings("null")
 	Optional<Meetings> findById(UUID meetingId);
 
 	// Método para editar una reunión

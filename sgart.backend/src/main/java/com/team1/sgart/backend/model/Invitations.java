@@ -48,7 +48,7 @@ public class Invitations {
         return invitation_id;
     }
 
-    public void setInvitationId(int invitation_id) {
+    public void setInvitationId(UUID invitation_id) {
         this.invitation_id = invitation_id;
     }
 

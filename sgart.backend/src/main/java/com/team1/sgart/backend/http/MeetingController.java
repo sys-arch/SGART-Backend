@@ -2,8 +2,6 @@ package com.team1.sgart.backend.http;
 
 import com.team1.sgart.backend.model.Meetings;
 import com.team1.sgart.backend.model.User;
-import com.team1.sgart.backend.model.InvitationStatus;
-import com.team1.sgart.backend.model.Invitations;
 import com.team1.sgart.backend.model.Locations;
 import com.team1.sgart.backend.services.MeetingService;
 import com.team1.sgart.backend.services.UserService;
@@ -14,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -22,12 +19,11 @@ import java.util.UUID;
 public class MeetingController {
 
     private MeetingService meetingService;   
-    private UserService userService;
+
     
     @Autowired
 	public MeetingController(MeetingService meetingService, UserService userService) {
 		this.meetingService = meetingService;
-		this.userService = userService;
 	}
 
     // Crear una reunión
@@ -50,38 +46,6 @@ public class MeetingController {
     public ResponseEntity<List<Locations>> getLocations() {
         List<Locations> locations = meetingService.getLocations();
         return locations.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(locations);
-    }
-
-    /*
-    // Comprobar la disponibilidad de un usuario para una reunión
-    @GetMapping("/check-availability/{userId}")
-    public ResponseEntity<Boolean> checkUserAvailability(@PathVariable UUID userId, @RequestParam("startTime") LocalTime startTime, 
-    		@RequestParam("endTime") LocalTime endTime) {
-        Optional<User> userOpt = userService.getUserById(userId);  // Obtener el usuario con el UserService para no hacer otro método
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();
-            boolean isAvailable = meetingService.isUserAvailable(user, startTime, endTime);
-            return ResponseEntity.ok(isAvailable);
-        } else {
-            return ResponseEntity.notFound().build(); // Si el usuario no se encuentra
-        }
-    }
-*/
-
-    // Invitar a un usuario a una reunión
-    @PostMapping("/invite/{meetingId}/{userId}")
-    public ResponseEntity<Invitations> inviteUserToMeeting(@PathVariable UUID meetingId, @PathVariable UUID userId) {
-        Optional<Meetings> meetingOpt = meetingService.getMeetingById(meetingId);
-        Optional<User> userOpt = userService.getUserById(userId);
-
-        if (meetingOpt.isPresent() && userOpt.isPresent()) {
-            Meetings meeting = meetingOpt.get();
-            User user = userOpt.get();
-            Invitations invitation = meetingService.inviteUserToMeeting(meeting, user, InvitationStatus.PENDIENTE);
-            return ResponseEntity.ok(invitation);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
     }
     
     // Obtener los asistentes a una reunión 

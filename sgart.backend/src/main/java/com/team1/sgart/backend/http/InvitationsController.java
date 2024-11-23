@@ -9,6 +9,7 @@ import com.team1.sgart.backend.services.InvitationsService;
 
 import jakarta.servlet.http.HttpSession;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -89,6 +90,27 @@ public class InvitationsController {
         } catch (Exception e) {
             logger.error("Error getting user attendance: {}", e.getMessage());
             return ResponseEntity.badRequest().body("Error getting user attendance");
+        }
+    }
+
+    @PostMapping("/{meetingId}/invite")
+    public ResponseEntity<?> inviteUsers(
+            @PathVariable UUID meetingId,
+            @RequestBody List<UUID> userIds,
+            HttpSession session) {
+        UUID userId = (UUID) session.getAttribute("userId");
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        try {
+            boolean invited = invitationsService.inviteUsers(meetingId, userIds);
+            return invited 
+                ? ResponseEntity.ok().build()
+                : ResponseEntity.badRequest().body("Error inviting users");
+        } catch (Exception e) {
+            logger.error("Error inviting users to meeting: {}", e.getMessage());
+            return ResponseEntity.badRequest().body("Error processing invitations");
         }
     }
 
