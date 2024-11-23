@@ -1,6 +1,7 @@
 package com.team1.sgart.backend.http;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,8 +15,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @RestController
-@RequestMapping("administrador/ausencias")
-@CrossOrigin("*")
+
+@RequestMapping("/administrador/ausencias")
+
 public class AbsencesController {
 
     private static final Logger logger = LoggerFactory.getLogger(AbsencesController.class);
@@ -41,14 +43,13 @@ public class AbsencesController {
         if (userId == null) {
             return ResponseEntity.badRequest().build();
         }
-
+    
         List<AbsencesDTO> absencesList = absencesService.getAbsencesByUser(userId);
         if (absencesList == null || absencesList.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(absencesList);
-    }
-
+    }    
 
     @PostMapping("/newAbsence")
     public ResponseEntity<AbsencesDTO> createAbsence(@RequestBody AbsencesDTO absenceDto) {

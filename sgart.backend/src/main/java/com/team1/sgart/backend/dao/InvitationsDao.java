@@ -50,6 +50,37 @@ public interface InvitationsDao extends JpaRepository<Invitations, Integer> {
         @Param("comment") String comment
     );
 
+
+    @Query(value = "SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END " +
+           "FROM SGART_InvitationsTable " +
+           "WHERE MEETING_ID = :meetingId AND USER_ID = :userId", 
+           nativeQuery = true)
+    boolean existsByUserIdAndMeetingId(
+        @Param("userId") UUID userId, 
+        @Param("meetingId") UUID meetingId
+    );
+
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Transactional
+    @Query(value = "UPDATE SGART_InvitationsTable " +
+           "SET USER_ATTENDANCE = 1 " +
+           "WHERE MEETING_ID = :meetingId AND USER_ID = :userId", 
+           nativeQuery = true)
+    int updateUserAttendance(
+        @Param("meetingId") UUID meetingId, 
+        @Param("userId") UUID userId
+    );
+
+    @Query(value = "SELECT CASE WHEN USER_ATTENDANCE = 1 THEN 1 ELSE 0 END " +
+           "FROM SGART_InvitationsTable " +
+           "WHERE MEETING_ID = :meetingId AND USER_ID = :userId", 
+           nativeQuery = true)
+    Integer getUserAttendance(
+        @Param("meetingId") UUID meetingId, 
+        @Param("userId") UUID userId
+    );
+
+
     @Modifying
     @Transactional
     @Query(value = "DELETE FROM SGART_InvitationsTable WHERE meeting_id = :meetingId AND user_id = :userId", nativeQuery = true)
@@ -61,4 +92,5 @@ public interface InvitationsDao extends JpaRepository<Invitations, Integer> {
 	
 	  @Query(value = "SELECT user_id FROM SGART_InvitationsTable WHERE meeting_id = :meetingId", nativeQuery = true)
 	  List<UUID> findUserIdsByMeetingId(@Param("meetingId") UUID meetingId);
+
 }

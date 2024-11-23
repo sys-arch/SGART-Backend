@@ -1,13 +1,14 @@
 package com.team1.sgart.backend.http;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
 import com.team1.sgart.backend.services.InvitationsService;
 
-import java.util.List;
+import jakarta.servlet.http.HttpSession;
+
 import java.util.Map;
 import java.util.UUID;
 
@@ -16,10 +17,8 @@ import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/invitations")
-@CrossOrigin(origins = "http://localhost:3000")
-
 public class InvitationsController {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(InvitationsController.class);
     private final InvitationsService invitationsService;
 
@@ -29,24 +28,67 @@ public class InvitationsController {
         logger.info("[!] InvitationsController created");
     }
 
-    @PatchMapping("/{meetingId}/status")
+    @PutMapping("/{meetingId}/status")
     public ResponseEntity<?> updateInvitationStatus(
             @PathVariable UUID meetingId,
-            @RequestParam UUID userId,
-            @RequestBody Map<String, String> requestBody) {
+            @RequestBody Map<String, String> requestBody,
+            HttpSession session) {
+        UUID userId = (UUID) session.getAttribute("userId");
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         try {
             boolean updated = invitationsService.updateInvitationStatus(
-                meetingId, 
-                userId, 
-                requestBody.get("newStatus"),
-                requestBody.get("comment")
-            );
-            
-            return updated ? ResponseEntity.ok().build() 
-                         : ResponseEntity.notFound().build();
+                    meetingId,
+                    userId,
+                    requestBody.get("newStatus"),
+                    requestBody.get("comment"));
+
+            return updated ? ResponseEntity.ok().build()
+                    : ResponseEntity.notFound().build();
         } catch (Exception e) {
             logger.error("Error updating invitation status: {}", e.getMessage());
             return ResponseEntity.badRequest().body("Error updating invitation status");
+        }
+    }
+
+    @PutMapping("/{meetingId}/attendance")
+    public ResponseEntity<?> updateUserAttendance(
+            @PathVariable UUID meetingId,
+            HttpSession session) {
+        UUID userId = (UUID) session.getAttribute("userId");
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        try {
+            boolean updated = invitationsService.updateUserAttendance(meetingId, userId);
+            return updated ? ResponseEntity.ok().build()
+                    : ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            logger.error("Error updating user attendance: {}", e.getMessage());
+            return ResponseEntity.badRequest().body("Error updating user attendance");
+        }
+    }
+
+    @GetMapping("/{meetingId}/attendance")
+    public ResponseEntity<?> getUserAttendance(
+            @PathVariable UUID meetingId,
+            HttpSession session) {
+        UUID userId = (UUID) session.getAttribute("userId");
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        try {
+            Integer attendance = invitationsService.getUserAttendance(meetingId, userId);
+            return attendance != null 
+                ? ResponseEntity.ok(attendance)
+                : ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            logger.error("Error getting user attendance: {}", e.getMessage());
+            return ResponseEntity.badRequest().body("Error getting user attendance");
         }
     }
 

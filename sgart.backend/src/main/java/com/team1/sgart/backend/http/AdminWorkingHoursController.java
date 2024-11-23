@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/administrador/horarios")
-@CrossOrigin(origins = "http://localhost:3000")
 public class AdminWorkingHoursController{
 
     private static final Logger logger = LoggerFactory.getLogger(AdminWorkingHoursController.class);

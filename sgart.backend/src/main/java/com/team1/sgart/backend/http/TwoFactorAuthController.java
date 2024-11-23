@@ -24,7 +24,7 @@ import com.team1.sgart.backend.util.JwtTokenProvider;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin("*")
+
 public class TwoFactorAuthController {
 	
 	private UserService userService;

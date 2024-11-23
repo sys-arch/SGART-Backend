@@ -24,7 +24,6 @@ import com.team1.sgart.backend.services.AdminService;
 
 @RestController
 @RequestMapping("/admin")
-@CrossOrigin("*")
 public class AdminController {
 
     @Autowired

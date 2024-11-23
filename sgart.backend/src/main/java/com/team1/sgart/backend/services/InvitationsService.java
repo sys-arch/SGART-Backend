@@ -42,4 +42,43 @@ public class InvitationsService {
         }
     }
 
+    public boolean updateUserAttendance(UUID meetingId, UUID userId) {
+        try {
+            logger.debug("Updating user attendance - Meeting: {}, User: {}", 
+                      meetingId, userId);
+            
+            int rowsUpdated = invitationsDao.updateUserAttendance(meetingId, userId);
+            return rowsUpdated > 0;
+            
+        } catch (Exception e) {
+            logger.error("Error updating user attendance", e);
+            throw new RuntimeException("Error updating user attendance", e);
+        }
+    }
+
+    public Integer getUserAttendance(UUID meetingId, UUID userId) {
+        if (meetingId == null || userId == null) {
+            logger.error("Meeting ID or User ID is null");
+            throw new IllegalArgumentException("Meeting ID and User ID cannot be null");
+        }
+
+        try {
+            logger.debug("Getting user attendance - Meeting: {}, User: {}", 
+                      meetingId, userId);
+            Integer attendance = invitationsDao.getUserAttendance(meetingId, userId);
+            
+            if (attendance == null) {
+                logger.debug("No attendance record found for Meeting: {} and User: {}", 
+                          meetingId, userId);
+            }
+            
+            return attendance;
+            
+        } catch (Exception e) {
+            logger.error("Error getting user attendance for Meeting: {} and User: {}: {}", 
+                      meetingId, userId, e.getMessage(), e);
+            throw new RuntimeException("Error retrieving user attendance: " + e.getMessage(), e);
+        }
+    }
+
 }
