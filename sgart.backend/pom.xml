@@ -193,7 +193,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<mainClass>com.team1.sgart.backend.SgartBackendApplication</mainClass>
+					<mainClass>com.team1.sgart.backend.App</mainClass>
 					<layout>JAR</layout>
 				</configuration>
 				<executions>
