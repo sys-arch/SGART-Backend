@@ -68,9 +68,11 @@ class MeetingServiceTest {
 	@Test
     void createMeeting_ShouldSaveAndReturnMeeting() {
         // Datos de prueba
+		UUID idOrganizer = UUID.randomUUID();
         User organizer = new User("organizer@example.com", "Organizer", "User", null, null, null, null, null, null, false, false, null);
+        organizer.setID(idOrganizer);
         Meetings meeting = new Meetings("Team Meeting", LocalDate.parse("2021-12-01"), false, LocalTime.parse("10:00"), LocalTime.parse("11:00"),                 
-        	    "Monthly sync", UUID.randomUUID(), UUID.randomUUID());
+        	    "Monthly sync", idOrganizer, UUID.randomUUID());
 
         when(meetingDao.save(any(Meetings.class))).thenReturn(meeting);
 
@@ -83,7 +85,7 @@ class MeetingServiceTest {
         // Verificaciones
         assertNotNull(createdMeeting);
         assertEquals("Team Meeting", createdMeeting.getMeetingTitle());
-        assertEquals(organizer, createdMeeting.getOrganizerId());
+        assertEquals(organizer.getID(), createdMeeting.getOrganizerId());
         verify(meetingDao, times(1)).save(any(Meetings.class));
     }
 
@@ -121,7 +123,7 @@ class MeetingServiceTest {
 
 		// Verificaciones
 		assertNotNull(createdInvitation);
-		assertEquals(InvitationStatus.PENDIENTE, createdInvitation.getInvitationStatus());
+		assertEquals(InvitationStatus.PENDIENTE.toString(), createdInvitation.getInvitationStatus());
 		assertEquals(meeting, createdInvitation.getMeeting());
 		assertEquals(user, createdInvitation.getUser());
 		verify(invitationDao, times(1)).save(any(Invitations.class));
@@ -148,25 +150,25 @@ class MeetingServiceTest {
 	@Test
 	void getAttendeesForMeeting_ShouldReturnAcceptedUsers() {
 		// Datos de prueba
-		Meetings meeting = new Meetings();
 		User user1 = new User();
 		User user2 = new User();
-		Invitations invitation1 = new Invitations(meeting, user1, InvitationStatus.ACEPTADA, false, null);
-		Invitations invitation2 = new Invitations(meeting, user2, InvitationStatus.ACEPTADA, false, null);
-		Invitations invitation3 = new Invitations(meeting, new User(), InvitationStatus.RECHAZADA, false, null);
+		Invitations invitation1 = new Invitations(existingMeeting, user1, InvitationStatus.ACEPTADA, false, null);
+		Invitations invitation2 = new Invitations(existingMeeting, user2, InvitationStatus.ACEPTADA, false, null);
+		Invitations invitation3 = new Invitations(existingMeeting, new User(), InvitationStatus.RECHAZADA, false, null);
 
 		List<Invitations> invitations = Arrays.asList(invitation1, invitation2, invitation3);
 
 		// Configurar el mock
-		when(invitationDao.findByMeetingId(meeting.getMeetingId())).thenReturn(invitations);
+		when(invitationDao.findByMeetingId(existingMeeting.getMeetingId())).thenReturn(invitations);
+		
 
 		// Ejecutar el método
-		List<UUID> attendees = meetingService.getAttendeesForMeeting(meeting);
+		List<UUID> attendees = meetingService.getAttendeesForMeeting(existingMeeting);
 
 		// Verificar resultados
 		assertEquals(2, attendees.size());
-		assertEquals(user1, attendees.get(0));
-		assertEquals(user2, attendees.get(1));
+		assertTrue(attendees.contains(user1.getID()));
+	    assertTrue(attendees.contains(user2.getID()));
 	}
 
 	@Test
@@ -194,7 +196,7 @@ class MeetingServiceTest {
 		});
 
 		assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
-		assertEquals("El organizador tiene una reunión en el nuevo tramo", exception.getReason());
+		assertEquals("Reunión no encontrada", exception.getReason());
 		verify(meetingDao, never()).updateMeeting(any(), any());
 	}
 
@@ -224,7 +226,7 @@ class MeetingServiceTest {
 		when(meetingDao.findById(existingMeeting.getMeetingId())).thenReturn(Optional.of(existingMeeting));
 		when(meetingDao.findConflictingMeetings(updatedMeeting.getMeetingDate(), updatedMeeting.getMeetingStartTime(),
 				updatedMeeting.getMeetingEndTime())).thenReturn(Collections.emptyList());
-
+		
 		// Act & Assert
 		ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
 			meetingService.modifyMeeting(existingMeeting.getMeetingId(), updatedMeeting);

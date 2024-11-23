@@ -15,6 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
@@ -118,7 +119,7 @@ public class MeetingService {
 		
 		meetingsDao.updateMeeting(meeting, updatedMeeting);
 	}
-
+/*
     public boolean isWithin24Hours(LocalTime nowTime, LocalTime targetTime, LocalDate nowDate, LocalDate targetDate) {
         
     	long hoursDifference = 0;
@@ -136,6 +137,16 @@ public class MeetingService {
 		}
     	
     	return available;
+    }
+ */   
+    public boolean isWithin24Hours(LocalTime nowTime, LocalTime targetTime, LocalDate nowDate, LocalDate targetDate) {
+        LocalDateTime nowDateTime = LocalDateTime.of(nowDate, nowTime);
+        LocalDateTime targetDateTime = LocalDateTime.of(targetDate, targetTime);
+        
+        Duration duration = Duration.between(nowDateTime, targetDateTime);
+        long hoursDifference = duration.toHours();
+        
+        return hoursDifference < 24;
     }
 
 }
