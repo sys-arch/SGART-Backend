@@ -302,9 +302,9 @@ class MeetingServiceTest {
     	Invitations invitation2 = new Invitations();
     	Invitations invitation3 = new Invitations();
         
-    	invitation1.setInvitationStatus(InvitationStatus.RECHAZADA);
-        invitation2.setInvitationStatus(InvitationStatus.RECHAZADA);
-        invitation3.setInvitationStatus(InvitationStatus.PENDIENTE);
+    	invitation1.setInvitationStatus("Rechazada");
+        invitation2.setInvitationStatus("Rechazada");
+        invitation3.setInvitationStatus("Pendiente");
         invitation3.setUser(excludedUser);
         
         invitation1.setMeeting(meeting);
@@ -341,9 +341,9 @@ class MeetingServiceTest {
         Invitations invitation2 = new Invitations();
         Invitations invitation3 = new Invitations();
 
-        invitation1.setInvitationStatus(InvitationStatus.RECHAZADA);
-        invitation2.setInvitationStatus(InvitationStatus.ACEPTADA);
-        invitation3.setInvitationStatus(InvitationStatus.RECHAZADA);
+        invitation1.setInvitationStatus("Rechazada");
+        invitation2.setInvitationStatus("Aceptada");
+        invitation3.setInvitationStatus("Rechazada");
         invitation3.setUser(new User());
 
         invitation1.setMeeting(meeting);

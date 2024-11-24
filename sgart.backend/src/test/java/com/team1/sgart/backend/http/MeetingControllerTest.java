@@ -32,6 +32,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -234,4 +235,68 @@ class MeetingControllerTest {
         Mockito.verify(meetingService, Mockito.times(1)).modifyMeeting(meetingId, updatedMeeting);
     }
     
+    //TDD cancelar reunión, organizador pulsa cancelar
+    @Test
+    public void testCancelMeetingOrganizer_Success() throws Exception {
+    	UUID meetingId = UUID.randomUUID();
+
+        // Simula el comportamiento del servicio para que devuelva true
+        Mockito.when(meetingService.cancelMeetingByOrganizer(meetingId)).thenReturn(true);
+
+        // Realiza la solicitud DELETE al controlador
+        mockMvc.perform(delete("/api/meetings/{meetingId}", meetingId)
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
+                
+    }
+    
+    @Test
+    public void testCancelMeetingOrganizer_NotFound() throws Exception {
+        UUID meetingId = UUID.randomUUID();
+
+        // Simula el comportamiento del servicio para reunión que no existe
+        Mockito.when(meetingService.cancelMeetingByOrganizer(meetingId))
+                .thenThrow(new RuntimeException("Reunión no encontrada"));
+
+        // Realiza la solicitud DELETE al controlador con la ruta completa
+        mockMvc.perform(delete("/api/meetings/{meetingId}", meetingId)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound()); // 404 Not Found
+    }
+    
+    //TDD cancelar reunión automático
+    @Test
+    public void testCancelMeetingIfAllInvitationsRejected_Success() throws Exception {
+        UUID meetingId = UUID.randomUUID();
+        UUID excludedUserId = UUID.randomUUID();
+
+        // Simula el comportamiento del servicio para que la cancelación sea exitosa
+        Mockito.when(meetingService.cancelMeetingIfAllInvitationsRejected(meetingId, excludedUserId)).thenReturn(true);
+
+        // Realiza la solicitud POST al controlador
+        mockMvc.perform(post("/api/meetings/cancel/rejected")
+                .param("meetingId", meetingId.toString())
+                .param("excludedUserId", excludedUserId.toString())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk()) //200 OK
+                .andExpect(content().string("Reunión cancelada debido a que todas las invitaciones fueron rechazadas"));
+    }
+
+    
+    @Test
+    public void testCancelMeetingIfAllInvitationsRejected_BadRequest() throws Exception {
+        UUID meetingId = UUID.randomUUID();
+        UUID excludedUserId = UUID.randomUUID();
+
+        // Simula el comportamiento del servicio para que no se pueda cancelar la reunión
+        Mockito.when(meetingService.cancelMeetingIfAllInvitationsRejected(meetingId, excludedUserId)).thenReturn(false);
+
+        // Realiza la solicitud POST al controlador
+        mockMvc.perform(post("/api/meetings/cancel/rejected")
+                .param("meetingId", meetingId.toString())
+                .param("excludedUserId", excludedUserId.toString())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest()) //400 Bad Request
+                .andExpect(content().string("La reunión sigue adelante, hay invitaciones pendientes o aceptadas"));
+    }
+
 }
