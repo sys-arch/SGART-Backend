@@ -31,8 +31,9 @@ public class UserService {
     private static final int MAX_ATTEMPTS = 3;
     private static final long BLOCK_TIME = 15 * 60 * 1000; // 15 minutos de bloqueo
 
-    private UserDao userDao;
-    private AdminDao adminDao;
+    private final UserDao userDao;
+    private final AdminDao adminDao;
+    private final JwtTokenProvider jwtTokenProvider;
 
     private ConcurrentHashMap<String, Integer> loginAttempts = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String, Long> blockedSessions = new ConcurrentHashMap<>();
@@ -41,12 +42,10 @@ public class UserService {
     private String jwtSecret;
 
     @Autowired
-    private JwtTokenProvider jwtTokenProvider;
-
-    @Autowired
-    UserService(UserDao userDao, AdminDao adminDao) {
+    public UserService(UserDao userDao, AdminDao adminDao, JwtTokenProvider jwtTokenProvider) {
         this.userDao = userDao;
         this.adminDao = adminDao;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     public User registrarUser(User user) {
