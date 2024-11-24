@@ -33,6 +33,7 @@ public interface MeetingsDao extends JpaRepository<Meetings, UUID> {
 		// Actualizar los campos
 		actualizarCampo(meeting::setMeetingTitle, updatedMeeting.getMeetingTitle());
 		actualizarCampo(meeting::setMeetingAllDay, updatedMeeting.isMeetingAllDay());
+		actualizarCampo(meeting::setMeetingDate, updatedMeeting.getMeetingDate());
 		actualizarCampo(meeting::setMeetingStartTime, updatedMeeting.getMeetingStartTime());
 		actualizarCampo(meeting::setMeetingEndTime, updatedMeeting.getMeetingEndTime());
 		actualizarCampo(meeting::setOrganizerId, updatedMeeting.getOrganizerId());
