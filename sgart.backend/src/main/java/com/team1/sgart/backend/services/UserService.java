@@ -12,6 +12,8 @@ import com.team1.sgart.backend.dao.AdminDao;
 import com.team1.sgart.backend.dao.UserDao;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.transaction.Transactional;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -25,8 +27,10 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
+import org.mindrot.jbcrypt.BCrypt;
 
 @Service
+@Transactional
 public class UserService {
     private static final int MAX_ATTEMPTS = 3;
     private static final long BLOCK_TIME = 15 * 60 * 1000; // 15 minutos de bloqueo
@@ -198,34 +202,27 @@ public class UserService {
     }
 
     public void resetPassword(String token, String newPassword) {
-        // Validar el token
         if (!jwtTokenProvider.validateToken(token)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token inválido o expirado");
         }
 
         try {
-            // Obtener el email del token usando el método existente
             String email = jwtTokenProvider.getEmailFromToken(token);
+            User user = userDao.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
 
-            // Buscar el usuario por email
-            Optional<User> userOptional = userDao.findByEmail(email);
-            if (userOptional.isEmpty()) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado");
-            }
-
-            User user = userOptional.get();
-            
             // Validar el formato de la nueva contraseña
             user.setPassword(newPassword);
             if (!passwordFormatoValido(user)) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Formato de contraseña inválido");
             }
 
-            // Actualizar la contraseña en la base de datos
+            // Actualizar la contraseña directamente sin encriptar
             userDao.updatePassword(user.getID(), newPassword);
 
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error al restablecer la contraseña: " + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, 
+                "Error al restablecer la contraseña: " + e.getMessage());
         }
     }
 }
