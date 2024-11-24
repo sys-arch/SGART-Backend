@@ -57,7 +57,7 @@ public class TwoFactorAuthService {
 
     
     public boolean validateTOTP(String secretKey, String code) {
-        return gAuth.authorize(secretKey, Integer.parseInt(code));
+        return gAuth.authorize(secretKey, gAuth.getTotpPassword(secretKey));
     }
 
     public boolean validateTOTPFromDB(String email, String code) {
@@ -65,9 +65,9 @@ public class TwoFactorAuthService {
         String secretKeyUser = userDao.obtenerAuthCodePorEmail(email);
         String secretKeyAdmin = adminDao.obtenerAuthCodePorEmail(email);
 		if (secretKeyAdmin != null) {
-			isValid = gAuth.authorize(secretKeyAdmin, Integer.parseInt(code));
+			isValid = gAuth.authorize(secretKeyAdmin, gAuth.getTotpPassword(secretKeyAdmin));
 		} else if (secretKeyUser != null) {
-			isValid = gAuth.authorize(secretKeyUser, Integer.parseInt(code));
+			isValid = gAuth.authorize(secretKeyUser, gAuth.getTotpPassword(secretKeyUser));
 		}
 		else {
             throw new IllegalArgumentException("Secret key not found for email: " + email);

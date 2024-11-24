@@ -11,7 +11,7 @@ public class Invitations {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int invitation_id;
+    private UUID invitation_id;
 
     @ManyToOne
     @JoinColumn(name = "meeting_id", nullable = false)
@@ -44,7 +44,7 @@ public class Invitations {
 
     // Getters y setters
 
-    public int getInvitationId() {
+    public UUID getInvitationId() {
         return invitation_id;
     }
 

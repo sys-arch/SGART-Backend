@@ -56,8 +56,8 @@ public class MeetingController {
     }
     
     // Editar una reunión
-    @PostMapping("/modify/{meetingId}")
-	public ResponseEntity<String> editMeeting(@PathVariable UUID meetingId, @RequestBody Meetings changeMeeting) {
+    @PostMapping("/{meetingId}/modify")
+	public ResponseEntity<String> editMeeting(@PathVariable("meetingId") UUID meetingId, @RequestBody Meetings changeMeeting) {
 		
         meetingService.modifyMeeting(meetingId, changeMeeting);
         return ResponseEntity.status(HttpStatus.OK).body("Reunión modificada correctamente");

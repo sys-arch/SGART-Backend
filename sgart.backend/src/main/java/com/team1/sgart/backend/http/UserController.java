@@ -52,7 +52,7 @@ public class UserController {
 @PostMapping("/login")
 public ResponseEntity<Object> login(@RequestBody User user, HttpSession session) {
     // Autenticar al usuario usando el servicio
-    GenericUser genericUser = userService.loginUser(user);
+    GenericUser genericUser = userService.loginUser(user,session);
     Map<String, Object> response = new HashMap<>();
 
     if (genericUser instanceof User) {

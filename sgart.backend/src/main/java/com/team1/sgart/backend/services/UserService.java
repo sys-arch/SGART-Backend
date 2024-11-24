@@ -9,7 +9,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.team1.sgart.backend.dao.AdminDao;
 import com.team1.sgart.backend.dao.UserDao;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
