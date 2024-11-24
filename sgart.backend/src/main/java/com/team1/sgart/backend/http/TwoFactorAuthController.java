@@ -118,7 +118,7 @@ public class TwoFactorAuthController {
 		String token = jwtTokenProvider.generatePasswordResetToken(user);
 		
 		//Enviamos el email
-		String recoveryLink = "url hacia la pagina en react?" + token; //Cambiar la URL en producción
+		String recoveryLink = "https://sgart-v1.web.app/#?token=" + token; //Cambiar la URL en producción
         emailService.sendPasswordResetEmail(user.getEmail(), recoveryLink);
         
         return ResponseEntity.status(HttpStatus.OK).body("{\"message\": \"Email de recuperación de contraseña enviado\"}");
