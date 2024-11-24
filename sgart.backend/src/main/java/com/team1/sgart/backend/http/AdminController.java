@@ -83,8 +83,8 @@ public class AdminController {
     }
     
     @PostMapping("/verificarEmail")
-	public ResponseEntity<String> verificarEmail(@RequestBody Admin admin) {
-		boolean existe = adminService.emailAdminEstaRegistrado(admin.getEmail());
+	public ResponseEntity<String> verificarEmail(@RequestBody String email) {
+		boolean existe = adminService.emailAdminEstaRegistrado(email);
 		if (!existe) {
 			return ResponseEntity.status(HttpStatus.OK).body("El email no está registrado");
 		} else {

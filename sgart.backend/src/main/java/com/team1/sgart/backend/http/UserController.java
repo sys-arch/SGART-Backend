@@ -167,6 +167,5 @@ public class UserController {
             user.setPassword("");
             return ResponseEntity.ok(user);
         }
-
     }
 }
