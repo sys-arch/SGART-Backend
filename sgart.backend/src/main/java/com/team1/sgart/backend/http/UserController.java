@@ -3,6 +3,7 @@ package com.team1.sgart.backend.http;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import com.team1.sgart.backend.model.*;
@@ -149,6 +150,23 @@ public ResponseEntity<Object> login(@RequestBody User user, HttpSession session)
         Map<String, UUID> response = new HashMap<>();
         response.put("userId", userId);
         return ResponseEntity.ok(response);
+    }
+    
+    @GetMapping("/current/user")
+    public ResponseEntity<User> getCurrentUser(HttpSession session) {
+        UUID userId = (UUID) session.getAttribute("userId");
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        Optional<User> currentUser = userService.getUserById(userId);
+        if(currentUser.isEmpty()) 
+        	return ResponseEntity.noContent().build();
+    	else{
+    		User user=currentUser.get();
+    		user.setPassword("");
+    		return ResponseEntity.ok(user);
+    	}
+        
     }
 
 }
