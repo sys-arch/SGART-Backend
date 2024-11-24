@@ -57,7 +57,14 @@ public class TwoFactorAuthService {
 
     
     public boolean validateTOTP(String secretKey, String code) {
-        return gAuth.authorize(secretKey, gAuth.getTotpPassword(secretKey));
+        try {
+            if (secretKey == null || code == null) {
+                return false;
+            }
+            return gAuth.authorize(secretKey, Integer.parseInt(code.trim()));
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     public boolean validateTOTPFromDB(String email, String code) {

@@ -5,6 +5,7 @@ import com.team1.sgart.backend.dao.InvitationsDao;
 import com.team1.sgart.backend.dao.LocationsDao;
 import com.team1.sgart.backend.dao.MeetingsDao;
 import com.team1.sgart.backend.model.Meetings;
+import com.team1.sgart.backend.model.MeetingsDTO;
 import com.team1.sgart.backend.model.User;
 import com.team1.sgart.backend.model.InvitationStatus;
 import com.team1.sgart.backend.model.Invitations;
@@ -197,4 +198,5 @@ public class MeetingService {
 		return false;
 	}
 	*/
+
 }
