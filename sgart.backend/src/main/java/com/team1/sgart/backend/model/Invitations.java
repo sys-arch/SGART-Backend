@@ -1,6 +1,8 @@
 package com.team1.sgart.backend.model;
 
 import jakarta.persistence.*;
+import java.util.UUID;
+
 
 @Entity
 @Table(name = "SGART_InvitationsTable")
@@ -8,7 +10,7 @@ public class Invitations {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int invitation_id;
+    private UUID invitation_id;
 
     @ManyToOne
     @JoinColumn(name = "meeting_id", nullable = false)
@@ -31,22 +33,22 @@ public class Invitations {
     public Invitations() {}
 
     // Constructor con parámetros
-    public Invitations(Meetings meeting, User user, InvitationStatus invitationStatus, boolean userAttendance, String rejectionReason) {
+    public Invitations(Meetings meeting, User user, String invitationStatus, boolean userAttendance, String rejectionReason) {
         this.meeting = meeting;
         this.user = user;
-        this.invitationStatus = invitationStatus.toString();
+        this.invitationStatus = invitationStatus;
         this.userAttendance = userAttendance;
         this.rejectionReason = rejectionReason;
     }
 
     // Getters y setters
 
-    public int getInvitationId() {
+    public UUID getInvitationId() {
         return invitation_id;
     }
 
-    public void setInvitationId(int invitationId) {
-        this.invitation_id = invitationId;
+    public void setInvitationId(UUID invitation_id) {
+        this.invitation_id = invitation_id;
     }
 
     public Meetings getMeeting() {

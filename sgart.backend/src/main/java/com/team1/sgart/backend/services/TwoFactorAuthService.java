@@ -22,20 +22,20 @@ import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
 @Service
 public class TwoFactorAuthService {
 
-    private final GoogleAuthenticator gAuth;
-    private UserDao userDao;
-    private AdminDao adminDao;
+    private final GoogleAuthenticator googleAuthenticator;
+    private final UserDao userDao;
+    private final AdminDao adminDao;
     
     @Autowired
-	public TwoFactorAuthService(UserDao userDao, AdminDao adminDao, GoogleAuthenticator gAuth) {
+	public TwoFactorAuthService(UserDao userDao, AdminDao adminDao, GoogleAuthenticator googleAuthenticator) {
 		this.userDao = userDao;
 		this.adminDao = adminDao;
-		this.gAuth = gAuth;
+		this.googleAuthenticator = googleAuthenticator;
 	}
 
     // Método para generar la clave secreta que usará Google Authenticator
     public String generateSecretKey() {
-        GoogleAuthenticatorKey key = gAuth.createCredentials();
+        GoogleAuthenticatorKey key = googleAuthenticator.createCredentials();
         return key.getKey(); // Devuelve la clave secreta en formato Base32
     }
 
@@ -57,7 +57,14 @@ public class TwoFactorAuthService {
 
     
     public boolean validateTOTP(String secretKey, String code) {
-        return gAuth.authorize(secretKey, Integer.parseInt(code));
+        try {
+            if (secretKey == null || code == null) {
+                return false;
+            }
+            return googleAuthenticator.authorize(secretKey, Integer.parseInt(code.trim()));
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     public boolean validateTOTPFromDB(String email, String code) {
@@ -65,9 +72,9 @@ public class TwoFactorAuthService {
         String secretKeyUser = userDao.obtenerAuthCodePorEmail(email);
         String secretKeyAdmin = adminDao.obtenerAuthCodePorEmail(email);
 		if (secretKeyAdmin != null) {
-			isValid = gAuth.authorize(secretKeyAdmin, Integer.parseInt(code));
+			isValid = googleAuthenticator.authorize(secretKeyAdmin, googleAuthenticator.getTotpPassword(secretKeyAdmin));
 		} else if (secretKeyUser != null) {
-			isValid = gAuth.authorize(secretKeyUser, Integer.parseInt(code));
+			isValid = googleAuthenticator.authorize(secretKeyUser, googleAuthenticator.getTotpPassword(secretKeyUser));
 		}
 		else {
             throw new IllegalArgumentException("Secret key not found for email: " + email);

@@ -3,6 +3,7 @@ package com.team1.sgart.backend.http;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import com.team1.sgart.backend.model.*;
@@ -43,91 +44,96 @@ public class UserController {
 		userService.modificarUser(user);
 		return ResponseEntity.status(HttpStatus.OK).body("Perfil modificado correctamente");
 	}
-	
+
 	@PostMapping("/modificarPerfil")
-	public ResponseEntity<String> modificarPerfil(@RequestBody UserDTO changesInUser) {
-		try {
-			userService.modificarPerfilUser(changesInUser);
-			return ResponseEntity.status(HttpStatus.OK).body("Perfil modificado correctamente");
-        } catch (ResponseStatusException ex) {
-            return ResponseEntity.status(ex.getStatusCode()).body(ex.getReason());
+    public ResponseEntity<String> modificarPerfil(@RequestBody UserDTO changesInUser) {
+        try {
+            userService.modificarPerfilUser(changesInUser);
+            return ResponseEntity.status(HttpStatus.OK).body("Perfil modificado correctamente");
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
         }
-	}
-
-@PostMapping("/login")
-public ResponseEntity<Object> login(@RequestBody User user, HttpSession session) {
-    // Autenticar al usuario usando el servicio
-    GenericUser genericUser = userService.loginUser(user);
-    Map<String, Object> response = new HashMap<>();
-
-    if (genericUser instanceof User) {
-        User userLogged = (User) genericUser;
-        
-        // Validar que el ID del usuario no sea nulo y corresponde al esperado
-        UUID userIdFromDb = userLogged.getID();
-        if (userIdFromDb == null) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("ID de usuario no encontrado en la base de datos");
-        }
-
-        // Guardar el ID en la sesión
-        session.setAttribute("userId", userIdFromDb);
-
-        // Mapear datos del usuario a un DTO
-        UserDTO userDTO = new UserDTO();
-        userDTO.setID(userIdFromDb);
-        userDTO.setName(userLogged.getName());
-        userDTO.setLastName(userLogged.getLastName());
-        userDTO.setEmail(userLogged.getEmail());
-        userDTO.setPassword(userLogged.getPassword());
-        userDTO.setDepartment(userLogged.getDepartment());
-        userDTO.setCenter(userLogged.getCenter());
-        userDTO.setHiringDate(userLogged.getHiringDate());
-        userDTO.setProfile(userLogged.getProfile());
-        userDTO.setValidated(userLogged.isValidated());
-        userDTO.setBlocked(userLogged.isBlocked());
-
-        // Respuesta para el cliente
-        response.put("user", userDTO);
-        response.put("type", "user");
-
-        // Log para depuración
-        logger.info("Usuario autenticado: {} (ID: {})", userLogged.getEmail(), userIdFromDb);
-
-        return ResponseEntity.ok(response);
-    } else if (genericUser instanceof Admin) {
-        Admin adminLogged = (Admin) genericUser;
-
-        // Validar que el ID del administrador no sea nulo
-        UUID adminIdFromDb = adminLogged.getID();
-        if (adminIdFromDb == null) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("ID de administrador no encontrado en la base de datos");
-        }
-
-        // Guardar el ID en la sesión
-        session.setAttribute("userId", adminIdFromDb);
-
-        // Mapear datos del administrador a un DTO
-        AdminDTO adminDTO = new AdminDTO();
-        adminDTO.setID(adminIdFromDb);
-        adminDTO.setName(adminLogged.getName());
-        adminDTO.setLastName(adminLogged.getLastName());
-        adminDTO.setEmail(adminLogged.getEmail());
-        adminDTO.setPassword(adminLogged.getPassword());
-
-        // Respuesta para el cliente
-        response.put("admin", adminDTO);
-        response.put("type", "admin");
-
-        // Log para depuración
-        logger.info("Administrador autenticado: {} (ID: {})", adminLogged.getEmail(), adminIdFromDb);
-
-        return ResponseEntity.ok(response);
-    } else {
-        logger.warn("Intento de inicio de sesión fallido para usuario: {}", user.getEmail());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
     }
-}
 
+	@PostMapping("/login")
+    public ResponseEntity<Object> login(@RequestBody User user, HttpSession session) {
+        try {
+            // Autenticar al usuario usando el servicio
+            GenericUser genericUser = userService.loginUser(user, session);
+            Map<String, Object> response = new HashMap<>();
+
+            if (genericUser instanceof User) {
+                User userLogged = (User) genericUser;
+
+                // Validar que el ID del usuario no sea nulo y corresponde al esperado
+                UUID userIdFromDb = userLogged.getID();
+                if (userIdFromDb == null) {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body("ID de usuario no encontrado en la base de datos");
+                }
+
+                // Guardar el ID en la sesión
+                session.setAttribute("userId", userIdFromDb);
+
+                // Mapear datos del usuario a un DTO
+                UserDTO userDTO = new UserDTO();
+                userDTO.setID(userIdFromDb);
+                userDTO.setName(userLogged.getName());
+                userDTO.setLastName(userLogged.getLastName());
+                userDTO.setEmail(userLogged.getEmail());
+                userDTO.setPassword(userLogged.getPassword());
+                userDTO.setDepartment(userLogged.getDepartment());
+                userDTO.setCenter(userLogged.getCenter());
+                userDTO.setHiringDate(userLogged.getHiringDate());
+                userDTO.setProfile(userLogged.getProfile());
+                userDTO.setValidated(userLogged.isValidated());
+                userDTO.setBlocked(userLogged.isBlocked());
+
+                // Respuesta para el cliente
+                response.put("user", userDTO);
+                response.put("type", "user");
+
+                // Log para depuración
+                logger.info("Usuario autenticado: {} (ID: {})", userLogged.getEmail(), userIdFromDb);
+
+                return ResponseEntity.ok(response);
+            } else if (genericUser instanceof Admin) {
+                Admin adminLogged = (Admin) genericUser;
+
+                // Validar que el ID del administrador no sea nulo
+                UUID adminIdFromDb = adminLogged.getID();
+                if (adminIdFromDb == null) {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body("ID de administrador no encontrado en la base de datos");
+                }
+
+                // Guardar el ID en la sesión
+                session.setAttribute("userId", adminIdFromDb);
+
+                // Mapear datos del administrador a un DTO
+                AdminDTO adminDTO = new AdminDTO();
+                adminDTO.setID(adminIdFromDb);
+                adminDTO.setName(adminLogged.getName());
+                adminDTO.setLastName(adminLogged.getLastName());
+                adminDTO.setEmail(adminLogged.getEmail());
+                adminDTO.setPassword(adminLogged.getPassword());
+
+                // Respuesta para el cliente
+                response.put("admin", adminDTO);
+                response.put("type", "admin");
+
+                // Log para depuración
+                logger.info("Administrador autenticado: {} (ID: {})", adminLogged.getEmail(), adminIdFromDb);
+
+                return ResponseEntity.ok(response);
+            } else {
+                logger.warn("Intento de inicio de sesión fallido para usuario: {}", user.getEmail());
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
+            }
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
+        }
+    }
 
 	@PostMapping("/verificar-email")
 	public ResponseEntity<String> verificarEmail(@RequestBody User user) {
@@ -145,15 +151,32 @@ public ResponseEntity<Object> login(@RequestBody User user, HttpSession session)
 		return ResponseEntity.ok(usersList);
 	}
 
-    @GetMapping("/current/userId")
-    public ResponseEntity<Map<String, UUID>> getCurrentUserId(HttpSession session) {
-        UUID userId = (UUID) session.getAttribute("userId");
-        if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        Map<String, UUID> response = new HashMap<>();
-        response.put("userId", userId);
-        return ResponseEntity.ok(response);
-    }
+	@GetMapping("/current/userId")
+	public ResponseEntity<Map<String, UUID>> getCurrentUserId(HttpSession session) {
+		UUID userId = (UUID) session.getAttribute("userId");
+		if (userId == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		}
+		Map<String, UUID> response = new HashMap<>();
+		response.put("userId", userId);
+		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/current/user")
+	public ResponseEntity<User> getCurrentUser(HttpSession session) {
+		UUID userId = (UUID) session.getAttribute("userId");
+		if (userId == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		}
+		Optional<User> currentUser = userService.getUserById(userId);
+		if (currentUser.isEmpty())
+			return ResponseEntity.noContent().build();
+		else {
+			User user = currentUser.get();
+			user.setPassword("");
+			return ResponseEntity.ok(user);
+		}
+
+	}
 
 }
