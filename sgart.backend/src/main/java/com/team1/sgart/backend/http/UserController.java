@@ -169,17 +169,4 @@ public class UserController {
         }
     }
 
-    @PostMapping("/reset-password")
-    public ResponseEntity<String> resetPassword(@RequestParam String token, @RequestBody Map<String, String> passwordData) {
-        try {
-            String newPassword = passwordData.get("password");
-            userService.resetPassword(token, newPassword);
-            return ResponseEntity.ok("Contraseña actualizada correctamente");
-        } catch (Exception e) {
-            logger.error("Error al restablecer la contraseña: ", e);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Error al restablecer la contraseña: " + e.getMessage());
-        }
-    }
-
 }
