@@ -2,6 +2,7 @@ package com.team1.sgart.backend.dao;
 
 import com.team1.sgart.backend.model.Meetings;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -22,6 +23,7 @@ public interface MeetingsDao extends JpaRepository<Meetings, UUID> {
 
 
 	// Método para obtener una reunión por su ID
+	@SuppressWarnings("null")
 	Optional<Meetings> findById(UUID meetingId);
 
 	// Método para editar una reunión
@@ -31,6 +33,7 @@ public interface MeetingsDao extends JpaRepository<Meetings, UUID> {
 		// Actualizar los campos
 		actualizarCampo(meeting::setMeetingTitle, updatedMeeting.getMeetingTitle());
 		actualizarCampo(meeting::setMeetingAllDay, updatedMeeting.isMeetingAllDay());
+		actualizarCampo(meeting::setMeetingDate, updatedMeeting.getMeetingDate());
 		actualizarCampo(meeting::setMeetingStartTime, updatedMeeting.getMeetingStartTime());
 		actualizarCampo(meeting::setMeetingEndTime, updatedMeeting.getMeetingEndTime());
 		actualizarCampo(meeting::setOrganizerId, updatedMeeting.getOrganizerId());
@@ -57,6 +60,14 @@ public interface MeetingsDao extends JpaRepository<Meetings, UUID> {
 				""", nativeQuery = true)
 	List<UUID> findConflictingMeetings(@Param("meetingDate") LocalDate meetingDate,
 			@Param("meetingStartTime") LocalTime meetingStartTime, @Param("meetingEndTime") LocalTime meetingEndTime);
+
+	@Modifying
+	@Query(value = "DELETE FROM SGART_InvitationsTable WHERE meeting_id = :meetingId", nativeQuery = true)
+	void deleteInvitationsByMeetingId(@Param("meetingId") UUID meetingId);
+
+	@Modifying
+	@Query(value = "DELETE FROM SGART_MeetingsTable WHERE meeting_id = :meetingId", nativeQuery = true)
+	void deleteMeetingById(@Param("meetingId") UUID meetingId);
 
 }
 
