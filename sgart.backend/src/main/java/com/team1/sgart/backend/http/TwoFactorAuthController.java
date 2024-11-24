@@ -1,6 +1,7 @@
 package com.team1.sgart.backend.http;
 
 import java.util.Base64;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.team1.sgart.backend.model.PasswordResetDTO;
 import com.team1.sgart.backend.model.TwoFactorAuth;
@@ -105,50 +107,62 @@ public class TwoFactorAuthController {
     }
     
     @PostMapping("/forgot-password")
-	public ResponseEntity<String> forgotPassword(@RequestParam String email) {
-    	User user = new User();
-    	user.setEmail(email);
-    	
-    	//Comprobamos la existencia del usuario
-		if (!userService.emailYaRegistrado(user)) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\": \"El email no está registrado\"}");
+    public ResponseEntity<String> forgotPassword(@RequestBody Map<String, String> emailData) {
+        try {
+            String email = emailData.get("email");
+            if (email == null || email.trim().isEmpty()) {
+                return ResponseEntity.badRequest()
+                    .body("{\"error\": \"El email es requerido\"}");
+            }
+
+            // Validar que el usuario existe y generar token
+            String token = userService.generatePasswordResetToken(email);
+            
+            // Construir el link de recuperación
+            String recoveryLink = "https://sgart-v1.web.app/#/reset-password?token=" + token;
+            
+            // Enviar el email con el link
+            emailService.sendPasswordResetEmail(email, recoveryLink);
+            
+            return ResponseEntity.ok()
+                .body("{\"message\": \"Se ha enviado un enlace de recuperación a tu correo\", \"email\": \"" + email + "\"}");
+                
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode())
+                .body("{\"error\": \"" + e.getReason() + "\"}");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("{\"error\": \"Error al procesar la solicitud: " + e.getMessage() + "\"}");
         }
-		
-		//Generamos el token JWT
-		String token = jwtTokenProvider.generatePasswordResetToken(user);
-		
-		//Enviamos el email
-		String recoveryLink = "https://sgart-v1.web.app/#/reset-password?token=" + token; //Cambiar la URL en producción
-        emailService.sendPasswordResetEmail(user.getEmail(), recoveryLink);
-        
-        return ResponseEntity.status(HttpStatus.OK).body("{\"message\": \"Email de recuperación de contraseña enviado\"}");
-	}
+    }
     
     @PostMapping("/reset-password")
-	public ResponseEntity<String> resetPassword(@RequestBody PasswordResetDTO resetRequest) {
-    	String token = resetRequest.getToken();
-    	String newPassword = resetRequest.getNewPassword();
-    	
-    	//Validamos el token
-		if (!jwtTokenProvider.validateToken(token)) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{\"error\": \"Token inválido\"}");
-		}
-		
-		//Obtenemos el email del token
-		String email = jwtTokenProvider.getEmailFromToken(token);
-		User user = new User();
-		user.setEmail(email);
-		
-		//Comprobamos la existencia del usuario
-		if (!userService.emailYaRegistrado(user)) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\": \"El email no está registrado\"}");
-		}
-		
-		//Cambiamos la contraseña
-		user.setPassword(newPassword);
-		userService.modificarUser(user);
-		
-		return ResponseEntity.ok("{\"message\": \"Contraseña recuperada correctamente\"}");
-	}
+    public ResponseEntity<String> resetPassword(@RequestBody PasswordResetDTO resetRequest) {
+        try {
+            // Validar que tenemos todos los datos necesarios
+            if (resetRequest.getToken() == null || resetRequest.getToken().trim().isEmpty()) {
+                return ResponseEntity.badRequest()
+                    .body("{\"error\": \"El token es requerido\"}");
+            }
+            
+            if (resetRequest.getNewPassword() == null || resetRequest.getNewPassword().trim().isEmpty()) {
+                return ResponseEntity.badRequest()
+                    .body("{\"error\": \"La nueva contraseña es requerida\"}");
+            }
+
+            // Intentar restablecer la contraseña
+            userService.resetPassword(resetRequest.getToken(), resetRequest.getNewPassword());
+            
+            return ResponseEntity.ok()
+                .body("{\"message\": \"Contraseña actualizada correctamente\"}");
+                
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode())
+                .body("{\"error\": \"" + e.getReason() + "\"}");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("{\"error\": \"Error al restablecer la contraseña: " + e.getMessage() + "\"}");
+        }
+    }
 
 }

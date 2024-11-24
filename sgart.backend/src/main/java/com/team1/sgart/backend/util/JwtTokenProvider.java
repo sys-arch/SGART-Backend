@@ -1,10 +1,14 @@
 package com.team1.sgart.backend.util;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 import javax.crypto.SecretKey;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.team1.sgart.backend.model.User;
 
@@ -16,15 +20,24 @@ import io.jsonwebtoken.security.Keys;
 @Component
 public class JwtTokenProvider {
 
-    private static final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256); // Genera una SecretKey segura
-    private static final long EXPIRATION_TIME = (15 * 60) * 1000; // 15 minutos en milisegundos
+    private SecretKey key;
+    private static final long EXPIRATION_TIME = (15 * 60) * 1000; // 15 minutos
+
+    @Value("${jwt.secret}")
+    private String secretKey;
+
+    public void init() {
+        byte[] keyBytes = secretKey.getBytes(StandardCharsets.UTF_8);
+        this.key = Keys.hmacShaKeyFor(keyBytes);
+    }
 
     // Método para generar el token de recuperación
     public String generatePasswordResetToken(User user) {
         return Jwts.builder()
                 .setSubject(user.getEmail())
+                .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(SECRET_KEY) 
+                .signWith(key)
                 .compact();
     }
 
@@ -32,7 +45,7 @@ public class JwtTokenProvider {
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder()
-                .setSigningKey(SECRET_KEY)
+                .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token);
             return true;
@@ -43,11 +56,15 @@ public class JwtTokenProvider {
 
     // Obtener el correo del token (usado en el restablecimiento de contraseña)
     public String getEmailFromToken(String token) {
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(SECRET_KEY)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-        return claims.getSubject();
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+            return claims.getSubject();
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token inválido");
+        }
     }
 }

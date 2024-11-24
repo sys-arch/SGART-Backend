@@ -42,9 +42,6 @@ public class UserService {
     private ConcurrentHashMap<String, Integer> loginAttempts = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String, Long> blockedSessions = new ConcurrentHashMap<>();
 
-    @Value("${jwt.secret}")
-    private String jwtSecret;
-
     @Autowired
     public UserService(UserDao userDao, AdminDao adminDao, JwtTokenProvider jwtTokenProvider) {
         this.userDao = userDao;
@@ -224,5 +221,18 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, 
                 "Error al restablecer la contraseña: " + e.getMessage());
         }
+    }
+
+    public String generatePasswordResetToken(String email) {
+        User user = userDao.findByEmail(email)
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, "No existe un usuario con ese email"));
+
+        if (user.isBlocked()) {
+            throw new ResponseStatusException(
+                HttpStatus.FORBIDDEN, "Esta cuenta está bloqueada");
+        }
+
+        return jwtTokenProvider.generatePasswordResetToken(user);
     }
 }
