@@ -117,7 +117,7 @@ class MeetingControllerTest {
                 .thenReturn(meeting);
         
         // Ejecutar la petición y verificar resultados
-        mockMvc.perform(post("/meetings/create")
+        mockMvc.perform(post("/api/meetings/create")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(meeting)))
                 .andExpect(status().isOk())
@@ -160,6 +160,8 @@ class MeetingControllerTest {
         // Datos de prueba
         UUID meetingId = UUID.randomUUID();
         Meetings meeting = new Meetings();
+        meeting.setMeetingId(meetingId);
+
         User user1 = new User();
         user1.setID(UUID.fromString("5ac9c5b9-c41f-4a33-8db9-81b5b0f93b64"));
         user1.setName("John Doe");
@@ -168,15 +170,14 @@ class MeetingControllerTest {
         user2.setID(UUID.fromString("fd925c7e-be4c-4997-bf40-f1de30925ded"));
         user2.setName("Jane Doe");
 
-        List<UUID> attendees = Arrays.asList(user1.getID() , user2.getID());
+        List<UUID> attendees = Arrays.asList(user1.getID(), user2.getID());
 
         // Configurar los mocks
         when(meetingService.getMeetingById(meetingId)).thenReturn(Optional.of(meeting));
         when(meetingService.getAttendeesForMeeting(meeting)).thenReturn(attendees);
 
         // Ejecutar la solicitud y verificar resultados
-        mockMvc.perform(get("/meetings/{meetingId}/attendees", meetingId))
-				.andDo(MockMvcResultHandlers.print())
+        mockMvc.perform(get("/api/meetings/{meetingId}/attendees", meetingId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0]").value("5ac9c5b9-c41f-4a33-8db9-81b5b0f93b64"))
                 .andExpect(jsonPath("$[1]").value("fd925c7e-be4c-4997-bf40-f1de30925ded"));
@@ -194,7 +195,7 @@ class MeetingControllerTest {
         Mockito.doNothing().when(meetingService).modifyMeeting(Mockito.eq(meetingId), Mockito.any(Meetings.class));
 
         // Act & Assert
-        mockMvc.perform(post("/meetings/modify/" + meetingId)
+        mockMvc.perform(post("/api/meetings/" + meetingId + "/modify")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(meetingJson))
                 .andExpect(status().isOk())
@@ -206,14 +207,13 @@ class MeetingControllerTest {
     //Devuelve 404
     @Test
     void editMeetingMeetingNotFoundReturns404() throws Exception {
-        
         String meetingJson = objectMapper.writeValueAsString(updatedMeeting);
         UUID meetingId = existingMeeting.getMeetingId();
-        
+
         Mockito.doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Reunión no encontrada"))
                 .when(meetingService).modifyMeeting(Mockito.eq(meetingId), Mockito.any(Meetings.class));
 
-        mockMvc.perform(post("/meetings/modify/" + meetingId)
+        mockMvc.perform(post("/api/meetings/" + meetingId + "/modify")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(meetingJson))
                 .andExpect(status().isNotFound())
@@ -225,15 +225,14 @@ class MeetingControllerTest {
     //Devuelve 409
     @Test
     void editMeetingConflictReturns409() throws Exception {
-        
         String meetingJson = objectMapper.writeValueAsString(updatedMeeting);
         UUID meetingId = existingMeeting.getMeetingId();
-        
+
         Mockito.doThrow(new ResponseStatusException(HttpStatus.CONFLICT, "El organizador tiene una reunión en el nuevo tramo"))
                 .when(meetingService).modifyMeeting(Mockito.eq(meetingId), Mockito.any(Meetings.class));
 
         // Act & Assert
-        mockMvc.perform(post("/meetings/modify/" + meetingId)
+        mockMvc.perform(post("/api/meetings/" + meetingId + "/modify")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(meetingJson))
                 .andExpect(status().isConflict())
