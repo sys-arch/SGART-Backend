@@ -1,6 +1,8 @@
 package com.team1.sgart.backend.services;
 
 import com.team1.sgart.backend.model.*;
+import com.team1.sgart.backend.util.JwtTokenProvider;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+
 @Service
 public class UserService {
     private static final int MAX_ATTEMPTS = 3;
@@ -27,6 +36,12 @@ public class UserService {
 
     private ConcurrentHashMap<String, Integer> loginAttempts = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String, Long> blockedSessions = new ConcurrentHashMap<>();
+
+    @Value("${jwt.secret}")
+    private String jwtSecret;
+
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
 
     @Autowired
     UserService(UserDao userDao, AdminDao adminDao) {
@@ -181,5 +196,37 @@ public class UserService {
 
     public Optional<User> getUserById(UUID userId) {
         return userDao.findById(userId);
+    }
+
+    public void resetPassword(String token, String newPassword) {
+        // Validar el token
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token inválido o expirado");
+        }
+
+        try {
+            // Obtener el email del token usando el método existente
+            String email = jwtTokenProvider.getEmailFromToken(token);
+
+            // Buscar el usuario por email
+            Optional<User> userOptional = userDao.findByEmail(email);
+            if (userOptional.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado");
+            }
+
+            User user = userOptional.get();
+            
+            // Validar el formato de la nueva contraseña
+            user.setPassword(newPassword);
+            if (!passwordFormatoValido(user)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Formato de contraseña inválido");
+            }
+
+            // Actualizar la contraseña en la base de datos
+            userDao.updatePassword(user.getID(), newPassword);
+
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error al restablecer la contraseña: " + e.getMessage());
+        }
     }
 }

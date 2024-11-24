@@ -75,4 +75,9 @@ public interface UserDao extends JpaRepository<User, UUID> {
     @Query("SELECT CONCAT(u.name, ' ', u.lastName) FROM User u WHERE u.id = :id")
     String findUserFullNameById(@Param("id") UUID id);
 
+    @Modifying
+    @Query("UPDATE User u SET u.password = :newPassword WHERE u.id = :userId")
+    @Transactional
+    void updatePassword(@Param("userId") UUID userId, @Param("newPassword") String newPassword);
+
 }
