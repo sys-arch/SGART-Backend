@@ -72,9 +72,9 @@ public class TwoFactorAuthService {
         String secretKeyUser = userDao.obtenerAuthCodePorEmail(email);
         String secretKeyAdmin = adminDao.obtenerAuthCodePorEmail(email);
 		if (secretKeyAdmin != null) {
-			isValid = gAuth.authorize(secretKeyAdmin, gAuth.getTotpPassword(secretKeyAdmin));
+			isValid = gAuth.authorize(secretKeyAdmin, Integer.parseInt(code.trim()));
 		} else if (secretKeyUser != null) {
-			isValid = gAuth.authorize(secretKeyUser, gAuth.getTotpPassword(secretKeyUser));
+			isValid = gAuth.authorize(secretKeyUser, Integer.parseInt(code.trim()));
 		}
 		else {
             throw new IllegalArgumentException("Secret key not found for email: " + email);
