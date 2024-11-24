@@ -1,9 +1,11 @@
+com/team1/sgart/backend/config/CorsConfig.class
 com/team1/sgart/backend/dao/AdminDao.class
 com/team1/sgart/backend/services/WorkingHoursService.class
 com/team1/sgart/backend/http/AdminCalendarController.class
 com/team1/sgart/backend/model/GenericUser.class
 com/team1/sgart/backend/http/AdminController.class
 com/team1/sgart/backend/model/WorkingHoursNewScheduleDTO.class
+com/team1/sgart/backend/http/InvitationsController.class
 com/team1/sgart/backend/model/InvitationsDTO.class
 com/team1/sgart/backend/services/LocationsService.class
 com/team1/sgart/backend/model/Absences.class
@@ -18,9 +20,11 @@ com/team1/sgart/backend/model/Locations.class
 com/team1/sgart/backend/model/LocationsDTO.class
 com/team1/sgart/backend/model/CalendarEvent.class
 com/team1/sgart/backend/model/WorkingHoursDTO.class
+com/team1/sgart/backend/http/UserCalendarController.class
 com/team1/sgart/backend/services/AdminService.class
 com/team1/sgart/backend/model/GenericUserDTO.class
 com/team1/sgart/backend/dao/LocationsDao.class
+com/team1/sgart/backend/services/InvitationsService.class
 com/team1/sgart/backend/dao/UserDao.class
 com/team1/sgart/backend/util/JwtTokenProvider.class
 com/team1/sgart/backend/model/AbsencesDTO.class

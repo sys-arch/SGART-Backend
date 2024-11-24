@@ -7,6 +7,9 @@ import com.team1.sgart.backend.dao.MeetingsDao;
 import com.team1.sgart.backend.model.Meetings;
 import com.team1.sgart.backend.model.MeetingsDTO;
 import com.team1.sgart.backend.model.User;
+
+import jakarta.transaction.Transactional;
+
 import com.team1.sgart.backend.model.InvitationStatus;
 import com.team1.sgart.backend.model.Invitations;
 import com.team1.sgart.backend.model.Locations;
@@ -154,16 +157,18 @@ public class MeetingService {
     	return available;
     }
 	// Método para cancelar una reunión MANUAL por organizador
+	@Transactional
 	public boolean cancelMeetingByOrganizer(UUID meetingId) {
-		// Recuperamos la reunión por su ID
 		Optional<Meetings> meetingOpt = meetingDao.findById(meetingId);
 		if (meetingOpt.isEmpty()) {
 			throw new RuntimeException("Reunión no encontrada");
 		}
-
-		Meetings meeting = meetingOpt.get();
-		meetingDao.delete(meeting); // cancelada = eliminada
-
+		
+		// Primero eliminamos las invitaciones
+		meetingDao.deleteInvitationsByMeetingId(meetingId);
+		// Luego eliminamos la reunión
+		meetingDao.deleteMeetingById(meetingId);
+		
 		return true;
 	}
 	/*
