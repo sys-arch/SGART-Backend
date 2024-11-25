@@ -4,7 +4,7 @@
 # https://aka.ms/yaml
 
 trigger:
-- fix_Pruebas
+- develop
 
 pool:
   name: Default
@@ -25,9 +25,9 @@ stages:
     - checkout: self
     - script: |
         echo "Cambiando a la rama develop"
-        git fetch origin develop
-        git checkout develop
-        git pull origin develop
+        git fetch origin fix_Pruebas
+        git checkout fix_Pruebas
+        git pull origin fix_Pruebas
       displayName: 'Checkout develop branch'
       
     
