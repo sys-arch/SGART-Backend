@@ -65,6 +65,7 @@ public interface UserDao extends JpaRepository<User, UUID> {
     @Query("SELECT u FROM User u WHERE u.validated = true")
     Optional<List<User>> getUsuariosValidados();
 
+	@Modifying
     @Transactional
     void deleteByEmail(String email);
 

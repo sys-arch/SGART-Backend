@@ -77,7 +77,7 @@ public class AdminController {
     }
 
     @DeleteMapping("/eliminar/email/{email}")
-    public ResponseEntity<String> eliminarUsuarioPorEmail(@PathVariable String email) {
+    public ResponseEntity<String> eliminarUsuarioPorEmail(@PathVariable ("email") String email) {
         adminService.eliminarUsuarioPorEmail(email);
         return new ResponseEntity<>("Perfil eliminado con éxito", HttpStatus.OK);
     }

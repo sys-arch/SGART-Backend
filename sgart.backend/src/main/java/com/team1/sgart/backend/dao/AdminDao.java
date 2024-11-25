@@ -36,8 +36,6 @@ public interface AdminDao extends  JpaRepository<Admin, UUID> {
 	        actualizarCampo(admin::setName, updatedAdmin.getName());
 	        actualizarCampo(admin::setLastName, updatedAdmin.getLastName());
 	        actualizarCampo(admin::setCenter, updatedAdmin.getCenter());
-	        actualizarCampo(admin::setEmail, updatedAdmin.getEmail());
-	        actualizarCampo(admin::setPassword, updatedAdmin.getPassword());
 
 	        // Guardar el admin actualizado
 	        return save(admin);
@@ -48,7 +46,8 @@ public interface AdminDao extends  JpaRepository<Admin, UUID> {
             setter.accept(nuevoValor);
         }
     }
-    
+
+	@Modifying
     @Transactional
     void deleteByEmail(String email);  // Para eliminar por email
     
