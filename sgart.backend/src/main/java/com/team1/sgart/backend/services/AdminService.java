@@ -1,9 +1,6 @@
 package com.team1.sgart.backend.services;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -13,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.team1.sgart.backend.dao.AdminDao;
+import com.team1.sgart.backend.dao.InvitationsDao;
 import com.team1.sgart.backend.dao.UserDao;
 import com.team1.sgart.backend.model.Admin;
 import com.team1.sgart.backend.model.AdminDTO;
@@ -24,11 +22,13 @@ public class AdminService {
 	
 	private UserDao userDAO;
 	private AdminDao adminDAO;
+	private InvitationsDao invitationsDAO;
 	
 	@Autowired
-	AdminService(UserDao userDao, AdminDao adminDao) {
+	AdminService(UserDao userDao, AdminDao adminDao,InvitationsDao invitationsDAO) {
         this.userDAO = userDao;
         this.adminDAO = adminDao;
+        this.invitationsDAO=invitationsDAO;
     }
 	
 	public List<UserDTO> mapUser(List<User> users){
@@ -105,8 +105,11 @@ public class AdminService {
 				throw new IllegalArgumentException();
 			else
 				adminDAO.deleteByEmail(email);
-		} else
+		} else {
+			User userToDelete=userDAO.findByEmail(email).get();
+			invitationsDAO.deleteByUser(userToDelete.getID());
 			userDAO.deleteByEmail(email);
+		}
     }
 
 	public List<AdminDTO> getAdmins() {

@@ -79,7 +79,11 @@ public interface InvitationsDao extends JpaRepository<Invitations, Integer> {
         @Param("meetingId") UUID meetingId, 
         @Param("userId") UUID userId
     );
-
+    
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM SGART_InvitationsTable WHERE user_id = :userId", nativeQuery = true)
+    void deleteByUser(@Param("userId") UUID userId);
 
     @Modifying
     @Transactional

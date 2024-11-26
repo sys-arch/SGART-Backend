@@ -1,6 +1,8 @@
 package com.team1.sgart.backend.services;
 
 import com.team1.sgart.backend.model.*;
+import com.team1.sgart.backend.util.JwtTokenProvider;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -10,6 +12,8 @@ import com.team1.sgart.backend.dao.AdminDao;
 import com.team1.sgart.backend.dao.UserDao;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.transaction.Transactional;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -18,20 +22,23 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class UserService {
     private static final int MAX_ATTEMPTS = 3;
     private static final long BLOCK_TIME = 15 * 60 * 1000; // 15 minutos de bloqueo
 
-    private UserDao userDao;
-    private AdminDao adminDao;
+    private final UserDao userDao;
+    private final AdminDao adminDao;
+    private final JwtTokenProvider jwtTokenProvider;
 
     private ConcurrentHashMap<String, Integer> loginAttempts = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String, Long> blockedSessions = new ConcurrentHashMap<>();
 
     @Autowired
-    UserService(UserDao userDao, AdminDao adminDao) {
+    public UserService(UserDao userDao, AdminDao adminDao, JwtTokenProvider jwtTokenProvider) {
         this.userDao = userDao;
         this.adminDao = adminDao;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     public User registrarUser(User user) {
@@ -181,5 +188,43 @@ public class UserService {
 
     public Optional<User> getUserById(UUID userId) {
         return userDao.findById(userId);
+    }
+
+    public void resetPassword(String token, String newPassword) {
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token inválido o expirado");
+        }
+
+        try {
+            String email = jwtTokenProvider.getEmailFromToken(token);
+            User user = userDao.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+
+            // Validar el formato de la nueva contraseña
+            user.setPassword(newPassword);
+            if (!passwordFormatoValido(user)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Formato de contraseña inválido");
+            }
+
+            // Actualizar la contraseña directamente sin encriptar
+            userDao.updatePassword(user.getID(), newPassword);
+
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, 
+                "Error al restablecer la contraseña: " + e.getMessage());
+        }
+    }
+
+    public String generatePasswordResetToken(String email) {
+        User user = userDao.findByEmail(email)
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, "No existe un usuario con ese email"));
+
+        if (user.isBlocked()) {
+            throw new ResponseStatusException(
+                HttpStatus.FORBIDDEN, "Esta cuenta está bloqueada");
+        }
+
+        return jwtTokenProvider.generatePasswordResetToken(user);
     }
 }

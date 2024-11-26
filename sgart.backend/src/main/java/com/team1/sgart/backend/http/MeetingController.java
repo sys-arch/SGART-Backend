@@ -20,13 +20,15 @@ import org.slf4j.LoggerFactory;
 @RestController
 @RequestMapping("api/meetings")
 public class MeetingController {
-
-    private MeetingService meetingService;
+	
+	private final MeetingService meetingService;
+	private final UserService userService;
     private static final Logger logger = LoggerFactory.getLogger(MeetingController.class);
 
     @Autowired
     public MeetingController(MeetingService meetingService, UserService userService) {
         this.meetingService = meetingService;
+        this.userService = userService;
     }
 
     // Crear una reunión

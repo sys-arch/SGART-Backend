@@ -7,7 +7,6 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -15,7 +14,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
 @Repository
@@ -64,7 +62,8 @@ public interface UserDao extends JpaRepository<User, UUID> {
     // Método para obtener la lista de usuarios que ya han sido validados
     @Query("SELECT u FROM User u WHERE u.validated = true")
     Optional<List<User>> getUsuariosValidados();
-
+    
+    @Modifying
     @Transactional
     void deleteByEmail(String email);
 
@@ -74,5 +73,10 @@ public interface UserDao extends JpaRepository<User, UUID> {
 
     @Query("SELECT CONCAT(u.name, ' ', u.lastName) FROM User u WHERE u.id = :id")
     String findUserFullNameById(@Param("id") UUID id);
+    
+    @Modifying
+    @Query("UPDATE User u SET u.password = :newPassword WHERE u.id = :userId")
+    @Transactional
+    void updatePassword(@Param("userId") UUID userId, @Param("newPassword") String newPassword);
 
 }

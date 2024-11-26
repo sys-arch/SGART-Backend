@@ -22,16 +22,17 @@ import com.team1.sgart.backend.model.Admin;
 import com.team1.sgart.backend.model.GenericUser;
 import com.team1.sgart.backend.model.User;
 import com.team1.sgart.backend.model.UserDTO;
+import com.team1.sgart.backend.util.JwtTokenProvider;
 
 @SpringBootTest
 class UserServiceTest {
-	
-	private static final String PASSWORD_DEBIL = "password";
-	private static final String NUEVO_NOMBRE = "Pablo";
-	private static final String PASSWORD_FUERTE = "Password365@";
-	private static final String FECHA_CORRECTA = "01/01/2024";
-	private static final String PASSWORD_INCORRECTO = "wrongPassword";
-	private static final String EMAIL_USUARIO = "carlos.romero@example.com";
+    
+    private static final String PASSWORD_DEBIL = "password";
+    private static final String NUEVO_NOMBRE = "Pablo";
+    private static final String PASSWORD_FUERTE = "Password365@";
+    private static final String FECHA_CORRECTA = "01/01/2024";
+    private static final String PASSWORD_INCORRECTO = "wrongPassword";
+    private static final String EMAIL_USUARIO = "carlos.romero@example.com";
 
     @Autowired
     private UserService userService;
@@ -41,6 +42,9 @@ class UserServiceTest {
     
     @MockBean
     private AdminDao adminDao;
+    
+    @MockBean
+    private JwtTokenProvider jwtTokenProvider;
 
     private User user;
     private Admin admin;
@@ -48,17 +52,17 @@ class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-    	user = new User("carlos.romero@example.com", "Carlos", "Romero Navarro", "Quality", "Ciudad Real", FECHA_CORRECTA, 
+        user = new User("carlos.romero@example.com", "Carlos", "Romero Navarro", "Quality", "Ciudad Real", FECHA_CORRECTA, 
                 "Scrum Developer", PASSWORD_FUERTE, PASSWORD_FUERTE, false, false, "");
-    	
-    	admin = new Admin("admin", "example", "admin@example.com", PASSWORD_FUERTE);
-    	
-    	jsonPerfilModificado.setID(user.getID());
-    	jsonPerfilModificado.setName("John");
-    	jsonPerfilModificado.setLastName("Marston");
-    	jsonPerfilModificado.setDepartment("Quality");
-    	jsonPerfilModificado.setCenter("Royal City");
-    	jsonPerfilModificado.setProfile("Scrum Master");
+        
+        admin = new Admin("admin", "example", "admin@example.com", PASSWORD_FUERTE);
+        
+        jsonPerfilModificado.setID(user.getID());
+        jsonPerfilModificado.setName("John");
+        jsonPerfilModificado.setLastName("Marston");
+        jsonPerfilModificado.setDepartment("Quality");
+        jsonPerfilModificado.setCenter("Royal City");
+        jsonPerfilModificado.setProfile("Scrum Master");
         
         Mockito.when(userDao.findByEmail(user.getEmail())).thenReturn(Optional.empty()); // Email no registrado
         Mockito.when(userDao.save(user)).thenReturn(user); // Simular guardado de usuario
@@ -72,8 +76,8 @@ class UserServiceTest {
 
     @Test
     void testRegistrarUserEmailYaRegistrado() {
-    	
-    	Optional<User> optionalUser = Optional.of(user);
+        
+        Optional<User> optionalUser = Optional.of(user);
         Mockito.when(userDao.findByEmail(user.getEmail())).thenReturn(optionalUser); // Simular que el email ya está registrado
         
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> 
@@ -81,29 +85,7 @@ class UserServiceTest {
         );
         assertEquals("El email ya está registrado", exception.getReason());
     }
-    /*
-    @Test
-    void testRegistrarUserPasswordDebil() {
-    	
-        user.setPassword(PASSWORD_DEBIL); // Contraseña débil
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> 
-            userService.registrarUser(user)
-        );
 
-        assertEquals("Formato de la contraseña incorrecto", exception.getReason());
-    }
-    
-    @Test
-    void testRegistrarUserEmailFormatoInvalido() {
-        user.setEmail("carlos.romero"); // Email con formato inválido
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> 
-            userService.registrarUser(user)
-        );
-
-        assertEquals("Formato del email incorrecto", exception.getReason());
-    }
-    */
-    
     @Test
     void testModificarUserExistente() {
         // Datos de prueba
@@ -127,7 +109,7 @@ class UserServiceTest {
 
     @Test
     void testModificarUserNoExistente() {
-    	User userModificado = new User();
+        User userModificado = new User();
         userModificado.setName(NUEVO_NOMBRE);
         userModificado.setEmail("romero@example.com");
 
@@ -227,8 +209,8 @@ class UserServiceTest {
 
     @Test
     void testModificarPerfilUserNoExistente() {
-    	User userModificado = new User();
-    	userModificado.setID(UUID.randomUUID());
+        User userModificado = new User();
+        userModificado.setID(UUID.randomUUID());
         userModificado.setName(NUEVO_NOMBRE);
         userModificado.setEmail("romero@example.com");
 

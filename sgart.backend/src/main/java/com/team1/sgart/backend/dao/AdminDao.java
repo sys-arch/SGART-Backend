@@ -10,7 +10,6 @@ import org.springframework.data.repository.query.Param;
 import java.util.UUID;
 
 import com.team1.sgart.backend.model.Admin;
-import com.team1.sgart.backend.model.User;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -36,8 +35,6 @@ public interface AdminDao extends  JpaRepository<Admin, UUID> {
 	        actualizarCampo(admin::setName, updatedAdmin.getName());
 	        actualizarCampo(admin::setLastName, updatedAdmin.getLastName());
 	        actualizarCampo(admin::setCenter, updatedAdmin.getCenter());
-	        actualizarCampo(admin::setEmail, updatedAdmin.getEmail());
-	        actualizarCampo(admin::setPassword, updatedAdmin.getPassword());
 
 	        // Guardar el admin actualizado
 	        return save(admin);

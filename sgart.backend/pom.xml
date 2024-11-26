@@ -120,6 +120,17 @@
 			<version>6.0.0</version>
 			<scope>provided</scope>
 		</dependency>
+		 <dependency>
+
+        <groupId>javax.servlet</groupId>
+
+        <artifactId>javax.servlet-api</artifactId>
+
+        <version>4.0.1</version>
+
+        <scope>provided</scope>
+
+    </dependency>
 
 		<dependency>
 			<groupId>com.mysql</groupId>
@@ -170,6 +181,12 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>org.mindrot</groupId>
+			<artifactId>jbcrypt</artifactId>
+			<version>0.4</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -189,8 +206,21 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<mainClass>com.team1.sgart.backend.App</mainClass>
+					<layout>JAR</layout>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
-
-
 </project>

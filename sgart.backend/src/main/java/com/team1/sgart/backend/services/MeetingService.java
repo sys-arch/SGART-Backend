@@ -5,7 +5,6 @@ import com.team1.sgart.backend.dao.InvitationsDao;
 import com.team1.sgart.backend.dao.LocationsDao;
 import com.team1.sgart.backend.dao.MeetingsDao;
 import com.team1.sgart.backend.model.Meetings;
-import com.team1.sgart.backend.model.MeetingsDTO;
 import com.team1.sgart.backend.model.User;
 
 import jakarta.transaction.Transactional;
@@ -44,9 +43,6 @@ public class MeetingService {
 		this.invitationsDao = invitationDao;
 		this.locationsDao = locationsDao;
 	}
-
-    @Autowired
-    private InvitationsDao invitationDao;
 
     // Método para crear la reunión
     public Meetings createMeeting(String meetingTitle, boolean meetingAllDay, LocalDate meetingDate, LocalTime meetingStartTime,
@@ -167,7 +163,7 @@ public class MeetingService {
 		
 		return true;
 	}
-
+	/*
 	// Método para cancelar una reunión si todas las invitaciones están rechazadas
 	public boolean cancelMeetingIfAllInvitationsRejected(UUID meetingId, UUID excludedInvitationId) {
 		
@@ -198,6 +194,6 @@ public class MeetingService {
 
 		return false;
 	}
-
+	*/
 
 }

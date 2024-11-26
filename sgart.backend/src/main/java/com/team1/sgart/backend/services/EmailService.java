@@ -19,7 +19,7 @@ public class EmailService {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(destinatary);
         message.setSubject("Recuperación de Contraseña");
-        message.setText("Haz clic en el siguiente enlace para restablecer tu contraseña: " + recoveryLink);
+        message.setText("Haz clic en el siguiente enlace para restablecer tu contraseña: " + recoveryLink + "\n\nEste enlace expirará en 15 minutos.");
         mailSender.send(message);
     }
 }
