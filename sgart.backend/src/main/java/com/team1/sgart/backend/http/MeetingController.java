@@ -21,8 +21,8 @@ import org.slf4j.LoggerFactory;
 @RequestMapping("api/meetings")
 public class MeetingController {
 	
-	private final MeetingService meetingService;
-	private final UserService userService;
+    private final MeetingService meetingService;
+    private final UserService userService;
     private static final Logger logger = LoggerFactory.getLogger(MeetingController.class);
 
     @Autowired

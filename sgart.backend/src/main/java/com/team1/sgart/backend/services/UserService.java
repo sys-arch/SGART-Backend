@@ -21,6 +21,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+import org.mindrot.jbcrypt.BCrypt;
+
 @Service
 @Transactional
 public class UserService {

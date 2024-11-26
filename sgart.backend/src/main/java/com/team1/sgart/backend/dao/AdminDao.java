@@ -45,7 +45,8 @@ public interface AdminDao extends  JpaRepository<Admin, UUID> {
             setter.accept(nuevoValor);
         }
     }
-    
+
+	@Modifying
     @Transactional
     void deleteByEmail(String email);  // Para eliminar por email
     

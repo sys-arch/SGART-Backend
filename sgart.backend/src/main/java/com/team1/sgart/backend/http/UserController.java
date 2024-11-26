@@ -135,21 +135,22 @@ public class UserController {
         }
     }
 
-	@PostMapping("/verificar-email")
-	public ResponseEntity<String> verificarEmail(@RequestBody User user) {
-		boolean existe = userService.emailYaRegistrado(user);
-		if (!existe) {
-			return ResponseEntity.status(HttpStatus.OK).body("El email no está registrado");
-		} else {
-			return ResponseEntity.status(HttpStatus.CONFLICT).body("El email está registrado");
-		}
-	}
 
-	@GetMapping("/cargarUsuarios")
-	public ResponseEntity<List<UserAbsenceDTO>> getAllUsers() {
-		List<UserAbsenceDTO> usersList = userService.loadUsers();
-		return ResponseEntity.ok(usersList);
-	}
+    @PostMapping("/verificar-email")
+    public ResponseEntity<String> verificarEmail(@RequestBody User user) {
+        boolean existe = userService.emailYaRegistrado(user);
+        if (!existe) {
+            return ResponseEntity.status(HttpStatus.OK).body("El email no está registrado");
+        } else {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("El email está registrado");
+        }
+    }
+
+    @GetMapping("/cargarUsuarios")
+    public ResponseEntity<List<UserAbsenceDTO>> getAllUsers() {
+        List<UserAbsenceDTO> usersList = userService.loadUsers();
+        return ResponseEntity.ok(usersList);
+    }
 
 	@GetMapping("/current/userId")
 	public ResponseEntity<Map<String, UUID>> getCurrentUserId(HttpSession session) {
@@ -178,5 +179,4 @@ public class UserController {
 		}
 
 	}
-
 }

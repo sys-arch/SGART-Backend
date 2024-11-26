@@ -5,6 +5,7 @@ import com.team1.sgart.backend.dao.InvitationsDao;
 import com.team1.sgart.backend.dao.LocationsDao;
 import com.team1.sgart.backend.dao.MeetingsDao;
 import com.team1.sgart.backend.model.Meetings;
+import com.team1.sgart.backend.model.MeetingsDTO;
 import com.team1.sgart.backend.model.User;
 
 import jakarta.transaction.Transactional;
@@ -195,5 +196,4 @@ public class MeetingService {
 		return false;
 	}
 	*/
-
 }
