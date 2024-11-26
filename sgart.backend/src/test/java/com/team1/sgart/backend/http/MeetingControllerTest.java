@@ -39,11 +39,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 
 @WebMvcTest(MeetingController.class)
 class MeetingControllerTest {
+	
+	private static final String URL_MEETINGS = "/api/meetings/";
+	private static final String URL_MODIFY = "/modify";
 
     @Autowired
     private MockMvc mockMvc;
@@ -195,7 +197,7 @@ class MeetingControllerTest {
         Mockito.doNothing().when(meetingService).modifyMeeting(Mockito.eq(meetingId), Mockito.any(Meetings.class));
 
         // Act & Assert
-        mockMvc.perform(post("/api/meetings/" + meetingId + "/modify")
+        mockMvc.perform(post(URL_MEETINGS + meetingId + URL_MODIFY)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(meetingJson))
                 .andExpect(status().isOk())
@@ -213,7 +215,7 @@ class MeetingControllerTest {
         Mockito.doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Reunión no encontrada"))
                 .when(meetingService).modifyMeeting(Mockito.eq(meetingId), Mockito.any(Meetings.class));
 
-        mockMvc.perform(post("/api/meetings/" + meetingId + "/modify")
+        mockMvc.perform(post(URL_MEETINGS + meetingId + URL_MODIFY)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(meetingJson))
                 .andExpect(status().isNotFound())
@@ -232,7 +234,7 @@ class MeetingControllerTest {
                 .when(meetingService).modifyMeeting(Mockito.eq(meetingId), Mockito.any(Meetings.class));
 
         // Act & Assert
-        mockMvc.perform(post("/api/meetings/" + meetingId + "/modify")
+        mockMvc.perform(post(URL_MEETINGS + meetingId + URL_MODIFY)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(meetingJson))
                 .andExpect(status().isConflict())

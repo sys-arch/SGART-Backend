@@ -4,9 +4,10 @@ public class TwoFactorAuth {
     private String mail;
     private String code;
 
-    // Constructor vacío
     // Esta vacio por si se usa jackson
-    public TwoFactorAuth() {}
+    public TwoFactorAuth() {/*Constructor por defecto*/
+    	
+    }
 
     // Getters y Setters
     public String getMail() {

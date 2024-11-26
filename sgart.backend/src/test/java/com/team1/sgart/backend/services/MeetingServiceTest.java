@@ -32,6 +32,9 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class MeetingServiceTest {
+	
+	private static final String MEETING_TITLE = "Team Meeting";
+	private static final String EXAMPLE_HOUR = "10:00";
 
 	@Mock
 	private MeetingsDao meetingDao;
@@ -72,19 +75,19 @@ class MeetingServiceTest {
 		User organizer = new User("organizer@example.com", "Organizer", "User", null, null, null, null, null, null,
 				false, false, null);
 		organizer.setID(idOrganizer);
-		Meetings meeting = new Meetings("Team Meeting", LocalDate.parse("2021-12-01"), false, LocalTime.parse("10:00"),
+		Meetings meeting = new Meetings(MEETING_TITLE, LocalDate.parse("2021-12-01"), false, LocalTime.parse(EXAMPLE_HOUR),
 				LocalTime.parse("11:00"), "Monthly sync", idOrganizer, UUID.randomUUID());
 
 		when(meetingDao.save(any(Meetings.class))).thenReturn(meeting);
 
 		// Llamada al servicio
-		Meetings createdMeeting = meetingService.createMeeting("Team Meeting", false, LocalDate.parse("2021-12-01"),
-				LocalTime.parse("10:00"), LocalTime.parse("11:00"), organizer.getName(), UUID.randomUUID(),
+		Meetings createdMeeting = meetingService.createMeeting(MEETING_TITLE, false, LocalDate.parse("2021-12-01"),
+				LocalTime.parse(EXAMPLE_HOUR), LocalTime.parse("11:00"), organizer.getName(), UUID.randomUUID(),
 				UUID.randomUUID());
 
 		// Verificaciones
 		assertNotNull(createdMeeting);
-		assertEquals("Team Meeting", createdMeeting.getMeetingTitle());
+		assertEquals(MEETING_TITLE, createdMeeting.getMeetingTitle());
 		assertEquals(organizer.getID(), createdMeeting.getOrganizerId());
 		verify(meetingDao, times(1)).save(any(Meetings.class));
 	}
@@ -114,7 +117,7 @@ class MeetingServiceTest {
 		User user = new User("user@example.com", "User", "Test", null, null, null, null, null, null, false, false,
 				null);
 		Meetings meeting = new Meetings("Project Kickoff", LocalDate.parse("2024-12-15"), false,
-				LocalTime.parse("09:00"), LocalTime.parse("10:00"), "", user.getID(), UUID.randomUUID());
+				LocalTime.parse("09:00"), LocalTime.parse(EXAMPLE_HOUR), "", user.getID(), UUID.randomUUID());
 		Invitations invitation = new Invitations(meeting, user, InvitationStatus.PENDIENTE.toString(), false, "");
 
 		when(invitationsDao.save(any(Invitations.class))).thenReturn(invitation);

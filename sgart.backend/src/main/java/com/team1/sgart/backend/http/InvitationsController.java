@@ -22,6 +22,7 @@ public class InvitationsController {
 
     private static final Logger logger = LoggerFactory.getLogger(InvitationsController.class);
     private final InvitationsService invitationsService;
+    private static final String USERID = "userId";
 
     @Autowired
     public InvitationsController(InvitationsService invitationsService) {
@@ -34,7 +35,7 @@ public class InvitationsController {
             @PathVariable UUID meetingId,
             @RequestBody Map<String, String> requestBody,
             HttpSession session) {
-        UUID userId = (UUID) session.getAttribute("userId");
+        UUID userId = (UUID) session.getAttribute(USERID);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -58,7 +59,7 @@ public class InvitationsController {
     public ResponseEntity<?> updateUserAttendance(
             @PathVariable UUID meetingId,
             HttpSession session) {
-        UUID userId = (UUID) session.getAttribute("userId");
+        UUID userId = (UUID) session.getAttribute(USERID);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -77,7 +78,7 @@ public class InvitationsController {
     public ResponseEntity<?> getUserAttendance(
             @PathVariable UUID meetingId,
             HttpSession session) {
-        UUID userId = (UUID) session.getAttribute("userId");
+        UUID userId = (UUID) session.getAttribute(USERID);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -98,7 +99,7 @@ public class InvitationsController {
             @PathVariable UUID meetingId,
             @RequestBody List<UUID> userIds,
             HttpSession session) {
-        UUID userId = (UUID) session.getAttribute("userId");
+        UUID userId = (UUID) session.getAttribute(USERID);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }

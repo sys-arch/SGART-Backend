@@ -50,16 +50,17 @@ public interface MeetingsDao extends JpaRepository<Meetings, UUID> {
 	}
 
 	@Query(value = """
-			SELECT m.meeting_id 
-			FROM SGART_MeetingsTable m
-			WHERE m.meeting_date = :meetingDate
-			AND (
-				CAST(CAST(:meetingDate AS DATETIME) + CAST(m.meeting_start_time AS DATETIME) AS DATETIME) < :meetingEndTime
-				AND CAST(CAST(:meetingDate AS DATETIME) + CAST(m.meeting_end_time AS DATETIME) AS DATETIME) > :meetingStartTime
-			 );
-				""", nativeQuery = true)
+            SELECT m.meeting_id 
+            FROM SGART_MeetingsTable m
+            WHERE m.meeting_date = :meetingDate
+            AND (
+                CAST(CAST(:meetingDate AS DATETIME) + CAST(m.meeting_start_time AS DATETIME) AS DATETIME) < :meetingEndTime
+                AND CAST(CAST(:meetingDate AS DATETIME) + CAST(m.meeting_end_time AS DATETIME) AS DATETIME) > :meetingStartTime
+                );
+            """, nativeQuery = true)
 	List<UUID> findConflictingMeetings(@Param("meetingDate") LocalDate meetingDate,
-			@Param("meetingStartTime") LocalTime meetingStartTime, @Param("meetingEndTime") LocalTime meetingEndTime);
+	        @Param("meetingStartTime") LocalTime meetingStartTime, 
+	        @Param("meetingEndTime") LocalTime meetingEndTime);
 
 	@Modifying
 	@Query(value = "DELETE FROM SGART_InvitationsTable WHERE meeting_id = :meetingId", nativeQuery = true)

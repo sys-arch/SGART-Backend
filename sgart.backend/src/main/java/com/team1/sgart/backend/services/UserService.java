@@ -21,19 +21,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
-import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
-import org.mindrot.jbcrypt.BCrypt;
-
 @Service
 @Transactional
 public class UserService {
     private static final int MAX_ATTEMPTS = 3;
-    private static final long BLOCK_TIME = 15 * 60 * 1000; // 15 minutos de bloqueo
+    private static final long BLOCK_TIME = (15 * 60 * 1000L); // 15 minutos de bloqueo
 
     private final UserDao userDao;
     private final AdminDao adminDao;

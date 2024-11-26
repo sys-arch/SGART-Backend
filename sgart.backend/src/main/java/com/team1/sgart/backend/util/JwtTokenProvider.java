@@ -21,7 +21,7 @@ import jakarta.annotation.PostConstruct;
 public class JwtTokenProvider {
 
     private SecretKey key;
-    private static final long EXPIRATION_TIME = (15 * 60) * 1000; // 15 minutos
+    private static final long EXPIRATION_TIME = ((15 * 60) * 1000L); // 15 minutos
 
     @Value("${jwt.secret}")
     private String secretKey;

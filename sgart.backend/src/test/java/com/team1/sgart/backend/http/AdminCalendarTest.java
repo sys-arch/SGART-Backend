@@ -16,7 +16,10 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class AdminCalendarTest {
+class AdminCalendarTest {
+	
+	private static final String ACCEPTED_STATUS = "Accepted";
+	private static final String EXAMPLE_NAME = "John Doe";
 
     @InjectMocks
     private AdminCalendarController controller;
@@ -29,7 +32,7 @@ public class AdminCalendarTest {
     }
 
     @Test
-    public void testGetAllMeetings() {
+    void testGetAllMeetings() {
         // Arrange
         MeetingsDTO mockMeeting = new MeetingsDTO(UUID.randomUUID(), "Test Meeting", false, LocalDate.parse("2024-12-15"),  LocalTime.parse("09:00"), LocalTime.parse("10:00"), "", UUID.randomUUID(), "", "");
         when(calendarService.loadMeetings()).thenReturn(Collections.singletonList(mockMeeting));
@@ -47,10 +50,10 @@ public class AdminCalendarTest {
     }
 
     @Test
-    public void testGetInvitees_ValidMeetingId() {
+    void testGetInvitees_ValidMeetingId() {
         // Arrange
         UUID meetingId = UUID.randomUUID();
-        InvitationsDTO mockInvitation = new InvitationsDTO(1, meetingId, UUID.randomUUID(), "John Doe", "Accepted", true, null);
+        InvitationsDTO mockInvitation = new InvitationsDTO(1, meetingId, UUID.randomUUID(), EXAMPLE_NAME, ACCEPTED_STATUS, true, null);
         when(calendarService.getDetailedInvitationsByMeetingId(meetingId)).thenReturn(Collections.singletonList(mockInvitation));
 
         Map<String, UUID> payload = new HashMap<>();
@@ -64,12 +67,12 @@ public class AdminCalendarTest {
         assertEquals(200, response.getStatusCodeValue());
         assertNotNull(response.getBody());
         assertEquals(1, response.getBody().size());
-        assertEquals("John Doe", response.getBody().get(0).getUserName());
+        assertEquals(EXAMPLE_NAME, response.getBody().get(0).getUserName());
         verify(calendarService, times(1)).getDetailedInvitationsByMeetingId(meetingId);
     }
 
     @Test
-    public void testGetInvitees_InvalidMeetingId() {
+    void testGetInvitees_InvalidMeetingId() {
         // Arrange
         Map<String, UUID> payload = new HashMap<>();
 
@@ -83,7 +86,7 @@ public class AdminCalendarTest {
     }
 
     @Test
-    public void testLoadMeetings_ServiceLayer() {
+    void testLoadMeetings_ServiceLayer() {
         // Arrange
         UUID meetingId = UUID.randomUUID();
         MeetingsDTO mockMeeting = new MeetingsDTO(
@@ -113,13 +116,13 @@ public class AdminCalendarTest {
 
 
     @Test
-    public void testGetDetailedInvitationsByMeetingId_ServiceLayer() {
+    void testGetDetailedInvitationsByMeetingId_ServiceLayer() {
         // Arrange
         UUID meetingId = UUID.randomUUID();
-        Object[] mockData = new Object[]{1, meetingId.toString(), UUID.randomUUID().toString(), "John", "Doe", "Accepted", true, null};
+        Object[] mockData = new Object[]{1, meetingId.toString(), UUID.randomUUID().toString(), "John", "Doe", ACCEPTED_STATUS, true, null};
         List<Object[]> mockResults = Collections.singletonList(mockData);
 
-        when(calendarService.getDetailedInvitationsByMeetingId(meetingId)).thenReturn(Collections.singletonList(new InvitationsDTO(1, meetingId, UUID.randomUUID(), "John Doe", "Accepted", true, null)));
+        when(calendarService.getDetailedInvitationsByMeetingId(meetingId)).thenReturn(Collections.singletonList(new InvitationsDTO(1, meetingId, UUID.randomUUID(), EXAMPLE_NAME, ACCEPTED_STATUS, true, null)));
 
         // Act
         List<InvitationsDTO> invitations = calendarService.getDetailedInvitationsByMeetingId(meetingId);
@@ -127,6 +130,6 @@ public class AdminCalendarTest {
         // Assert
         assertNotNull(invitations);
         assertEquals(1, invitations.size());
-        assertEquals("John Doe", invitations.get(0).getUserName());
+        assertEquals(EXAMPLE_NAME, invitations.get(0).getUserName());
     }
 }

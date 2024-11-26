@@ -18,10 +18,11 @@ import org.springframework.http.ResponseEntity;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
-public class AbsencesControllerTest {
+class AbsencesControllerTest {
+	
+	private static final String TEST_REASON = "Test Reason";
 
     @Mock
     private AbsencesDao absencesDao;
@@ -48,14 +49,14 @@ public class AbsencesControllerTest {
         absence.setAbsenceStartDate(LocalDate.now());
         absence.setAbsenceEndDate(LocalDate.now().plusDays(1));
         absence.setAbsenceAllDay(true);
-        absence.setAbsenceReason("Test Reason");
+        absence.setAbsenceReason(TEST_REASON);
         mockAbsences.add(absence);
 
         when(absencesDao.findByUserId(userId)).thenReturn(mockAbsences);
 
         List<AbsencesDTO> absencesDTOList = absencesService.getAbsencesByUser(userId);
         assertEquals(1, absencesDTOList.size());
-        assertEquals("Test Reason", absencesDTOList.get(0).getAbsenceReason());
+        assertEquals(TEST_REASON, absencesDTOList.get(0).getAbsenceReason());
 
         ResponseEntity<List<AbsencesDTO>> response = absencesController.getAbsencesByUser(userId);
         assertEquals(200, response.getStatusCodeValue());
@@ -80,7 +81,7 @@ public class AbsencesControllerTest {
         absenceDto.setUserId(userId);
         absenceDto.setAbsenceStartDate(LocalDate.now());
         absenceDto.setAbsenceEndDate(LocalDate.now().plusDays(1));
-        absenceDto.setAbsenceReason("Test Reason");
+        absenceDto.setAbsenceReason(TEST_REASON);
         absenceDto.setAbsenceAllDay(true);
 
         Absences mockAbsence = new Absences();
@@ -88,19 +89,19 @@ public class AbsencesControllerTest {
         mockAbsence.setUserId(userId);
         mockAbsence.setAbsenceStartDate(LocalDate.now());
         mockAbsence.setAbsenceEndDate(LocalDate.now().plusDays(1));
-        mockAbsence.setAbsenceReason("Test Reason");
+        mockAbsence.setAbsenceReason(TEST_REASON);
         mockAbsence.setAbsenceAllDay(true);
 
         when(absencesDao.save(any(Absences.class))).thenReturn(mockAbsence);
 
         AbsencesDTO createdAbsence = absencesService.createAbsence(absenceDto);
         assertNotNull(createdAbsence);
-        assertEquals("Test Reason", createdAbsence.getAbsenceReason());
+        assertEquals(TEST_REASON, createdAbsence.getAbsenceReason());
 
         ResponseEntity<AbsencesDTO> response = absencesController.createAbsence(absenceDto);
         assertEquals(200, response.getStatusCodeValue());
         assertNotNull(response.getBody());
-        assertEquals("Test Reason", response.getBody().getAbsenceReason());
+        assertEquals(TEST_REASON, response.getBody().getAbsenceReason());
     }
 
     @Test

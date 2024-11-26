@@ -2,8 +2,6 @@ package com.team1.sgart.backend.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team1.sgart.backend.model.Admin;
-import com.team1.sgart.backend.model.GenericUser;
-import com.team1.sgart.backend.model.Meetings;
 import com.team1.sgart.backend.model.User;
 import com.team1.sgart.backend.model.UserDTO;
 import com.team1.sgart.backend.services.UserService;
@@ -33,6 +31,7 @@ class UserControllerTest {
 	private static final String URLMODIFICAR = "/users/modificar";
 	private static final String URLLOGIN = "/users/login";
 	private static final String URLMODIFICAR_PERFIL = "/users/modificarPerfil";
+	private static final String USER_NOTFOUND = "Usuario no encontrado";
 	
     @Autowired
     private MockMvc mockMvc;
@@ -145,7 +144,7 @@ class UserControllerTest {
         ObjectMapper objectMapper = new ObjectMapper();
         String userJson = objectMapper.writeValueAsString(user);
         
-        Mockito.doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"))
+        Mockito.doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, USER_NOTFOUND))
                 .when(userService).modificarUser(Mockito.any(User.class));
         
         mockMvc.perform(post(URLMODIFICAR).contentType(MediaType.APPLICATION_JSON)
@@ -203,14 +202,14 @@ class UserControllerTest {
 
         // Simulando un usuario no encontrado (respondería un error 401)
         Mockito.when(userService.loginUser(Mockito.any(User.class), Mockito.any(HttpSession.class)))
-                .thenThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario no encontrado"));
+                .thenThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, USER_NOTFOUND));
 
-        mockMvc.perform(post("/users/login")
+        mockMvc.perform(post(URLLOGIN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(userJson)
-                .sessionAttr("session", new MockHttpSession())) // Agregar una sesión simulada
+                .sessionAttr("session", new MockHttpSession())) 
                 .andExpect(status().isUnauthorized())
-                .andExpect(content().string("Usuario no encontrado"));
+                .andExpect(content().string(USER_NOTFOUND));
     }
     
     // Tests para el método modificar perfil
@@ -228,13 +227,13 @@ class UserControllerTest {
 
     @Test
     void usuarioNoExistenteModificarPerfilDevuelve404() throws Exception {
-        Mockito.doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"))
+        Mockito.doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, USER_NOTFOUND))
                 .when(userService).modificarPerfilUser(Mockito.any(UserDTO.class));
 
-        mockMvc.perform(post("/users/modificarPerfil")
+        mockMvc.perform(post(URLMODIFICAR_PERFIL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(changesInProfile))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("Usuario no encontrado"));
+                .andExpect(content().string(USER_NOTFOUND));
     }
 }

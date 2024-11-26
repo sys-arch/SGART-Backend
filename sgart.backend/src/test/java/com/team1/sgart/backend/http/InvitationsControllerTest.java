@@ -22,6 +22,10 @@ import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.*;
 
 class InvitationsControllerTest {
+	
+	private static final String USER_ID = "userId";
+	private static final String ACCEPTED_STATUS = "Aceptada";
+	private static final String NEW_STATUS = "newStatus";
 
     @Mock
     private InvitationsService invitationsService;
@@ -43,14 +47,14 @@ class InvitationsControllerTest {
         userId = UUID.randomUUID();
         requestBody = new HashMap<>();
         session = mock(HttpSession.class);
-        when(session.getAttribute("userId")).thenReturn(userId);
+        when(session.getAttribute(USER_ID)).thenReturn(userId);
     }
 
     @Test
     void updateInvitationStatus_WhenSuccessful_ReturnsOk() {
         // Arrange
-        requestBody.put("newStatus", "Aceptada");
-        when(session.getAttribute("userId")).thenReturn(userId);
+        requestBody.put(NEW_STATUS, ACCEPTED_STATUS);
+        when(session.getAttribute(USER_ID)).thenReturn(userId);
         when(invitationsService.updateInvitationStatus(any(), any(), any(), any())).thenReturn(true);
 
         // Act
@@ -64,8 +68,8 @@ class InvitationsControllerTest {
     @Test
     void updateInvitationStatus_WhenNotFound_ReturnsNotFound() {
         // Arrange
-        requestBody.put("newStatus", "Aceptada");
-        when(session.getAttribute("userId")).thenReturn(userId);
+        requestBody.put(NEW_STATUS, ACCEPTED_STATUS);
+        when(session.getAttribute(USER_ID)).thenReturn(userId);
         when(invitationsService.updateInvitationStatus(any(), any(), any(), any())).thenReturn(false);
 
         // Act
@@ -79,9 +83,9 @@ class InvitationsControllerTest {
     @Test
     void updateInvitationStatus_WhenRejected_ReturnsOk() {
         // Arrange
-        requestBody.put("newStatus", "Rechazada");
+        requestBody.put(NEW_STATUS, "Rechazada");
         requestBody.put("comment", "No puedo asistir");
-        when(session.getAttribute("userId")).thenReturn(userId);
+        when(session.getAttribute(USER_ID)).thenReturn(userId);
         when(invitationsService.updateInvitationStatus(any(), any(), any(), any())).thenReturn(true);
 
         // Act
@@ -95,8 +99,8 @@ class InvitationsControllerTest {
     @Test
     void updateInvitationStatus_WhenServiceThrowsException_ReturnsBadRequest() {
         // Arrange
-        requestBody.put("newStatus", "Aceptada");
-        when(session.getAttribute("userId")).thenReturn(userId);
+        requestBody.put(NEW_STATUS, ACCEPTED_STATUS);
+        when(session.getAttribute(USER_ID)).thenReturn(userId);
         when(invitationsService.updateInvitationStatus(any(), any(), any(), any()))
             .thenThrow(new RuntimeException("Error"));
 
@@ -113,8 +117,8 @@ class InvitationsControllerTest {
     @Test
     void updateInvitationStatus_WhenInvalidStatus_ReturnsBadRequest() {
         // Arrange
-        requestBody.put("newStatus", "InvalidStatus");
-        when(session.getAttribute("userId")).thenReturn(userId);
+        requestBody.put(NEW_STATUS, "InvalidStatus");
+        when(session.getAttribute(USER_ID)).thenReturn(userId);
         when(invitationsService.updateInvitationStatus(any(), any(), any(), any()))
             .thenThrow(new IllegalArgumentException("Invalid status"));
 

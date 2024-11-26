@@ -34,8 +34,10 @@ public class Absences {
 
     @Column(name = "absence_reason", length = 255)
     private String absenceReason;
-
-    public Absences() {}
+    
+    public Absences() { /*Constructor por defecto*/
+    	
+    }
 
     // Getters and Setters
     public UUID getAbsenceId() {

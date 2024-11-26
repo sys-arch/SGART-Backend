@@ -27,6 +27,7 @@ public class UserCalendarController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserCalendarController.class);
     private final CalendarService calendarService;
+    private static final String USER_ID = "userId";
 
     @Autowired
     public UserCalendarController(CalendarService calendarService) {
@@ -36,7 +37,7 @@ public class UserCalendarController {
     
     @GetMapping("/meetings")
     public ResponseEntity<List<MeetingsDTO>> loadMeetings(HttpSession session) {
-        UUID userId = (UUID) session.getAttribute("userId");
+        UUID userId = (UUID) session.getAttribute(USER_ID);
         logger.info("User ID: {}", userId);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -49,7 +50,7 @@ public class UserCalendarController {
 
     @PostMapping("/invitados")
     public ResponseEntity<List<InvitationsDTO>> loadInvitees(@RequestBody UUID meetingId, HttpSession session) {
-        UUID userId = (UUID) session.getAttribute("userId");
+        UUID userId = (UUID) session.getAttribute(USER_ID);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -66,7 +67,7 @@ public class UserCalendarController {
     
     @GetMapping("/organized-meetings")
     public ResponseEntity<List<MeetingsDTO>> loadOrganizedMeetings(HttpSession session) {
-        UUID userId = (UUID) session.getAttribute("userId");
+        UUID userId = (UUID) session.getAttribute(USER_ID);
         logger.info("User ID: {}", userId);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

@@ -21,6 +21,9 @@ import com.team1.sgart.backend.model.User;
 
 @ExtendWith(MockitoExtension.class)
 public class AdminServiceTest {
+	
+	private static final String USER_EMAIL = "user@dominio.com";
+	private static final String EXAMPLE_EMAIL = "test@example.com";
 
 	@Mock
 	private UserDao userDAO;
@@ -32,9 +35,9 @@ public class AdminServiceTest {
 	private AdminService adminService;
 
 	@Test
-	public void testValidarUsuario_UserNotFound() {
+	void testValidarUsuario_UserNotFound() {
 		// Simular que el usuario no existe
-		String userEmail = "user@dominio.com";
+		String userEmail = USER_EMAIL;
 		Mockito.when(userDAO.findByEmail(userEmail)).thenReturn(Optional.empty());
 
 		// Ejecutar el test y esperar una excepción
@@ -47,9 +50,9 @@ public class AdminServiceTest {
 	}
 
 	@Test
-	public void testValidarUsuario_UsuarioYaValidado() {
+	void testValidarUsuario_UsuarioYaValidado() {
 		// Simular que el usuario existe y ya está validado
-		String userEmail = "user@dominio.com";
+		String userEmail = USER_EMAIL;
 		User user = new User();
 		user.setEmail(userEmail);
 		Mockito.when(userDAO.findByEmail(userEmail)).thenReturn(Optional.of(user));
@@ -65,9 +68,9 @@ public class AdminServiceTest {
 	}
 
 	@Test
-	public void testValidarUsuario_Exito() {
+	void testValidarUsuario_Exito() {
 		// Simular que el usuario existe y no está validado
-		String userEmail = "user@dominio.com";
+		String userEmail = USER_EMAIL;
 		User user = new User();
 		user.setEmail(userEmail);
 		Mockito.when(userDAO.findByEmail(userEmail)).thenReturn(Optional.of(user));
@@ -91,8 +94,8 @@ public class AdminServiceTest {
 	 */
 
 	@Test
-	public void testEliminarUsuarioPorEmail_UsuarioExiste() {
-		String userEmail = "test@example.com";
+	void testEliminarUsuarioPorEmail_UsuarioExiste() {
+		String userEmail = EXAMPLE_EMAIL;
 		lenient().when(userDAO.findByEmail(userEmail)).thenReturn(Optional.of(new User()));
 
 		adminService.eliminarUsuarioPorEmail(userEmail);
@@ -101,8 +104,8 @@ public class AdminServiceTest {
 	}
 
 	@Test
-    public void testBloquearUsuario_UsuarioNoBloqueado() {
-        String userEmail = "test@example.com";
+    void testBloquearUsuario_UsuarioNoBloqueado() {
+        String userEmail = EXAMPLE_EMAIL;
         User user = new User();
         user.setBlocked(false); // Usuario inicialmente no bloqueado
 
@@ -115,8 +118,8 @@ public class AdminServiceTest {
     }
 
     @Test
-    public void testDesbloquearUsuario_UsuarioBloqueado() {
-        String userEmail = "test@example.com";
+    void testDesbloquearUsuario_UsuarioBloqueado() {
+        String userEmail = EXAMPLE_EMAIL;
         User user = new User();
         user.setBlocked(true); // Usuario inicialmente bloqueado
 

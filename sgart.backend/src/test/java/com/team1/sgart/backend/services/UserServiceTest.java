@@ -33,6 +33,8 @@ class UserServiceTest {
     private static final String FECHA_CORRECTA = "01/01/2024";
     private static final String PASSWORD_INCORRECTO = "wrongPassword";
     private static final String EMAIL_USUARIO = "carlos.romero@example.com";
+    private static final String EMAIL_ADMIN = "admin@example.com";
+    private static final String DEPARTAMENTO = "Quality";
 
     @Autowired
     private UserService userService;
@@ -52,15 +54,15 @@ class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        user = new User("carlos.romero@example.com", "Carlos", "Romero Navarro", "Quality", "Ciudad Real", FECHA_CORRECTA, 
+        user = new User(EMAIL_USUARIO, "Carlos", "Romero Navarro", DEPARTAMENTO, "Ciudad Real", FECHA_CORRECTA, 
                 "Scrum Developer", PASSWORD_FUERTE, PASSWORD_FUERTE, false, false, "");
         
-        admin = new Admin("admin", "example", "admin@example.com", PASSWORD_FUERTE);
+        admin = new Admin("admin", "example", EMAIL_ADMIN, PASSWORD_FUERTE);
         
         jsonPerfilModificado.setID(user.getID());
         jsonPerfilModificado.setName("John");
         jsonPerfilModificado.setLastName("Marston");
-        jsonPerfilModificado.setDepartment("Quality");
+        jsonPerfilModificado.setDepartment(DEPARTAMENTO);
         jsonPerfilModificado.setCenter("Royal City");
         jsonPerfilModificado.setProfile("Scrum Master");
         
@@ -92,7 +94,7 @@ class UserServiceTest {
         Optional<User> optionalUser = Optional.of(user);
 
         User userModificado = new User();
-        userModificado.setEmail("carlos.romero@example.com");
+        userModificado.setEmail(EMAIL_USUARIO);
         userModificado.setName(NUEVO_NOMBRE);
 
         // Configurar los mocks
@@ -121,8 +123,8 @@ class UserServiceTest {
     @Test
     void testLoginUsuarioValido() {
         Optional<User> optionalUser = Optional.of(user);
-        Mockito.when(userDao.findByEmailAndPassword("carlos.romero@example.com", PASSWORD_FUERTE)).thenReturn(optionalUser);
-        Mockito.when(userDao.findByEmail("carlos.romero@example.com")).thenReturn(optionalUser);
+        Mockito.when(userDao.findByEmailAndPassword(EMAIL_USUARIO, PASSWORD_FUERTE)).thenReturn(optionalUser);
+        Mockito.when(userDao.findByEmail(EMAIL_USUARIO)).thenReturn(optionalUser);
 
         // Ejecución
         GenericUser resultado = userService.loginUser(user, new MockHttpSession());
@@ -135,12 +137,12 @@ class UserServiceTest {
     @Test
     void testLoginAdminValidoDevuelveAdmin() {
         Optional<Admin> optionalAdmin = Optional.of(admin);
-        Mockito.when(adminDao.findByEmailAndPassword("admin@example.com", PASSWORD_FUERTE)).thenReturn(optionalAdmin);
-        Mockito.when(adminDao.findByEmail("admin@example.com")).thenReturn(optionalAdmin);
+        Mockito.when(adminDao.findByEmailAndPassword(EMAIL_ADMIN, PASSWORD_FUERTE)).thenReturn(optionalAdmin);
+        Mockito.when(adminDao.findByEmail(EMAIL_ADMIN)).thenReturn(optionalAdmin);
 
         // Ejecución
         User adminUser = new User();
-        adminUser.setEmail("admin@example.com");
+        adminUser.setEmail(EMAIL_ADMIN);
         adminUser.setPassword(PASSWORD_FUERTE);
         GenericUser resultado = userService.loginUser(adminUser, new MockHttpSession());
         Admin adminLogged = (Admin) resultado;
@@ -201,7 +203,7 @@ class UserServiceTest {
         // Verificar que el perfil ha sido actualizado
         assertEquals("John", user.getName());
         assertEquals("Marston", user.getLastName());
-        assertEquals("Quality", user.getDepartment());
+        assertEquals(DEPARTAMENTO, user.getDepartment());
         assertEquals("Royal City", user.getCenter());
         assertEquals("Scrum Master", user.getProfile());
         Mockito.verify(userDao).save(user); // Verificar que el perfil ha sido actualizado

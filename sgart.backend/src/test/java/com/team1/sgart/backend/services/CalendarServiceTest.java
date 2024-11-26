@@ -23,7 +23,10 @@ import com.team1.sgart.backend.model.MeetingsDTO;
 import com.team1.sgart.backend.model.Invitations;
 
 @ExtendWith(MockitoExtension.class)
-public class CalendarServiceTest {
+class CalendarServiceTest {
+	
+	private static final String MEETING_TITLE = "Test Meeting";
+	private static final String MEETING_LOCATION = "Test Location";
 
     @Mock
     private MeetingsDao meetingsDao;
@@ -53,7 +56,7 @@ public class CalendarServiceTest {
 
         mockMeeting = new Meetings();
         mockMeeting.setMeetingId(meetingId);
-        mockMeeting.setMeetingTitle("Test Meeting");
+        mockMeeting.setMeetingTitle(MEETING_TITLE);
         mockMeeting.setMeetingAllDay(false);
         mockMeeting.setMeetingStartTime(LocalTime.of(9, 0));
         mockMeeting.setMeetingEndTime(LocalTime.of(10, 0));
@@ -72,7 +75,7 @@ public class CalendarServiceTest {
 
         Meetings mockMeeting = new Meetings();
         mockMeeting.setMeetingId(meetingId);
-        mockMeeting.setMeetingTitle("Test Meeting");
+        mockMeeting.setMeetingTitle(MEETING_TITLE);
         mockMeeting.setMeetingAllDay(false);
         mockMeeting.setMeetingStartTime(LocalTime.of(10, 0));
         mockMeeting.setMeetingEndTime(LocalTime.of(11, 0));
@@ -85,7 +88,7 @@ public class CalendarServiceTest {
 
         when(meetingsDao.findAll()).thenReturn(mockMeetings);
         when(userDao.findUserFullNameById(organizerId)).thenReturn("Test Organizer");
-        when(locationsService.getLocationById(locationId)).thenReturn("Test Location");
+        when(locationsService.getLocationById(locationId)).thenReturn(MEETING_LOCATION);
 
         // Act
         List<MeetingsDTO> result = calendarService.loadMeetings();
@@ -95,9 +98,9 @@ public class CalendarServiceTest {
         assertEquals(1, result.size());
         MeetingsDTO resultDTO = result.get(0);
         assertEquals(meetingId, resultDTO.getMeetingId());
-        assertEquals("Test Meeting", resultDTO.getMeetingTitle());
+        assertEquals(MEETING_TITLE, resultDTO.getMeetingTitle());
         assertEquals("Test Organizer", resultDTO.getOrganizerName());
-        assertEquals("Test Location", resultDTO.getLocationName());
+        assertEquals(MEETING_LOCATION, resultDTO.getLocationName());
         verify(meetingsDao).findAll();
         verify(userDao).findUserFullNameById(organizerId);
         verify(locationsService).getLocationById(locationId);
@@ -111,7 +114,7 @@ public class CalendarServiceTest {
         
         when(invitationsDao.findByUserId(userId)).thenReturn(List.of(mockInvitation));
         when(meetingsDao.findAllById(List.of(meetingId))).thenReturn(List.of(mockMeeting));
-        when(locationsService.getLocationById(locationId)).thenReturn("Test Location");
+        when(locationsService.getLocationById(locationId)).thenReturn(MEETING_LOCATION);
 
         // Act
         List<MeetingsDTO> result = calendarService.getMeetingsByUserId(userId);
@@ -121,8 +124,8 @@ public class CalendarServiceTest {
         assertEquals(1, result.size());
         MeetingsDTO resultDTO = result.get(0);
         assertEquals(meetingId, resultDTO.getMeetingId());
-        assertEquals("Test Meeting", resultDTO.getMeetingTitle());
-        assertEquals("Test Location", resultDTO.getLocationName());
+        assertEquals(MEETING_TITLE, resultDTO.getMeetingTitle());
+        assertEquals(MEETING_LOCATION, resultDTO.getLocationName());
         verify(invitationsDao).findByUserId(userId);
         verify(meetingsDao).findAllById(anyList());
         verify(locationsService).getLocationById(locationId);

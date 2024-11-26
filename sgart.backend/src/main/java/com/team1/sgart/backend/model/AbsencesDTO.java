@@ -32,7 +32,9 @@ public class AbsencesDTO {
     @JsonProperty("absenceReason")
     private String absenceReason;
 
-    public AbsencesDTO() {}
+    public AbsencesDTO() {
+    	/*Constructor por defecto*/
+    }
 
     // Getters and Setters
     public UUID getAbsenceId() {

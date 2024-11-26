@@ -7,7 +7,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,7 +17,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.team1.sgart.backend.model.PasswordResetDTO;
 import com.team1.sgart.backend.model.TwoFactorAuth;
-import com.team1.sgart.backend.model.User;
 import com.team1.sgart.backend.services.EmailService;
 import com.team1.sgart.backend.services.TwoFactorAuthService;
 import com.team1.sgart.backend.services.UserService;

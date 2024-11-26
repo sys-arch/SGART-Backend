@@ -25,6 +25,7 @@ public class UserController {
 
 	private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 	private UserService userService;
+	private static final String USER_ID = "userId";
 
 	@Autowired
 	UserController(UserService userService) {
@@ -73,7 +74,7 @@ public class UserController {
                 }
 
                 // Guardar el ID en la sesión
-                session.setAttribute("userId", userIdFromDb);
+                session.setAttribute(USER_ID, userIdFromDb);
 
                 // Mapear datos del usuario a un DTO
                 UserDTO userDTO = new UserDTO();
@@ -108,7 +109,7 @@ public class UserController {
                 }
 
                 // Guardar el ID en la sesión
-                session.setAttribute("userId", adminIdFromDb);
+                session.setAttribute(USER_ID, adminIdFromDb);
 
                 // Mapear datos del administrador a un DTO
                 AdminDTO adminDTO = new AdminDTO();
@@ -154,18 +155,18 @@ public class UserController {
 
 	@GetMapping("/current/userId")
 	public ResponseEntity<Map<String, UUID>> getCurrentUserId(HttpSession session) {
-		UUID userId = (UUID) session.getAttribute("userId");
+		UUID userId = (UUID) session.getAttribute(USER_ID);
 		if (userId == null) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		}
 		Map<String, UUID> response = new HashMap<>();
-		response.put("userId", userId);
+		response.put(USER_ID, userId);
 		return ResponseEntity.ok(response);
 	}
 
 	@GetMapping("/current/user")
 	public ResponseEntity<User> getCurrentUser(HttpSession session) {
-		UUID userId = (UUID) session.getAttribute("userId");
+		UUID userId = (UUID) session.getAttribute(USER_ID);
 		if (userId == null) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		}
