@@ -10,7 +10,6 @@ import org.springframework.data.repository.query.Param;
 import java.util.UUID;
 
 import com.team1.sgart.backend.model.Admin;
-import com.team1.sgart.backend.model.User;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;

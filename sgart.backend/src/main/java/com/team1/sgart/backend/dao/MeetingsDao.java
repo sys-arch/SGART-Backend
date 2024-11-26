@@ -68,6 +68,4 @@ public interface MeetingsDao extends JpaRepository<Meetings, UUID> {
 	@Modifying
 	@Query(value = "DELETE FROM SGART_MeetingsTable WHERE meeting_id = :meetingId", nativeQuery = true)
 	void deleteMeetingById(@Param("meetingId") UUID meetingId);
-
 }
-

@@ -110,5 +110,8 @@ public interface InvitationsDao extends JpaRepository<Invitations, Integer> {
         @Param("status") String status,
         @Param("comment") String comment
     );
+    
+    @Query("SELECT i FROM Invitations i WHERE i.meeting.meetingId = :meetingId AND i.invitation_id <> :excludedInvitationId")
+    List<Invitations> findByMeetingIdAndInvitationIdNot(UUID meetingId, UUID excludedInvitationId);
 
 }

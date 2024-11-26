@@ -21,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
@@ -43,9 +44,6 @@ public class MeetingService {
 		this.invitationsDao = invitationDao;
 		this.locationsDao = locationsDao;
 	}
-
-    @Autowired
-    private InvitationsDao invitationDao;
 
     // Método para crear la reunión
     public Meetings createMeeting(String meetingTitle, boolean meetingAllDay, LocalDate meetingDate, LocalTime meetingStartTime,
@@ -95,67 +93,62 @@ public class MeetingService {
         return invitationsDao.findDetailedInvitationsByMeetingId(meetingId);
     }
     
-    // Modificar las reuniones
-    public void modifyMeeting(UUID idMeeting, Meetings updatedMeeting) {
-		Meetings meeting;
-		//Comprobamos si la reunión existe
-		if (!meetingDao.findById(idMeeting).isPresent()) {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "El organizador tiene una reunión en el nuevo tramo");
-		}
-		
-		else {
-			 meeting = meetingDao.findById(idMeeting).get();
-		}	
-		//Se revisan las reuniones del organizador, si tiene una reunión en el nuevo tramo, error de no permitido
-		List<UUID> conflictingMeetings = meetingDao.findConflictingMeetings(updatedMeeting.getMeetingDate(),
-				updatedMeeting.getMeetingStartTime(), updatedMeeting.getMeetingEndTime());
-		if (!conflictingMeetings.isEmpty()) {
-			throw new ResponseStatusException(HttpStatus.CONFLICT, "El organizador tiene una reunión en el nuevo tramo");
-		}
-		else if(isWithin24Hours(LocalTime.now(), updatedMeeting.getMeetingStartTime(), LocalDate.now(), updatedMeeting.getMeetingDate())) {
-			throw new ResponseStatusException(HttpStatus.CONFLICT, "No se puede modificar una reunión con menos de 24 horas de antelación");
-		}
-		else 
-		{
-			// Se revisan las reuniones de los invitados, si tienen una reunión en el nuevo tramo, se elimina al invitado de la reunión
-			List<UUID> attendees = invitationsDao.findUserIdsByMeetingId(idMeeting); //Crear método para extraer de la tabla de invitaciones
-			for (UUID attendee : attendees) {
-				for (UUID idMeetingSearch : conflictingMeetings) {
-					// Si el usuario tiene una reunión en el nuevo tramo, se elimina de la reunión
-					if (invitationsDao.checkUserHaveMeeting(attendee, idMeetingSearch) > 0) {
-						// Eliminar al invitado de la tabla de reuniones
-						invitationsDao.deleteByMeetingIdAndUserId(attendee, idMeetingSearch);
-					}
-				}
-				conflictingMeetings = meetingDao.findConflictingMeetings(updatedMeeting.getMeetingDate(),
-						updatedMeeting.getMeetingStartTime(), updatedMeeting.getMeetingEndTime());
-				if (!conflictingMeetings.isEmpty()) {
-					//Eliminar al invitado de la tabla de reunioines
-				}
-			}
-		}
-		
-		meetingDao.updateMeeting(meeting, updatedMeeting);
-	}
+ // Modificar las reuniones
+ 	public void modifyMeeting(UUID idMeeting, Meetings updatedMeeting) {
+ 		Meetings meeting;
+ 		// Comprobamos si la reunión existe
+ 		if (!meetingDao.findById(idMeeting).isPresent()) {
+ 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Reunión no encontrada");
+ 		}
+
+ 		else {
+ 			meeting = meetingDao.findById(idMeeting).get();
+ 		}
+ 		// Se revisan las reuniones del organizador, si tiene una reunión en el nuevo
+ 		// tramo, error de no permitido
+ 		List<UUID> conflictingMeetings = meetingDao.findConflictingMeetings(updatedMeeting.getMeetingDate(),
+ 				updatedMeeting.getMeetingStartTime(), updatedMeeting.getMeetingEndTime());
+ 		if (!conflictingMeetings.isEmpty()) {
+ 			throw new ResponseStatusException(HttpStatus.CONFLICT,
+ 					"El organizador tiene una reunión en el nuevo tramo");
+ 		} else if (isWithin24Hours(LocalTime.now(), updatedMeeting.getMeetingStartTime(), LocalDate.now(),
+ 				updatedMeeting.getMeetingDate())) {
+ 			throw new ResponseStatusException(HttpStatus.CONFLICT,
+ 					"No se puede modificar una reunión con menos de 24 horas de antelación");
+ 		} else {
+ 			// Se revisan las reuniones de los invitados, si tienen una reunión en el nuevo
+ 			// tramo, se elimina al invitado de la reunión
+ 			List<UUID> attendees = invitationsDao.findUserIdsByMeetingId(idMeeting); // Crear método para extraer de la
+ 																						// tabla de invitaciones
+ 			for (UUID attendee : attendees) {
+ 				for (UUID idMeetingSearch : conflictingMeetings) {
+ 					// Si el usuario tiene una reunión en el nuevo tramo, se elimina de la reunión
+ 					if (invitationsDao.checkUserHaveMeeting(attendee, idMeetingSearch) > 0) {
+ 						// Eliminar al invitado de la tabla de reuniones
+ 						invitationsDao.deleteByMeetingIdAndUserId(attendee, idMeetingSearch);
+ 					}
+ 				}
+ 				conflictingMeetings = meetingDao.findConflictingMeetings(updatedMeeting.getMeetingDate(),
+ 						updatedMeeting.getMeetingStartTime(), updatedMeeting.getMeetingEndTime());
+ 				if (!conflictingMeetings.isEmpty()) {
+ 					// Eliminar al invitado de la tabla de reunioines
+ 				}
+ 			}
+ 		}
+
+ 		meetingDao.updateMeeting(meeting, updatedMeeting);
+ 	}
 
     public boolean isWithin24Hours(LocalTime nowTime, LocalTime targetTime, LocalDate nowDate, LocalDate targetDate) {
-        
-    	long hoursDifference = 0;
-    	long daysBetween = nowDate.until(targetDate).getDays();
-    	boolean available = false;
-    	//Comprobamos si el día de la reunión es el mismo que el actual o es el siguiente
-    	if (daysBetween == 1 ) {
-			// Calculamos la duración entre los dos tiempos
-	        Duration duration = Duration.between(nowTime, targetTime);
-	        // Obtenemos la diferencia en horas absolutas
-	        hoursDifference = Math.abs(duration.toHours());
-			if (hoursDifference < 24) {
-				available = true;
-			}
-		}
-    	
-    	return available;
-    }
+		LocalDateTime nowDateTime = LocalDateTime.of(nowDate, nowTime);
+		LocalDateTime targetDateTime = LocalDateTime.of(targetDate, targetTime);
+
+		Duration duration = Duration.between(nowDateTime, targetDateTime);
+		long hoursDifference = duration.toHours();
+
+		return hoursDifference < 24;
+	}
+    
 	// Método para cancelar una reunión MANUAL por organizador
 	@Transactional
 	public boolean cancelMeetingByOrganizer(UUID meetingId) {
@@ -203,5 +196,4 @@ public class MeetingService {
 		return false;
 	}
 	*/
-
 }

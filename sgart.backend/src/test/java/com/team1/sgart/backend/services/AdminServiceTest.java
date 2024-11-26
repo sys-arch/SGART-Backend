@@ -13,11 +13,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.team1.sgart.backend.dao.InvitationsDao;
 import com.team1.sgart.backend.dao.UserDao;
 import com.team1.sgart.backend.model.User;
 
@@ -26,6 +24,9 @@ public class AdminServiceTest {
 
 	@Mock
 	private UserDao userDAO;
+	
+	@Mock
+	private InvitationsDao invitationsDAO;
 
 	@InjectMocks
 	private AdminService adminService;

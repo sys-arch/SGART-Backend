@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;
@@ -19,7 +20,7 @@ import org.slf4j.LoggerFactory;
 @RestController
 @RequestMapping("api/meetings")
 public class MeetingController {
-
+	
     private final MeetingService meetingService;
     private final UserService userService;
     private static final Logger logger = LoggerFactory.getLogger(MeetingController.class);
@@ -56,19 +57,27 @@ public class MeetingController {
 
     // Obtener los asistentes a una reunión
     @GetMapping("/{meetingId}/attendees")
-    public List<UUID> getAttendees(@PathVariable("meetingId") UUID meetingId) {
-        Meetings meeting = meetingService.getMeetingById(meetingId)
-                .orElseThrow(() -> new RuntimeException("ERROR: Reunión no encontrada"));
-        return meetingService.getAttendeesForMeeting(meeting);
+    public ResponseEntity<List<UUID>> getAttendees(@PathVariable("meetingId") UUID meetingId) {
+        try {
+            Meetings meeting = meetingService.getMeetingById(meetingId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reunión no encontrada"));
+            List<UUID> attendees = meetingService.getAttendeesForMeeting(meeting);
+            return ResponseEntity.ok(attendees);
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(null);
+        }
     }
 
     // Editar una reunión
     @PostMapping("/{meetingId}/modify")
     public ResponseEntity<String> editMeeting(@PathVariable("meetingId") UUID meetingId,
-            @RequestBody Meetings changeMeeting) {
-
-        meetingService.modifyMeeting(meetingId, changeMeeting);
-        return ResponseEntity.status(HttpStatus.OK).body("Reunión modificada correctamente");
+                                              @RequestBody Meetings changeMeeting) {
+        try {
+            meetingService.modifyMeeting(meetingId, changeMeeting);
+            return ResponseEntity.status(HttpStatus.OK).body("Reunión modificada correctamente");
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
+        }
     }
 
     @DeleteMapping("/{meetingId}/cancel")
