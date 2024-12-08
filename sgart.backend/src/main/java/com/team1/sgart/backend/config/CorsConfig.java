@@ -8,13 +8,17 @@ import org.springframework.lang.NonNull;
 @Configuration
 public class CorsConfig implements WebMvcConfigurer {
 
+   
     @Override
     public void addCorsMappings(@NonNull CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("https://sgart-v1.web.app")
+                .allowedOrigins(
+                        "https://sgart-v1.web.app", // Producción
+                        "http://localhost:3000"    // Desarrollo
+                )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
-                .allowCredentials(true)
+                .allowCredentials(true) // Permitir credenciales
                 .maxAge(3600);
     }
 }
