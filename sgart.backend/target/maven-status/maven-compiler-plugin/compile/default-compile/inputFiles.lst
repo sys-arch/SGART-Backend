@@ -2,6 +2,7 @@ C:\Users\luise\OneDrive\Documentos\Curso\24-25\PRACTICA-4º\Sprint3\SGART-Backen
 C:\Users\luise\OneDrive\Documentos\Curso\24-25\PRACTICA-4º\Sprint3\SGART-Backend\sgart.backend\src\main\java\com\team1\sgart\backend\dao\AdminDao.java
 C:\Users\luise\OneDrive\Documentos\Curso\24-25\PRACTICA-4º\Sprint3\SGART-Backend\sgart.backend\src\main\java\com\team1\sgart\backend\http\InvitationsController.java
 C:\Users\luise\OneDrive\Documentos\Curso\24-25\PRACTICA-4º\Sprint3\SGART-Backend\sgart.backend\src\main\java\com\team1\sgart\backend\http\TwoFactorAuthController.java
+C:\Users\luise\OneDrive\Documentos\Curso\24-25\PRACTICA-4º\Sprint3\SGART-Backend\sgart.backend\src\main\java\com\team1\sgart\backend\config\SecurityConfig.java
 C:\Users\luise\OneDrive\Documentos\Curso\24-25\PRACTICA-4º\Sprint3\SGART-Backend\sgart.backend\src\main\java\com\team1\sgart\backend\http\AbsencesController.java
 C:\Users\luise\OneDrive\Documentos\Curso\24-25\PRACTICA-4º\Sprint3\SGART-Backend\sgart.backend\src\main\java\com\team1\sgart\backend\model\GenericUser.java
 C:\Users\luise\OneDrive\Documentos\Curso\24-25\PRACTICA-4º\Sprint3\SGART-Backend\sgart.backend\src\main\java\com\team1\sgart\backend\model\Absences.java
@@ -23,6 +24,8 @@ C:\Users\luise\OneDrive\Documentos\Curso\24-25\PRACTICA-4º\Sprint3\SGART-Backen
 C:\Users\luise\OneDrive\Documentos\Curso\24-25\PRACTICA-4º\Sprint3\SGART-Backend\sgart.backend\src\main\java\com\team1\sgart\backend\util\JwtTokenProvider.java
 C:\Users\luise\OneDrive\Documentos\Curso\24-25\PRACTICA-4º\Sprint3\SGART-Backend\sgart.backend\src\main\java\com\team1\sgart\backend\http\AdminWorkingHoursController.java
 C:\Users\luise\OneDrive\Documentos\Curso\24-25\PRACTICA-4º\Sprint3\SGART-Backend\sgart.backend\src\main\java\com\team1\sgart\backend\dao\UserDao.java
+C:\Users\luise\OneDrive\Documentos\Curso\24-25\PRACTICA-4º\Sprint3\SGART-Backend\sgart.backend\src\main\java\com\team1\sgart\backend\http\AuthController.java
+C:\Users\luise\OneDrive\Documentos\Curso\24-25\PRACTICA-4º\Sprint3\SGART-Backend\sgart.backend\src\main\java\com\team1\sgart\backend\util\JwtAuthenticationFilter.java
 C:\Users\luise\OneDrive\Documentos\Curso\24-25\PRACTICA-4º\Sprint3\SGART-Backend\sgart.backend\src\main\java\com\team1\sgart\backend\model\LocationsDTO.java
 C:\Users\luise\OneDrive\Documentos\Curso\24-25\PRACTICA-4º\Sprint3\SGART-Backend\sgart.backend\src\main\java\com\team1\sgart\backend\model\Admin.java
 C:\Users\luise\OneDrive\Documentos\Curso\24-25\PRACTICA-4º\Sprint3\SGART-Backend\sgart.backend\src\main\java\com\team1\sgart\backend\config\CorsConfig.java
