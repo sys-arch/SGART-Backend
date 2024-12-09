@@ -30,6 +30,9 @@ public class UserService {
     private final UserDao userDao;
     private final AdminDao adminDao;
     private final JwtTokenProvider jwtTokenProvider;
+    
+    @Autowired
+    private ValidationService validationService;
 
     private ConcurrentHashMap<String, Integer> loginAttempts = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String, Long> blockedSessions = new ConcurrentHashMap<>();
@@ -43,7 +46,7 @@ public class UserService {
 
     public User registrarUser(User user) {
         // Comprobar si el email ya está registrado
-        if (emailYaRegistrado(user)) {
+        if (validationService.emailExisteEnSistema(user.getEmail())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "El email ya está registrado");
         }
         return userDao.save(user);
@@ -63,7 +66,8 @@ public class UserService {
                 actualizarCampo(updatedUser::setLastName, user.getLastName());
                 actualizarCampo(updatedUser::setDepartment, user.getDepartment());
                 actualizarCampo(updatedUser::setCenter, user.getCenter());
-                actualizarCampo(updatedUser::setEmail, user.getEmail());
+                //No se debería poder actualizar el email, CONTROLAR EN FRONT
+                //actualizarCampo(updatedUser::setEmail, user.getEmail());
                 actualizarCampo(updatedUser::setHiringDate, user.getHiringDate());
                 actualizarCampo(updatedUser::setProfile, user.getProfile());
                 userDao.save(updatedUser);
@@ -149,10 +153,13 @@ public class UserService {
     }
 
     public boolean emailYaRegistrado(User user) {
-        boolean yaRegistrado = true;
+    	boolean yaRegistrado = false;
+        Optional<User> usuarioExistente = userDao.findByEmail(user.getEmail());
 
-        if (!userDao.findByEmail(user.getEmail()).isPresent())
-            yaRegistrado = false;
+        if (usuarioExistente.isPresent() && 
+            usuarioExistente.get().getEmail().equalsIgnoreCase(user.getEmail())) {
+            yaRegistrado = true;
+        }
 
         return yaRegistrado;
     }

@@ -15,6 +15,8 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
 public interface AdminDao extends  JpaRepository<Admin, UUID> {
+	
+	@Query("SELECT a FROM Admin a WHERE LOWER(a.email) = LOWER(:email)")
     Optional<Admin> findByEmail(String email);
     Optional<Admin> findByEmailAndPassword(String email, String password);
     
