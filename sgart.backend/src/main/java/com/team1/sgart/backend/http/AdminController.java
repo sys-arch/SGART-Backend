@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import com.team1.sgart.backend.model.UserDTO;
 import com.team1.sgart.backend.model.Admin;
@@ -39,7 +40,6 @@ public class AdminController {
 		adminService.modificarAdmin(admin);
 		return ResponseEntity.status(HttpStatus.OK).body("Perfil modificado correctamente");
 	}
-    
     @PostMapping("/crearAdmin")
 	public ResponseEntity<String> crearAdmin(@RequestBody Admin admin) {
 		UUID id=adminService.crearAdmin(admin);
