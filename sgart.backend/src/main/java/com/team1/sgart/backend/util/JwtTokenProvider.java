@@ -11,6 +11,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.team1.sgart.backend.model.User;
+import com.team1.sgart.backend.model.GenericUser;
+import com.team1.sgart.backend.model.Admin;
+
+
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -20,52 +24,66 @@ import jakarta.annotation.PostConstruct;
 @Component
 public class JwtTokenProvider {
 
-    private SecretKey key;
-    private static final long EXPIRATION_TIME = ((15 * 60) * 1000L); // 15 minutos
+	    private SecretKey key;
 
-    @Value("${jwt.secret}")
-    private String secretKey;
+	    @Value("${jwt.secret}")
+	    private String secretKey;
 
-    @PostConstruct
-    public void init() {
-        byte[] keyBytes = secretKey.getBytes(StandardCharsets.UTF_8);
-        this.key = Keys.hmacShaKeyFor(keyBytes);
-    }
+	    private static final long EXPIRATION_TIME = ((15 * 60) * 1000L); // 15 minutos
 
-    // Método para generar el token de recuperación
-    public String generatePasswordResetToken(User user) {
-        return Jwts.builder()
-                .setSubject(user.getEmail())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(key)
-                .compact();
-    }
+	    @PostConstruct
+	    public void init() {
+	        byte[] keyBytes = secretKey.getBytes(StandardCharsets.UTF_8);
+	        this.key = Keys.hmacShaKeyFor(keyBytes);
+	    }
 
-    // Método para validar el token
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
+	    public String generateToken(GenericUser user) {
+	        String role = user instanceof Admin ? "admin" : "employee";
+	        return Jwts.builder()
+	                .setSubject(user.getEmail())
+	                .claim("role", role)
+	                .setIssuedAt(new Date())
+	                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+	                .signWith(key)
+	                .compact();
+	    }
+	    public String generatePasswordResetToken(User user) {
+	        return Jwts.builder()
+	                .setSubject(user.getEmail())
+	                .setIssuedAt(new Date())
+	                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+	                .signWith(key)
+	                .compact();
+	    }
 
-    // Obtener el correo del token (usado en el restablecimiento de contraseña)
-    public String getEmailFromToken(String token) {
-        try {
-            Claims claims = Jwts.parserBuilder()
-                    .setSigningKey(key)
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody();
-            return claims.getSubject();
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token inválido");
-        }
-    }
-}
+
+	    public boolean validateToken(String token) {
+	        try {
+	            Jwts.parserBuilder()
+	                .setSigningKey(key)
+	                .build()
+	                .parseClaimsJws(token);
+	            return true;
+	        } catch (Exception e) {
+	            return false;
+	        }
+	    }
+
+	    public String getEmailFromToken(String token) {
+	        Claims claims = Jwts.parserBuilder()
+	                .setSigningKey(key)
+	                .build()
+	                .parseClaimsJws(token)
+	                .getBody();
+	        return claims.getSubject();
+	    }
+
+	    public String getRoleFromToken(String token) {
+	        Claims claims = Jwts.parserBuilder()
+	                .setSigningKey(key)
+	                .build()
+	                .parseClaimsJws(token)
+	                .getBody();
+	        return claims.get("role", String.class);
+	    }
+	}
