@@ -25,6 +25,9 @@ public class AdminService {
 	private InvitationsDao invitationsDAO;
 	
 	@Autowired
+    private ValidationService validationService;
+	
+	@Autowired
 	AdminService(UserDao userDao, AdminDao adminDao,InvitationsDao invitationsDAO) {
         this.userDAO = userDao;
         this.adminDAO = adminDao;
@@ -126,7 +129,7 @@ public class AdminService {
 	
 	public UUID crearAdmin(Admin admin) {
 		String email = admin.getEmail();
-		if(emailAdminEstaRegistrado(email)) 
+		if(validationService.emailExisteEnSistema(admin.getEmail())) 
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El email ya está registrado");
 		adminDAO.save(admin);
 		return adminDAO.findByEmail(admin.getEmail()).get().getID();
