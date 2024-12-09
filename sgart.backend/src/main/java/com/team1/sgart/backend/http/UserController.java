@@ -63,29 +63,30 @@ public class UserController {
     }
 
 	@PostMapping("/login")
-	public ResponseEntity<Map<String, Object>> login(@RequestBody User user) {
+	public ResponseEntity<Map<String, Object>> login(@RequestBody User user, HttpSession session) {
 	    try {
 	        // Autenticar al usuario
-	        GenericUser genericUser = userService.loginUser(user, null);
-
-	        if (genericUser == null) {
-	            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("success", false));
+	        GenericUser authenticatedUser = userService.loginUser(user, session);
+	        if (authenticatedUser == null) {
+	            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+	                    .body(Map.of("success", false, "message", "Credenciales incorrectas"));
 	        }
 
-	        // Crear el token
-	        String token = jwtTokenProvider.generateToken(genericUser);
+	        // Generar el token JWT
+	        String token = jwtTokenProvider.generateToken(authenticatedUser);
 
-	        // Respuesta con booleano y token
+	        // Crear la respuesta
 	        Map<String, Object> response = new HashMap<>();
 	        response.put("success", true);
 	        response.put("token", token);
 
 	        return ResponseEntity.ok(response);
-
-	    } catch (ResponseStatusException e) {
-	        return ResponseEntity.status(e.getStatusCode()).body(Map.of("success", false, "error", e.getReason()));
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                .body(Map.of("success", false, "message", e.getMessage()));
 	    }
 	}
+
 
 
 
