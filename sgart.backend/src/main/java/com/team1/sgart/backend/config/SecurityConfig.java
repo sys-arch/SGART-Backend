@@ -23,6 +23,7 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable()) // Deshabilitar CSRF
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/meetings/**").hasAuthority("employee") // Restringir acceso a empleados
                 .requestMatchers("/auth/validate-token").permitAll() // Permitir acceso sin autenticación
                 .requestMatchers("/admin/**").hasAuthority("admin") // Solo admin puede acceder
                 .requestMatchers("/employee/**").hasAuthority("employee") // Solo empleados pueden acceder

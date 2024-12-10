@@ -79,4 +79,9 @@ public interface UserDao extends JpaRepository<User, UUID> {
     @Transactional
     void updatePassword(@Param("userId") UUID userId, @Param("newPassword") String newPassword);
 
+    @Query("SELECT u FROM User u WHERE u.blocked = false AND u.profile <> 'Admin'")
+    List<User> findAllNonAdminAndNotBlocked();
+
+
+
 }

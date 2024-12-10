@@ -7,6 +7,7 @@ import com.team1.sgart.backend.dao.MeetingsDao;
 import com.team1.sgart.backend.model.Meetings;
 import com.team1.sgart.backend.model.User;
 
+
 import jakarta.transaction.Transactional;
 
 import com.team1.sgart.backend.model.InvitationStatus;
@@ -51,11 +52,10 @@ public class MeetingService {
         return meetingDao.save(meeting);
     }
 
-    // Método para obtener todos los usuarios habilitados
     public List<User> getAvailableUsers() {
-        return userDao.findAllNotBlocked(); // Solo los usuarios no bloqueados
+        return userDao.findAllNonAdminAndNotBlocked();
     }
-    
+
     // Método para obtener todas las localizaciones
   	public List<Locations> getLocations() {
   		return locationsDao.findAll();
