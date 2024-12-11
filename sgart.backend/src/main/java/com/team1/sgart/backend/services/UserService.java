@@ -235,4 +235,17 @@ public class UserService {
         userDao.updatePassword(user.getID(), validarYHashearPassword(newPassword));
     }
 
+    public String generatePasswordResetToken(String email) {
+        User user = userDao.findByEmail(email)
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, "No existe un usuario con ese email"));
+
+        if (user.isBlocked()) {
+            throw new ResponseStatusException(
+                HttpStatus.FORBIDDEN, "Esta cuenta está bloqueada");
+        }
+
+        return jwtTokenProvider.generatePasswordResetToken(user);
+    }
+
 }
