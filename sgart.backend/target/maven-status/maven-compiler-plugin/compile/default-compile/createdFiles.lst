@@ -22,6 +22,7 @@ com\team1\sgart\backend\model\Admin.class
 com\team1\sgart\backend\http\AuthController.class
 com\team1\sgart\backend\App.class
 com\team1\sgart\backend\services\AbsencesService.class
+com\team1\sgart\backend\services\ValidationService.class
 com\team1\sgart\backend\model\GenericUserDTO.class
 com\team1\sgart\backend\services\MeetingService.class
 com\team1\sgart\backend\services\UserService.class

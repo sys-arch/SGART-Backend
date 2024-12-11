@@ -115,44 +115,7 @@ public class User extends GenericUser{
 		this.validated = validated;
 	}
 
-	public boolean comprobarFormatoPassword() {
-		boolean valida = true;
-		
-		int longitudMinima = 8;
-	    String mayus = ".*[A-Z].*";
-	    String minus = ".*[a-z].*";
-	    String digit = ".*\\d*.";
-	    String specialCharacters = ".*[!@#\\$%\\^&\\*].*";
-
-
-	    // Verificar longitud mínima
-	    if (password.length() < longitudMinima) {
-	    	valida = false;
-	    }
-
-	    // Verificar que tenga al menos una letra mayúscula
-	    if (!Pattern.matches(mayus, password)) {
-	    	valida = false;
-	    }
-
-	    // Verificar que tenga al menos una letra minúscula
-	    if (!Pattern.matches(minus, password)) {
-	    	valida = false;
-	    }
-	    
-	    // Verificar que tenga al menos un dígito
-	    if (!Pattern.matches(digit, password)) {
-	    	valida = false;
-	    }
-
-	    // Verificar que tenga al menos un carácter especial
-	    if (!Pattern.matches(specialCharacters, password)) {
-	    	valida = false;
-	    }
-
-	    // Si cumple con todas las condiciones
-	    return valida;
-	}
+	
 
 	public boolean comprobarFormatoEmail() {
 		boolean valido = true;

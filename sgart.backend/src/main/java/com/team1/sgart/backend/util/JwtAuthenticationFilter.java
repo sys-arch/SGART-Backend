@@ -24,9 +24,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
+   
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+        // Log headers
+        request.getHeaderNames().asIterator().forEachRemaining(headerName -> {
+            System.out.println("Header: " + headerName + " -> " + request.getHeader(headerName));
+        });
 
         String header = request.getHeader("Authorization");
         if (header != null && header.startsWith("Bearer ")) {
@@ -43,4 +48,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
+
 }
