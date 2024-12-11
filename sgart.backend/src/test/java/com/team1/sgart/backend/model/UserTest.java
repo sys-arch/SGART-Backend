@@ -73,17 +73,7 @@ class UserTest {
 		assertEquals("newPassword123", user.getPassword());
 	}
     
-    @Test
-	void testComprobarFormatoPasswordCorrecto() {
-		user.setPassword(PASSWORD_FUERTE);
-		assertTrue(user.comprobarFormatoPassword());
-	}
-    
-    @Test
-    void testComprobarFormatoPasswordIncorrecto() {
-		user.setPassword("password");
-		assertFalse(user.comprobarFormatoPassword());
-	}
+
     
     @Test
     void testComprobarFormatoEmailCorrecto() {

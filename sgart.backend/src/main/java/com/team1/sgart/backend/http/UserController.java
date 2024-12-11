@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.team1.sgart.backend.dao.UserDao;
 import com.team1.sgart.backend.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,6 +29,9 @@ public class UserController {
 	private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 	private UserService userService;
 	private static final String USER_ID = "userId";
+	@Autowired
+	private UserDao userDao;
+
 
 	@Autowired
 	UserController(UserService userService) {
@@ -90,15 +94,24 @@ public class UserController {
 
 
 
-    @PostMapping("/verificar-email")
-    public ResponseEntity<String> verificarEmail(@RequestBody User user) {
-        boolean existe = userService.emailYaRegistrado(user);
-        if (!existe) {
-            return ResponseEntity.status(HttpStatus.OK).body("El email no está registrado");
-        } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("El email está registrado");
-        }
-    }
+	@PostMapping("/verificar-email")
+	public ResponseEntity<String> verificarEmail(@RequestBody User user) {
+	    try {
+	        logger.info("Verificando email: " + user.getEmail());
+	        Optional<User> existingUser = userDao.findByEmail(user.getEmail());
+	        if (existingUser.isPresent()) {
+	            logger.info("El email ya está registrado");
+	            return ResponseEntity.status(HttpStatus.CONFLICT).body("El email está registrado");
+	        } else {
+	            logger.info("El email no está registrado");
+	            return ResponseEntity.status(HttpStatus.OK).body("El email no está registrado");
+	        }
+	    } catch (Exception e) {
+	        logger.error("Error al verificar el email", e);
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al verificar el email");
+	    }
+	}
+
 
     @GetMapping("/cargarUsuarios")
     public ResponseEntity<List<UserAbsenceDTO>> getAllUsers() {
