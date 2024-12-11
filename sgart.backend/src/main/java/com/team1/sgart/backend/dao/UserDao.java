@@ -19,6 +19,7 @@ import jakarta.transaction.Transactional;
 @Repository
 public interface UserDao extends JpaRepository<User, UUID> {
 
+	@Query("SELECT u FROM User u WHERE LOWER(u.email) = LOWER(:email)")
     Optional<User> findByEmail(String email);
 
     Optional<User> findByEmailAndPassword(String email, String password);

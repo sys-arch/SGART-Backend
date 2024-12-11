@@ -22,6 +22,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable()) // Deshabilitar CSRF
+            .cors(cors -> cors.configure(http))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/meetings/**").hasAuthority("employee") // Restringir acceso a empleados
                 .requestMatchers("/auth/validate-token").permitAll() // Permitir acceso sin autenticación

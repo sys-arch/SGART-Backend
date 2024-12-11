@@ -1,3 +1,9 @@
+# Ignorar archivos compilados de Java
+*.class
+
+# Ignorar directorios de compilación
+target/
+build/
 
 # Archivos de configuración de editores
 .vscode/
