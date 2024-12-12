@@ -25,227 +25,209 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class UserService {
-    private static final int MAX_ATTEMPTS = 3;
-    private static final long BLOCK_TIME = (15 * 60 * 1000L); // 15 minutos de bloqueo
-
-    private final UserDao userDao;
-    private final AdminDao adminDao;
-    private final JwtTokenProvider jwtTokenProvider;
-    
-    @Autowired
-    private ValidationService validationService;
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
-    private ConcurrentHashMap<String, Integer> loginAttempts = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<String, Long> blockedSessions = new ConcurrentHashMap<>();
-
-    @Autowired
-    public UserService(UserDao userDao, AdminDao adminDao, JwtTokenProvider jwtTokenProvider) {
-        this.userDao = userDao;
-        this.adminDao = adminDao;
-        this.jwtTokenProvider = jwtTokenProvider;
-    }
-
-    public User registrarUser(User user) {
-        // Comprobar si el email ya está registrado
-        if (validationService.emailExisteEnSistema(user.getEmail())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "El email ya está registrado");
-        }
-        String hashedEmail = passwordEncoder.encode(user.getEmail());
-        user.setEmail(hashedEmail);
-        // Validar y hashear la contraseña
-        user.setPassword(validarYHashearPassword(user.getPassword()));
-
-        return userDao.save(user);
-    }
-
-
-    public void modificarUser(User user) {
-        Optional<User> userToModify = userDao.findByEmail(user.getEmail());
-        if (userToModify.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "El email no está registrado");
-        }
-
-        User updatedUser = userToModify.get();
-        actualizarCampo(updatedUser::setName, user.getName());
-        actualizarCampo(updatedUser::setLastName, user.getLastName());
-        actualizarCampo(updatedUser::setDepartment, user.getDepartment());
-        actualizarCampo(updatedUser::setCenter, user.getCenter());
-        actualizarCampo(updatedUser::setHiringDate, user.getHiringDate());
-        actualizarCampo(updatedUser::setProfile, user.getProfile());
-
-        // Validar y hashear nueva contraseña si es necesario
-        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
-            updatedUser.setPassword(validarYHashearPassword(user.getPassword()));
-        }
-
-        userDao.save(updatedUser);
-    }
-
-    
-
-    public void modificarPerfilUser(UserDTO changesInUser) {
-        UUID userId = changesInUser.getID();
-        Optional<User> userToModify = userDao.findById(userId);
-        if (userToModify.isPresent()) {
-            User updatedUser = userToModify.get();
-            actualizarCampo(updatedUser::setName, changesInUser.getName());
-            actualizarCampo(updatedUser::setLastName, changesInUser.getLastName());
-            actualizarCampo(updatedUser::setDepartment, changesInUser.getDepartment());
-            actualizarCampo(updatedUser::setCenter, changesInUser.getCenter());
-            actualizarCampo(updatedUser::setProfile, changesInUser.getProfile());
-            userDao.save(updatedUser);
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado");
-        }
-    }
-
-    public GenericUser loginUser(User user, HttpSession session) {
-        String sessionId = session.getId();
-        if (isSessionBlocked(sessionId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Inicio de sesión bloqueado temporalmente. Inténtelo más tarde.");
-        }
-
-        String email = user.getEmail();
-        String password = user.getPassword();
-
-        if (!emailFormatoValido(user)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Formato del email incorrecto");
-        }
-
-        Optional<User> optionalUser = userDao.findByEmail(email);
-        if (optionalUser.isPresent()) {
-            User existingUser = optionalUser.get();
-            if (passwordEncoder.matches(password, existingUser.getPassword())) {
-                resetAttempts(sessionId);
-                if (existingUser.isBlocked()) {
-                    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cuenta bloqueada. Contacte al soporte.");
-                }
-                return existingUser;
-            } else {
-                incrementAttempts(sessionId);
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Contraseña incorrecta.");
-            }
-        }
-
-        incrementAttempts(sessionId);
-        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Email no encontrado.");
-    }
-
-    private boolean isSessionBlocked(String sessionId) {
-        if (blockedSessions.containsKey(sessionId)) {
-            long blockTime = blockedSessions.get(sessionId);
-            if (System.currentTimeMillis() - blockTime > BLOCK_TIME) {
-                blockedSessions.remove(sessionId);
-                return false;
-            }
-            return true;
-        }
-        return false;
-    }
-
-    private void incrementAttempts(String sessionId) {
-        loginAttempts.merge(sessionId, 1, Integer::sum);
-        if (loginAttempts.get(sessionId) > MAX_ATTEMPTS) {
-            blockedSessions.put(sessionId, System.currentTimeMillis());
-            loginAttempts.remove(sessionId);
-        }
-    }
-
-    private void resetAttempts(String sessionId) {
-        loginAttempts.remove(sessionId);
-    }
-
-    public boolean emailFormatoValido(User user) {
-        boolean emailValido = false;
-
-        if (user.comprobarFormatoEmail())
-            emailValido = true;
-
-        return emailValido;
-    }
-
-    public boolean verificarEmail(String rawEmail, String hashedEmail) {
-        return passwordEncoder.matches(rawEmail, hashedEmail);
-    }
-
-
-    private String validarYHashearPassword(String password) {
-        if (password == null || password.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La contraseña no puede estar vacía");
-        }
-        if (!comprobarFormatoPassword(password)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Formato de contraseña inválido");
-        }
-        return passwordEncoder.encode(password);
-    }
-
-
-
-	private boolean comprobarFormatoPassword(String password) {
-    	    int longitudMinima = 8;
-    	    String mayus = ".*[A-Z].*";
-    	    String minus = ".*[a-z].*";
-    	    String digit = ".*\\d.*";
-    	    String specialCharacters = ".*[!@#\\$%\\^&\\*].*";
-
-    	    return password.length() >= longitudMinima &&
-    	           password.matches(mayus) &&
-    	           password.matches(minus) &&
-    	           password.matches(digit) &&
-    	           password.matches(specialCharacters);
-    	}
-
 	
+	
+	    private static final int MAX_ATTEMPTS = 3;
+	    private static final long BLOCK_TIME = (15 * 60 * 1000L); // 15 minutos de bloqueo
 
-	public List<UserAbsenceDTO> loadUsers() {
-        List<User> users = userDao.findAll();
-        return users.stream().map(user -> {
-            UserAbsenceDTO userAbsenceDTO = new UserAbsenceDTO();
-            userAbsenceDTO.setId(user.getID());
-            userAbsenceDTO.setEmail(user.getEmail());
-            userAbsenceDTO.setFirstName(user.getName());
-            userAbsenceDTO.setLastName(user.getLastName());
-            userAbsenceDTO.setCenter(user.getCenter());
-            userAbsenceDTO.setProfile(user.getProfile());
-            return userAbsenceDTO;
-        }).collect(Collectors.toList());
-    }
+	    private final UserDao userDao;
+	    private final AdminDao adminDao;
+	    private final JwtTokenProvider jwtTokenProvider;
 
-    private <T> void actualizarCampo(Consumer<T> setter, T nuevoValor) {
-        if (nuevoValor != null && !(nuevoValor instanceof String str && str.isEmpty())) {
-            setter.accept(nuevoValor);
-        }
-    }
+	    @Autowired
+	    private ValidationService validationService;
+	    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    public Optional<User> getUserById(UUID userId) {
-        return userDao.findById(userId);
-    }
+	    private ConcurrentHashMap<String, Integer> loginAttempts = new ConcurrentHashMap<>();
+	    private ConcurrentHashMap<String, Long> blockedSessions = new ConcurrentHashMap<>();
 
-    public void resetPassword(String token, String newPassword) {
-        if (!jwtTokenProvider.validateToken(token)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token inválido o expirado");
-        }
+	    @Autowired
+	    public UserService(UserDao userDao, AdminDao adminDao, JwtTokenProvider jwtTokenProvider) {
+	        this.userDao = userDao;
+	        this.adminDao = adminDao;
+	        this.jwtTokenProvider = jwtTokenProvider;
+	    }
 
-        String email = jwtTokenProvider.getEmailFromToken(token);
-        User user = userDao.findByEmail(email)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+	    public User registrarUser(User user) {
+	        // Comprobar si el email ya está registrado
+	        if (validationService.emailExisteEnSistema(user.getEmail())) {
+	            throw new ResponseStatusException(HttpStatus.CONFLICT, "El email ya está registrado");
+	        }
+	        // Validar y hashear la contraseña
+	        user.setPassword(validarYHashearPassword(user.getPassword()));
 
-        // Validar y hashear la nueva contraseña
-        userDao.updatePassword(user.getID(), validarYHashearPassword(newPassword));
-    }
+	        return userDao.save(user);
+	    }
 
-    public String generatePasswordResetToken(String email) {
-        User user = userDao.findByEmail(email)
-            .orElseThrow(() -> new ResponseStatusException(
-                HttpStatus.NOT_FOUND, "No existe un usuario con ese email"));
+	    public void modificarUser(User user) {
+	        Optional<User> userToModify = userDao.findByEmail(user.getEmail());
+	        if (userToModify.isEmpty()) {
+	            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "El email no está registrado");
+	        }
 
-        if (user.isBlocked()) {
-            throw new ResponseStatusException(
-                HttpStatus.FORBIDDEN, "Esta cuenta está bloqueada");
-        }
+	        User updatedUser = userToModify.get();
+	        actualizarCampo(updatedUser::setName, user.getName());
+	        actualizarCampo(updatedUser::setLastName, user.getLastName());
+	        actualizarCampo(updatedUser::setDepartment, user.getDepartment());
+	        actualizarCampo(updatedUser::setCenter, user.getCenter());
+	        actualizarCampo(updatedUser::setHiringDate, user.getHiringDate());
+	        actualizarCampo(updatedUser::setProfile, user.getProfile());
 
-        return jwtTokenProvider.generatePasswordResetToken(user);
-    }
+	        // Validar y hashear nueva contraseña si es necesario
+	        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+	            updatedUser.setPassword(validarYHashearPassword(user.getPassword()));
+	        }
 
-}
+	        userDao.save(updatedUser);
+	    }
+
+	    public void modificarPerfilUser(UserDTO changesInUser) {
+	        UUID userId = changesInUser.getID();
+	        Optional<User> userToModify = userDao.findById(userId);
+	        if (userToModify.isPresent()) {
+	            User updatedUser = userToModify.get();
+	            actualizarCampo(updatedUser::setName, changesInUser.getName());
+	            actualizarCampo(updatedUser::setLastName, changesInUser.getLastName());
+	            actualizarCampo(updatedUser::setDepartment, changesInUser.getDepartment());
+	            actualizarCampo(updatedUser::setCenter, changesInUser.getCenter());
+	            actualizarCampo(updatedUser::setProfile, changesInUser.getProfile());
+	            userDao.save(updatedUser);
+	        } else {
+	            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado");
+	        }
+	    }
+
+	    public GenericUser loginUser(User user, HttpSession session) {
+	        String sessionId = session.getId();
+	        if (isSessionBlocked(sessionId)) {
+	            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Inicio de sesión bloqueado temporalmente. Inténtelo más tarde.");
+	        }
+
+	        String email = user.getEmail();
+	        String password = user.getPassword();
+
+	        if (!emailFormatoValido(user)) {
+	            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Formato del email incorrecto");
+	        }
+
+	        Optional<User> optionalUser = userDao.findByEmail(email);
+	        if (optionalUser.isPresent()) {
+	            User existingUser = optionalUser.get();
+	            if (passwordEncoder.matches(password, existingUser.getPassword())) {
+	                resetAttempts(sessionId);
+	                if (existingUser.isBlocked()) {
+	                    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cuenta bloqueada. Contacte al soporte.");
+	                }
+	                return existingUser;
+	            } else {
+	                incrementAttempts(sessionId);
+	                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Contraseña incorrecta.");
+	            }
+	        }
+
+	        incrementAttempts(sessionId);
+	        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Email no encontrado.");
+	    }
+
+	    private boolean isSessionBlocked(String sessionId) {
+	        if (blockedSessions.containsKey(sessionId)) {
+	            long blockTime = blockedSessions.get(sessionId);
+	            if (System.currentTimeMillis() - blockTime > BLOCK_TIME) {
+	                blockedSessions.remove(sessionId);
+	                return false;
+	            }
+	            return true;
+	        }
+	        return false;
+	    }
+
+	    private void incrementAttempts(String sessionId) {
+	        loginAttempts.merge(sessionId, 1, Integer::sum);
+	        if (loginAttempts.get(sessionId) > MAX_ATTEMPTS) {
+	            blockedSessions.put(sessionId, System.currentTimeMillis());
+	            loginAttempts.remove(sessionId);
+	        }
+	    }
+
+	    private void resetAttempts(String sessionId) {
+	        loginAttempts.remove(sessionId);
+	    }
+
+	    public boolean emailFormatoValido(User user) {
+	        return user.comprobarFormatoEmail();
+	    }
+
+	    private String validarYHashearPassword(String password) {
+	        if (password == null || password.isEmpty()) {
+	            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La contraseña no puede estar vacía");
+	        }
+	        if (!comprobarFormatoPassword(password)) {
+	            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Formato de contraseña inválido");
+	        }
+	        return passwordEncoder.encode(password);
+	    }
+
+	    private boolean comprobarFormatoPassword(String password) {
+	        int longitudMinima = 8;
+	        String mayus = ".*[A-Z].*";
+	        String minus = ".*[a-z].*";
+	        String digit = ".*\\d.*";
+	        String specialCharacters = ".*[!@#\\$%\\^&\\*].*";
+
+	        return password.length() >= longitudMinima &&
+	               password.matches(mayus) &&
+	               password.matches(minus) &&
+	               password.matches(digit) &&
+	               password.matches(specialCharacters);
+	    }
+
+	    public List<UserAbsenceDTO> loadUsers() {
+	        List<User> users = userDao.findAll();
+	        return users.stream().map(user -> {
+	            UserAbsenceDTO userAbsenceDTO = new UserAbsenceDTO();
+	            userAbsenceDTO.setId(user.getID());
+	            userAbsenceDTO.setEmail(user.getEmail());
+	            userAbsenceDTO.setFirstName(user.getName());
+	            userAbsenceDTO.setLastName(user.getLastName());
+	            userAbsenceDTO.setCenter(user.getCenter());
+	            userAbsenceDTO.setProfile(user.getProfile());
+	            return userAbsenceDTO;
+	        }).collect(Collectors.toList());
+	    }
+
+	    private <T> void actualizarCampo(Consumer<T> setter, T nuevoValor) {
+	        if (nuevoValor != null && !(nuevoValor instanceof String str && str.isEmpty())) {
+	            setter.accept(nuevoValor);
+	        }
+	    }
+
+	    public Optional<User> getUserById(UUID userId) {
+	        return userDao.findById(userId);
+	    }
+
+	    public void resetPassword(String token, String newPassword) {
+	        if (!jwtTokenProvider.validateToken(token)) {
+	            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token inválido o expirado");
+	        }
+
+	        String email = jwtTokenProvider.getEmailFromToken(token);
+	        User user = userDao.findByEmail(email)
+	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+
+	        // Validar y hashear la nueva contraseña
+	        userDao.updatePassword(user.getID(), validarYHashearPassword(newPassword));
+	    }
+
+	    public String generatePasswordResetToken(String email) {
+	        User user = userDao.findByEmail(email)
+	            .orElseThrow(() -> new ResponseStatusException(
+	                HttpStatus.NOT_FOUND, "No existe un usuario con ese email"));
+
+	        if (user.isBlocked()) {
+	            throw new ResponseStatusException(
+	                HttpStatus.FORBIDDEN, "Esta cuenta está bloqueada");
+	        }
+
+	        return jwtTokenProvider.generatePasswordResetToken(user);
+	    }
+	}
