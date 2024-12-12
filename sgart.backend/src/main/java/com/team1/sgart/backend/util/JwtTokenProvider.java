@@ -1,6 +1,8 @@
 package com.team1.sgart.backend.util;
 
 import java.nio.charset.StandardCharsets;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 import java.util.Date;
 
 import javax.crypto.SecretKey;
@@ -42,11 +44,13 @@ public class JwtTokenProvider {
 	        return Jwts.builder()
 	                .setSubject(user.getEmail())
 	                .claim("role", role)
+	                .claim("userId", user.getID().toString()) // Incluye el userId en los claims
 	                .setIssuedAt(new Date())
 	                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
 	                .signWith(key)
 	                .compact();
 	    }
+
 	    public String generatePasswordResetToken(User user) {
 	        return Jwts.builder()
 	                .setSubject(user.getEmail())
@@ -86,4 +90,19 @@ public class JwtTokenProvider {
 	                .getBody();
 	        return claims.get("role", String.class);
 	    }
+	    
+	    public String getUserIdFromToken(String token) {
+	        try {
+	            Claims claims = Jwts.parserBuilder()
+	                    .setSigningKey(key) // Clave secreta configurada
+	                    .build()
+	                    .parseClaimsJws(token)
+	                    .getBody();
+	            return claims.get("userId", String.class); // Asegúrate de incluir `userId` como un claim en el JWT
+	        } catch (Exception e) {
+	            return null; // Retorna null si el token no es válido
+	        }
+	    }
+
+
 	}
