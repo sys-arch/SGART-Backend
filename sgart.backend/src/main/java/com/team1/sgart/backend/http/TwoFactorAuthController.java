@@ -116,6 +116,7 @@ public class TwoFactorAuthController {
             // Validar que el usuario existe y generar token
             String token = userService.generatePasswordResetToken(email);
             
+            
             // Construir el link de recuperación
             String recoveryLink = "https://sgart-v1.web.app/#/reset-password?token=" + token;
             
