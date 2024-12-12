@@ -28,7 +28,6 @@ public class AdminController {
     @Autowired
     private AdminService adminService;
     
-    
     @GetMapping("/getUsuariosValidados")
     public ResponseEntity<List<UserDTO>> getUsuariosValidados(){
     	List<UserDTO> users=adminService.getUsuariosValidados();
