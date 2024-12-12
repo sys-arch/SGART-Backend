@@ -8,9 +8,10 @@ import java.util.UUID;
 @Table(name = "SGART_InvitationsTable")
 public class Invitations {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private UUID invitation_id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.UUID)
+	private UUID invitation_id;
+
 
     @ManyToOne
     @JoinColumn(name = "meeting_id", nullable = false)

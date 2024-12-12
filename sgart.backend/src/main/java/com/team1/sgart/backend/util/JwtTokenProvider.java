@@ -14,6 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.team1.sgart.backend.model.User;
 import com.team1.sgart.backend.model.GenericUser;
+import com.team1.sgart.backend.http.UserCalendarController;
 import com.team1.sgart.backend.model.Admin;
 
 
@@ -22,9 +23,11 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @Component
 public class JwtTokenProvider {
+    	private static final Logger logger = LoggerFactory.getLogger(UserCalendarController.class);
 
 	    private SecretKey key;
 
@@ -94,15 +97,20 @@ public class JwtTokenProvider {
 	    public String getUserIdFromToken(String token) {
 	        try {
 	            Claims claims = Jwts.parserBuilder()
-	                    .setSigningKey(key) // Clave secreta configurada
+	                    .setSigningKey(key)
 	                    .build()
 	                    .parseClaimsJws(token)
 	                    .getBody();
-	            return claims.get("userId", String.class); // Asegúrate de incluir `userId` como un claim en el JWT
+	            logger.debug("Extracted claims from token: {}", claims);
+
+	            return claims.get("userId", String.class);
 	        } catch (Exception e) {
-	            return null; // Retorna null si el token no es válido
+	        	logger.debug("tokeeeeeeeeeeeeeeeeeen:",token);
+	            logger.error("Error extracting userId from token: {}", e.getMessage(), e);
+	            return null;
 	        }
 	    }
+
 
 
 	}
