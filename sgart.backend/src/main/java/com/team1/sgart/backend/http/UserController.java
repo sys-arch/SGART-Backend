@@ -138,20 +138,27 @@ public class UserController {
 
 
 
-	@GetMapping("/current/user")
-	public ResponseEntity<User> getCurrentUser(HttpSession session) {
-		UUID userId = (UUID) session.getAttribute(USER_ID);
-		if (userId == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-		}
-		Optional<User> currentUser = userService.getUserById(userId);
-		if (currentUser.isEmpty())
-			return ResponseEntity.noContent().build();
-		else {
-			User user = currentUser.get();
-			user.setPassword("");
-			return ResponseEntity.ok(user);
-		}
+    @GetMapping("/current/user")
+    public ResponseEntity<User> getCurrentUser(@RequestHeader("Authorization") String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
-	}
+        String token = authHeader.substring(7); // Remueve "Bearer "
+        String userId = jwtTokenProvider.getUserIdFromToken(token); // Extrae el userId del token
+
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Optional<User> currentUser = userService.getUserById(UUID.fromString(userId));
+        if (currentUser.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+
+        User user = currentUser.get();
+        user.setPassword(""); // Eliminar la contraseña por seguridad
+        return ResponseEntity.ok(user);
+    }
+
 }

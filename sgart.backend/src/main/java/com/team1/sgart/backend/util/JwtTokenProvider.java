@@ -105,7 +105,6 @@ public class JwtTokenProvider {
 
 	            return claims.get("userId", String.class);
 	        } catch (Exception e) {
-	        	logger.debug("tokeeeeeeeeeeeeeeeeeen:",token);
 	            logger.error("Error extracting userId from token: {}", e.getMessage(), e);
 	            return null;
 	        }
