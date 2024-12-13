@@ -24,8 +24,12 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable()) // Deshabilitar CSRF
             .cors(cors -> cors.configure(http))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/meetings/**").hasAuthority("employee") // Restringir acceso a empleados
+            	.requestMatchers("/auth/validate-totp").permitAll() 
+                .requestMatchers("/auth/generate-qr").permitAll() // Permitir acceso sin autenticación
+                .requestMatchers("/users/current/userId").authenticated() // Permitir acceso a cualquier usuario autenticado
+                .requestMatchers("/api/meetings/**").authenticated() // Restringir acceso a empleados
                 .requestMatchers("/auth/validate-token").permitAll() // Permitir acceso sin autenticación
+                .requestMatchers("/invitations/**").hasAuthority("employee") // Solo empleados pueden invitar
                 .requestMatchers("/admin/**").hasAuthority("admin") // Solo admin puede acceder
                 .requestMatchers("/employee/**").hasAuthority("employee") // Solo empleados pueden acceder
                 .requestMatchers("/users/**").permitAll() // Solo usuarios pueden acceder

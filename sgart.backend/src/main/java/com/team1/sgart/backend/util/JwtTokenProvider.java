@@ -1,6 +1,8 @@
 package com.team1.sgart.backend.util;
 
 import java.nio.charset.StandardCharsets;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 import java.util.Date;
 
 import javax.crypto.SecretKey;
@@ -12,6 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.team1.sgart.backend.model.User;
 import com.team1.sgart.backend.model.GenericUser;
+import com.team1.sgart.backend.http.UserCalendarController;
 import com.team1.sgart.backend.model.Admin;
 
 
@@ -20,9 +23,11 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @Component
 public class JwtTokenProvider {
+    	private static final Logger logger = LoggerFactory.getLogger(UserCalendarController.class);
 
 	    private SecretKey key;
 
@@ -42,11 +47,13 @@ public class JwtTokenProvider {
 	        return Jwts.builder()
 	                .setSubject(user.getEmail())
 	                .claim("role", role)
+	                .claim("userId", user.getID().toString()) // Incluye el userId en los claims
 	                .setIssuedAt(new Date())
 	                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
 	                .signWith(key)
 	                .compact();
 	    }
+
 	    public String generatePasswordResetToken(User user) {
 	        return Jwts.builder()
 	                .setSubject(user.getEmail())
@@ -86,4 +93,23 @@ public class JwtTokenProvider {
 	                .getBody();
 	        return claims.get("role", String.class);
 	    }
+	    
+	    public String getUserIdFromToken(String token) {
+	        try {
+	            Claims claims = Jwts.parserBuilder()
+	                    .setSigningKey(key)
+	                    .build()
+	                    .parseClaimsJws(token)
+	                    .getBody();
+	            logger.debug("Extracted claims from token: {}", claims);
+
+	            return claims.get("userId", String.class);
+	        } catch (Exception e) {
+	            logger.error("Error extracting userId from token: {}", e.getMessage(), e);
+	            return null;
+	        }
+	    }
+
+
+
 	}

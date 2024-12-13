@@ -34,6 +34,8 @@ public class MeetingController {
     // Crear una reunión
     @PostMapping("/create")
     public ResponseEntity<Meetings> createMeeting(@RequestBody Meetings meeting) {
+        System.out.println("Datos recibidos para la reunión: " + meeting);
+
         Meetings createdMeeting = meetingService.createMeeting(meeting.getMeetingTitle(), meeting.isMeetingAllDay(),
                 meeting.getMeetingDate(),
                 meeting.getMeetingStartTime(), meeting.getMeetingEndTime(), meeting.getMeetingObservations(),
