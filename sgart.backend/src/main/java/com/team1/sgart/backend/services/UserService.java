@@ -126,7 +126,7 @@ public class UserService {
 	        }
 
 	        incrementAttempts(sessionId);
-	        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario o contraseña incorrectos");
+	        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Email no encontrado.");
 	    }
 
 	    private boolean isSessionBlocked(String sessionId) {

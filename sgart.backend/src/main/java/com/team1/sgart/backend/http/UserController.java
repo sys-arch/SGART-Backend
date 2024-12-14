@@ -134,7 +134,7 @@ public class UserController {
         }
 
         Map<String, String> response = new HashMap<>();
-        response.put("userId", userId);
+        response.put(USER_ID, userId);
         return ResponseEntity.ok(response);
     }
 

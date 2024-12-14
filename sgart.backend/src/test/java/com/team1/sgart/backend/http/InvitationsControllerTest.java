@@ -1,6 +1,7 @@
 package com.team1.sgart.backend.http;
 
 import com.team1.sgart.backend.services.InvitationsService;
+import com.team1.sgart.backend.util.JwtTokenProvider;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -11,12 +12,17 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.*;
@@ -40,30 +46,24 @@ class InvitationsControllerTest {
     
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-        invitationsService = mock(InvitationsService.class);
-        invitationsController = new InvitationsController(invitationsService);
+    	userId = UUID.randomUUID();
         meetingId = UUID.randomUUID();
-        userId = UUID.randomUUID();
+        MockitoAnnotations.openMocks(this);
+        JwtTokenProvider jwtTokenProvider = mock(JwtTokenProvider.class);
+        invitationsController = new InvitationsController(invitationsService, jwtTokenProvider);
+        invitationsService = mock(InvitationsService.class);
+        when(jwtTokenProvider.getUserIdFromToken(anyString())).thenReturn(userId.toString());
+
         requestBody = new HashMap<>();
         session = mock(HttpSession.class);
         when(session.getAttribute(USER_ID)).thenReturn(userId);
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getCredentials()).thenReturn("mockToken");
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
     }
 
-    @Test
-    void updateInvitationStatus_WhenSuccessful_ReturnsOk() {
-        // Arrange
-        requestBody.put(NEW_STATUS, ACCEPTED_STATUS);
-        when(session.getAttribute(USER_ID)).thenReturn(userId);
-        when(invitationsService.updateInvitationStatus(any(), any(), any(), any())).thenReturn(true);
-
-        // Act
-        ResponseEntity<?> response = invitationsController.updateInvitationStatus(
-            meetingId, requestBody, session);
-
-        // Assert
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-    }
 
     @Test
     void updateInvitationStatus_WhenNotFound_ReturnsNotFound() {
@@ -74,59 +74,41 @@ class InvitationsControllerTest {
 
         // Act
         ResponseEntity<?> response = invitationsController.updateInvitationStatus(
-            meetingId, requestBody, session);
+            meetingId, requestBody);
+
+        // Assert
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+    @Test
+    void updateInvitationStatus_WhenUnauthorized_ReturnsUnauthorized() {
+        // Arrange
+        requestBody.put(NEW_STATUS, ACCEPTED_STATUS);
+        when(session.getAttribute(USER_ID)).thenReturn(null); // Simula un usuario no autenticado
+
+        // Act
+        ResponseEntity<?> response = invitationsController.updateInvitationStatus(
+                meetingId, requestBody);
 
         // Assert
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
-    @Test
-    void updateInvitationStatus_WhenRejected_ReturnsOk() {
-        // Arrange
-        requestBody.put(NEW_STATUS, "Rechazada");
-        requestBody.put("comment", "No puedo asistir");
-        when(session.getAttribute(USER_ID)).thenReturn(userId);
-        when(invitationsService.updateInvitationStatus(any(), any(), any(), any())).thenReturn(true);
-
-        // Act
-        ResponseEntity<?> response = invitationsController.updateInvitationStatus(
-            meetingId, requestBody, session);
-
-        // Assert
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-    }
 
     @Test
     void updateInvitationStatus_WhenServiceThrowsException_ReturnsBadRequest() {
         // Arrange
         requestBody.put(NEW_STATUS, ACCEPTED_STATUS);
-        when(session.getAttribute(USER_ID)).thenReturn(userId);
-        when(invitationsService.updateInvitationStatus(any(), any(), any(), any()))
-            .thenThrow(new RuntimeException("Error"));
+        when(invitationsService.updateInvitationStatus(any(), any(), eq(ACCEPTED_STATUS), any()))
+            .thenThrow(new RuntimeException("Unexpected error"));
 
         // Act
         ResponseEntity<?> response = invitationsController.updateInvitationStatus(
-            meetingId, requestBody, session);
+                meetingId, requestBody);
 
         // Assert
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals("Error updating invitation status", response.getBody());
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals(null, response.getBody());
     }
 
-    @Test
-    void updateInvitationStatus_WhenInvalidStatus_ReturnsBadRequest() {
-        // Arrange
-        requestBody.put(NEW_STATUS, "InvalidStatus");
-        when(session.getAttribute(USER_ID)).thenReturn(userId);
-        when(invitationsService.updateInvitationStatus(any(), any(), any(), any()))
-            .thenThrow(new IllegalArgumentException("Invalid status"));
 
-        // Act
-        ResponseEntity<?> response = invitationsController.updateInvitationStatus(
-            meetingId, requestBody, session);
-
-        // Assert
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-    }
 }
