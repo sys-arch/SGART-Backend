@@ -140,19 +140,34 @@ public class AdminService {
 	}
 
 	public void modificarAdmin(Admin admin) {
-		String email = admin.getEmail();
-		if(!emailAdminEstaRegistrado(email)) 
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "El email no está registrado");
-		adminDAO.updateAdmin(email, admin);
+	    String email = admin.getEmail();
+	    if (!emailAdminEstaRegistrado(email)) {
+	        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "El email no está registrado");
+	    }
+
+	    // Hashear la contraseña si no está hasheada
+	    if (admin.getPassword() != null && !admin.getPassword().startsWith("$2a$")) {
+	        admin.setPassword(passwordEncoder.encode(admin.getPassword()));
+	    }
+
+	    adminDAO.updateAdmin(email, admin);
 	}
+
 	
 	public UUID crearAdmin(Admin admin) {
-		String email = admin.getEmail();
-		if(validationService.emailExisteEnSistema(admin.getEmail())) 
-			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El email ya está registrado");
-		adminDAO.save(admin);
-		return adminDAO.findByEmail(admin.getEmail()).get().getID();
+	    if (validationService.emailExisteEnSistema(admin.getEmail())) {
+	        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El email ya está registrado");
+	    }
+
+	    // Hashear la contraseña antes de guardar
+	    if (admin.getPassword() != null && !admin.getPassword().startsWith("$2a$")) {
+	        admin.setPassword(passwordEncoder.encode(admin.getPassword()));
+	    }
+
+	    adminDAO.save(admin);
+	    return adminDAO.findByEmail(admin.getEmail()).get().getID();
 	}
+
 	
 	private boolean emailUserEstaRegistrado(String email) {
 		return userDAO.findByEmail(email).isPresent();
