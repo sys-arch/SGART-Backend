@@ -29,6 +29,8 @@ public class UserController {
 	private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 	private UserService userService;
 	private static final String USER_ID = "userId";
+	private static final String SUCCESS_KEY = "success";
+	private static final String MESSAGE_KEY = "message";
 	@Autowired
 	private UserDao userDao;
 
@@ -73,7 +75,7 @@ public class UserController {
 	        GenericUser authenticatedUser = userService.loginUser(user, session);
 	        if (authenticatedUser == null) {
 	            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-	                    .body(Map.of("success", false, "message", "Credenciales incorrectas"));
+	                    .body(Map.of(SUCCESS_KEY , false,MESSAGE_KEY, "Credenciales incorrectas"));
 	        }
 
 	        // Generar el token JWT
@@ -81,13 +83,13 @@ public class UserController {
 
 	        // Crear la respuesta
 	        Map<String, Object> response = new HashMap<>();
-	        response.put("success", true);
+	        response.put(SUCCESS_KEY , true);
 	        response.put("token", token);
 
 	        return ResponseEntity.ok(response);
 	    } catch (Exception e) {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-	                .body(Map.of("success", false, "message", e.getMessage()));
+	                .body(Map.of(SUCCESS_KEY , false, MESSAGE_KEY, e.getMessage()));
 	    }
 	}
 
@@ -132,7 +134,7 @@ public class UserController {
         }
 
         Map<String, String> response = new HashMap<>();
-        response.put("userId", userId);
+        response.put(USER_ID, userId);
         return ResponseEntity.ok(response);
     }
 

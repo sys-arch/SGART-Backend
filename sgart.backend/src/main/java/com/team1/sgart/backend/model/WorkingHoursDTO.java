@@ -15,7 +15,6 @@ public class WorkingHoursDTO {
     @JsonProperty("endingTime")
     private LocalTime endTime;
 
-    public WorkingHoursDTO() {}
 
     public WorkingHoursDTO(int id, LocalTime startTime, LocalTime endTime) {
         this.id = id;
