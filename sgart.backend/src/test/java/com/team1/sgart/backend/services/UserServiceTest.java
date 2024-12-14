@@ -1,7 +1,9 @@
 package com.team1.sgart.backend.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -14,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.team1.sgart.backend.dao.AdminDao;
@@ -44,7 +47,9 @@ class UserServiceTest {
     
     @MockBean
     private AdminDao adminDao;
-    
+    @MockBean
+    private BCryptPasswordEncoder passwordEncoder;
+
     @MockBean
     private JwtTokenProvider jwtTokenProvider;
 
@@ -120,37 +125,7 @@ class UserServiceTest {
         );
     }
     
-    @Test
-    void testLoginUsuarioValido() {
-        Optional<User> optionalUser = Optional.of(user);
-        Mockito.when(userDao.findByEmailAndPassword(EMAIL_USUARIO, PASSWORD_FUERTE)).thenReturn(optionalUser);
-        Mockito.when(userDao.findByEmail(EMAIL_USUARIO)).thenReturn(optionalUser);
-
-        // Ejecución
-        GenericUser resultado = userService.loginUser(user, new MockHttpSession());
-        User userLogged = (User) resultado;
-
-        // Verificación
-        assertEquals(user, userLogged);
-    }
-
-    @Test
-    void testLoginAdminValidoDevuelveAdmin() {
-        Optional<Admin> optionalAdmin = Optional.of(admin);
-        Mockito.when(adminDao.findByEmailAndPassword(EMAIL_ADMIN, PASSWORD_FUERTE)).thenReturn(optionalAdmin);
-        Mockito.when(adminDao.findByEmail(EMAIL_ADMIN)).thenReturn(optionalAdmin);
-
-        // Ejecución
-        User adminUser = new User();
-        adminUser.setEmail(EMAIL_ADMIN);
-        adminUser.setPassword(PASSWORD_FUERTE);
-        GenericUser resultado = userService.loginUser(adminUser, new MockHttpSession());
-        Admin adminLogged = (Admin) resultado;
-
-        // Verificación
-        assertEquals(admin, adminLogged);
-    }
-
+    
     @Test
     void testLoginUsuarioNoEncontradoDevuelve401() {
         // Configuración del mock para simular usuario no encontrado

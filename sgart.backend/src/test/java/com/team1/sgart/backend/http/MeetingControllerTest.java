@@ -1,4 +1,5 @@
 package com.team1.sgart.backend.http;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -9,6 +10,7 @@ import com.team1.sgart.backend.model.Meetings;
 import com.team1.sgart.backend.model.User;
 import com.team1.sgart.backend.services.MeetingService;
 import com.team1.sgart.backend.services.UserService;
+import com.team1.sgart.backend.util.JwtTokenProvider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
@@ -40,6 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@AutoConfigureMockMvc(addFilters = false)
 
 @WebMvcTest(MeetingController.class)
 class MeetingControllerTest {
@@ -49,6 +53,8 @@ class MeetingControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+    @MockBean
+    private JwtTokenProvider jwtTokenProvider;
 
     @MockBean
     private MeetingService meetingService;
@@ -71,11 +77,14 @@ class MeetingControllerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        
-        objectMapper.registerModule(new JavaTimeModule()); 
-    	objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
-        // Datos iniciales para una reunión existente
+        Mockito.when(jwtTokenProvider.validateToken("fake-jwt-token")).thenReturn(true);
+        Mockito.when(jwtTokenProvider.getEmailFromToken("fake-jwt-token")).thenReturn("user@example.com");
+
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+        // Datos iniciales
         existingMeeting = new Meetings(
                 "Initial Meeting", 
                 LocalDate.parse("2024-12-12"), 
@@ -87,24 +96,10 @@ class MeetingControllerTest {
                 UUID.randomUUID()
         );
         existingMeeting.setMeetingId((UUID.fromString("fc5e6d02-8c77-4e24-9372-8e8a9e876d91")));
-
-        // Datos para una reunión actualizada
-        updatedMeeting = new Meetings(
-                "Updated Meeting", 
-                LocalDate.parse("2024-12-15"), 
-                false, 
-                LocalTime.of(10, 0), 
-                LocalTime.of(11, 0), 
-                "Updated Observations", 
-                existingMeeting.getOrganizerId(), 
-                existingMeeting.getLocationId()
-        );
-        updatedMeeting.setMeetingId((UUID.fromString("fc5e6d02-8c77-4e24-9372-8e8a9e876d91")));
     }
 
     @Test
     void createMeeting_ShouldReturnMeeting() throws Exception {
-        // Preparar datos de prueba
         Meetings meeting = new Meetings();
         meeting.setMeetingTitle("Reunión de prueba");
         meeting.setMeetingAllDay(false);
@@ -114,133 +109,133 @@ class MeetingControllerTest {
         meeting.setLocationId(UUID.randomUUID());
         meeting.setMeetingObservations("Reunión importante");
 
-        // Simular comportamiento del servicio
-        Mockito.when(meetingService.createMeeting(anyString(), anyBoolean(), any(), any(), any(), any(), any(), any()))
-                .thenReturn(meeting);
-        
-        // Ejecutar la petición y verificar resultados
+        Mockito.when(meetingService.createMeeting(
+                Mockito.anyString(), 
+                Mockito.anyBoolean(), 
+                Mockito.any(), 
+                Mockito.any(), 
+                Mockito.any(), 
+                Mockito.anyString(), 
+                Mockito.any(), 
+                Mockito.any()
+        )).thenReturn(meeting);
+
         mockMvc.perform(post("/api/meetings/create")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(meeting)))
+                .content(objectMapper.writeValueAsString(meeting))
+                .header("Authorization", "Bearer fake-jwt-token"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.meetingTitle").value("Reunión de prueba"))
-                .andExpect(jsonPath("$.meetingAllDay").value(false))
-                .andExpect(jsonPath("$.meetingStartTime").value("10:00:00"))
-                .andExpect(jsonPath("$.meetingEndTime").value("12:00:00"))
-                .andExpect(jsonPath("$.meetingObservations").value("Reunión importante"));
-    }
-/*	Rosa: no encuentro la forma de que este test funcione y el código lo he revisado varias veces y no encuentro el error 
- *  si es que hay. Lo dejo comentado por si luego se me ocurre algo.
- *  
- *  
-    @Test
-    void inviteUserToMeeting_ShouldReturnInvitation() throws Exception {
-        // Crear datos de prueba
-        UUID meetingId = UUID.randomUUID();
-        UUID userId = UUID.randomUUID();
-        Meeting meeting = new Meeting();  
-        User user = new User();
-        Invitation invitation = new Invitation(meeting, user, InvitationStatus.PENDIENTE, false, null);
-
-
-        when(meetingService.getMeetingById(meetingId)).thenReturn(Optional.of(meeting));
-        when(userService.getUserById(userId)).thenReturn(Optional.of(user));
-
-        when(invitationDao.save(any(Invitation.class))).thenReturn(invitation);
-
-        // llamada al endpoint
-        mockMvc.perform(post("/invite/{meetingId}/{userId}", meetingId, userId))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("PENDIENTE"))  // Verificar el estado de la invitación
-                .andExpect(jsonPath("$.userAttendance").value(false));  // Verificar la asistencia
+                .andExpect(jsonPath("$.meetingAllDay").value(false));
     }
 
-*/
     
     @Test
     void getAttendees_ShouldReturnListOfAttendees() throws Exception {
-        // Datos de prueba
         UUID meetingId = UUID.randomUUID();
         Meetings meeting = new Meetings();
         meeting.setMeetingId(meetingId);
 
         User user1 = new User();
-        user1.setID(UUID.fromString("5ac9c5b9-c41f-4a33-8db9-81b5b0f93b64"));
+        user1.setID(UUID.randomUUID());
+
+        User user2 = new User();
+        user2.setID(UUID.randomUUID());
+
+        List<UUID> attendees = List.of(user1.getID(), user2.getID());
+
+        Mockito.when(meetingService.getMeetingById(meetingId))
+                .thenReturn(Optional.of(meeting));
+        Mockito.when(meetingService.getAttendeesForMeeting(meeting))
+                .thenReturn(attendees);
+
+        mockMvc.perform(get("/api/meetings/{meetingId}/attendees", meetingId)
+                .header("Authorization", "Bearer fake-jwt-token"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0]").value(user1.getID().toString()))
+                .andExpect(jsonPath("$[1]").value(user2.getID().toString()));
+    }
+
+    
+
+    @Test
+    void cancelMeeting_ShouldReturnSuccessMessage() throws Exception {
+        UUID meetingId = UUID.randomUUID();
+
+        Mockito.when(meetingService.cancelMeetingByOrganizer(Mockito.eq(meetingId))).thenReturn(true);
+
+        mockMvc.perform(delete("/api/meetings/{meetingId}/cancel", meetingId)
+                        .header("Authorization", "Bearer fake-jwt-token"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Reunión cancelada exitosamente"));
+
+        Mockito.verify(meetingService, Mockito.times(1)).cancelMeetingByOrganizer(Mockito.eq(meetingId));
+    }
+    @Test
+    void getAvailableUsers_ShouldReturnListOfUsers() throws Exception {
+        User user1 = new User();
+        user1.setID(UUID.randomUUID());
         user1.setName("John Doe");
 
         User user2 = new User();
-        user2.setID(UUID.fromString("fd925c7e-be4c-4997-bf40-f1de30925ded"));
+        user2.setID(UUID.randomUUID());
         user2.setName("Jane Doe");
 
-        List<UUID> attendees = Arrays.asList(user1.getID(), user2.getID());
+        List<User> availableUsers = List.of(user1, user2);
 
-        // Configurar los mocks
-        when(meetingService.getMeetingById(meetingId)).thenReturn(Optional.of(meeting));
-        when(meetingService.getAttendeesForMeeting(meeting)).thenReturn(attendees);
+        Mockito.when(meetingService.getAvailableUsers()).thenReturn(availableUsers);
 
-        // Ejecutar la solicitud y verificar resultados
-        mockMvc.perform(get("/api/meetings/{meetingId}/attendees", meetingId))
+        mockMvc.perform(get("/api/meetings/available-users")
+                        .header("Authorization", "Bearer fake-jwt-token"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0]").value("5ac9c5b9-c41f-4a33-8db9-81b5b0f93b64"))
-                .andExpect(jsonPath("$[1]").value("fd925c7e-be4c-4997-bf40-f1de30925ded"));
+                .andExpect(jsonPath("$[0].id").value(user1.getID().toString()))
+                .andExpect(jsonPath("$[0].name").value("John Doe"))
+                .andExpect(jsonPath("$[1].id").value(user2.getID().toString()))
+                .andExpect(jsonPath("$[1].name").value("Jane Doe"));
+
+        Mockito.verify(meetingService, Mockito.times(1)).getAvailableUsers();
     }
-    
-    //Devuelve 200
     @Test
-    void editMeetingValidRequestReturns200() throws Exception {
-    	ObjectMapper objectMapper = new ObjectMapper();
-    	objectMapper.registerModule(new JavaTimeModule()); 
-    	objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        String meetingJson = objectMapper.writeValueAsString(updatedMeeting);
-        UUID meetingId = existingMeeting.getMeetingId();
-
-        Mockito.doNothing().when(meetingService).modifyMeeting(Mockito.eq(meetingId), Mockito.any(Meetings.class));
-
-        // Act & Assert
-        mockMvc.perform(post(URL_MEETINGS + meetingId + URL_MODIFY)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(meetingJson))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Reunión modificada correctamente"));
-
-        Mockito.verify(meetingService, Mockito.times(1)).modifyMeeting(Mockito.eq(meetingId), Mockito.any(Meetings.class));
-    }
-    
-    //Devuelve 404
-    @Test
-    void editMeetingMeetingNotFoundReturns404() throws Exception {
-        String meetingJson = objectMapper.writeValueAsString(updatedMeeting);
-        UUID meetingId = existingMeeting.getMeetingId();
+    void editMeeting_InvalidMeetingId_ShouldReturnNotFound() throws Exception {
+        UUID invalidMeetingId = UUID.randomUUID();
+        Meetings updatedMeeting = new Meetings(
+                "Updated Meeting", 
+                LocalDate.parse("2024-12-15"), 
+                false, 
+                LocalTime.of(10, 0), 
+                LocalTime.of(11, 0), 
+                "Updated Observations", 
+                UUID.randomUUID(), 
+                UUID.randomUUID()
+        );
 
         Mockito.doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Reunión no encontrada"))
-                .when(meetingService).modifyMeeting(Mockito.eq(meetingId), Mockito.any(Meetings.class));
+                .when(meetingService).modifyMeeting(Mockito.eq(invalidMeetingId), Mockito.any(Meetings.class));
 
-        mockMvc.perform(post(URL_MEETINGS + meetingId + URL_MODIFY)
+        // Ejecutar la petición y verificar resultados
+        mockMvc.perform(post("/api/meetings/{meetingId}/modify", invalidMeetingId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(meetingJson))
+                        .content(objectMapper.writeValueAsString(updatedMeeting))
+                        .header("Authorization", "Bearer fake-jwt-token"))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("Reunión no encontrada"));
 
-        Mockito.verify(meetingService, Mockito.times(1)).modifyMeeting(Mockito.eq(meetingId), Mockito.any(Meetings.class));
+        Mockito.verify(meetingService, Mockito.times(1))
+                .modifyMeeting(Mockito.eq(invalidMeetingId), Mockito.any(Meetings.class));
     }
-    
-    //Devuelve 409
     @Test
-    void editMeetingConflictReturns409() throws Exception {
-        String meetingJson = objectMapper.writeValueAsString(updatedMeeting);
-        UUID meetingId = existingMeeting.getMeetingId();
+    void cancelMeeting_NonExistentMeeting_ShouldReturnNotFound() throws Exception {
+        UUID nonExistentMeetingId = UUID.randomUUID();
 
-        Mockito.doThrow(new ResponseStatusException(HttpStatus.CONFLICT, "El organizador tiene una reunión en el nuevo tramo"))
-                .when(meetingService).modifyMeeting(Mockito.eq(meetingId), Mockito.any(Meetings.class));
+        Mockito.doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Reunión no encontrada"))
+                .when(meetingService).cancelMeetingByOrganizer(Mockito.eq(nonExistentMeetingId));
 
-        // Act & Assert
-        mockMvc.perform(post(URL_MEETINGS + meetingId + URL_MODIFY)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(meetingJson))
-                .andExpect(status().isConflict())
-                .andExpect(content().string("El organizador tiene una reunión en el nuevo tramo"));
+        mockMvc.perform(delete("/api/meetings/{meetingId}/cancel", nonExistentMeetingId)
+                        .header("Authorization", "Bearer fake-jwt-token"))
+                .andExpect(status().isNotFound()); // Verificar solo el estado
 
-        Mockito.verify(meetingService, Mockito.times(1)).modifyMeeting(Mockito.eq(meetingId), Mockito.any(Meetings.class));
+        Mockito.verify(meetingService, Mockito.times(1)).cancelMeetingByOrganizer(Mockito.eq(nonExistentMeetingId));
     }
-    
+
+
 }

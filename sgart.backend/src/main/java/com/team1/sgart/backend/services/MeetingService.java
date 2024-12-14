@@ -163,36 +163,5 @@ public class MeetingService {
 		
 		return true;
 	}
-	/*
-	// Método para cancelar una reunión si todas las invitaciones están rechazadas
-	public boolean cancelMeetingIfAllInvitationsRejected(UUID meetingId, UUID excludedInvitationId) {
-		
-		// Recuperamos todas las invitaciones EXCEPTO la que se está procesando por si no se ha guardado Rechazada aún
-		List<Invitations> invitations = invitationDao.findByMeetingIdAndInvitationIdNot(meetingId, excludedInvitationId);
-
-
-		if (invitations.isEmpty()) {
-			throw new RuntimeException("No se encontraron invitaciones para la reunión");
-		}
-
-		// Verificamos que todas las invitaciones están rechazadas
-		boolean allRejected = invitations.stream()
-				.allMatch(invitation -> invitation.getInvitationStatus().equals(InvitationStatus.RECHAZADA));
-
-		if (allRejected) {
-// ------------------------------------------------------------------------------------Esto es igual que cancelMeetingByOrganizer se podría juntar :P
-			Optional<Meetings> meetingOpt = meetingDao.findById(meetingId);
-			if (meetingOpt.isEmpty()) {
-				throw new RuntimeException("Reunión no encontrada");
-			}
-
-			Meetings meeting = meetingOpt.get();
-			meetingDao.delete(meeting);
-			return true;
-			//--------------------------------------------------------------------------
-		}
-
-		return false;
-	}
-	*/
+	
 }

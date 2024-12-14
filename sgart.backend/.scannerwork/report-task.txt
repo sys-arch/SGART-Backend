@@ -2,5 +2,5 @@ projectKey=2024-g01-SGART-Backend
 serverUrl=http://seralu4.esi.uclm.es:1521
 serverVersion=10.6.0.92116
 dashboardUrl=http://seralu4.esi.uclm.es:1521/dashboard?id=2024-g01-SGART-Backend
-ceTaskId=db82856b-261c-44d4-b2b1-91cbd55dd00e
-ceTaskUrl=http://seralu4.esi.uclm.es:1521/api/ce/task?id=db82856b-261c-44d4-b2b1-91cbd55dd00e
+ceTaskId=6491dd4d-885f-4487-a202-66f2a75cc286
+ceTaskUrl=http://seralu4.esi.uclm.es:1521/api/ce/task?id=6491dd4d-885f-4487-a202-66f2a75cc286
