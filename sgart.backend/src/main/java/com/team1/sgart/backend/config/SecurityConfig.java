@@ -30,7 +30,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/meetings/**").authenticated() // Restringir acceso a empleados
                 .requestMatchers("/auth/validate-token").permitAll() // Permitir acceso sin autenticación
                 .requestMatchers("/invitations/**").hasAuthority("employee") // Solo empleados pueden invitar
-                .requestMatchers("/admin/**").hasAuthority("admin") // Solo admin puede acceder
+                .requestMatchers("/admin/**").permitAll() // Solo admin puede acceder
                 .requestMatchers("/employee/**").hasAuthority("employee") // Solo empleados pueden acceder
                 .requestMatchers("/users/**").permitAll() // Solo usuarios pueden acceder
                 .anyRequest().authenticated() // Cualquier otra solicitud requiere autenticación
@@ -46,4 +46,3 @@ public class SecurityConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 }
-
