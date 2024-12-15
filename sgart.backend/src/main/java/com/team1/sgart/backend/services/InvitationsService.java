@@ -83,6 +83,8 @@ public class InvitationsService {
     }
 
     public boolean inviteUsers(UUID meetingId, List<UUID> userIds) {
+    	logger.debug("Datos recibidos en inviteUsers: meetingId={}, userIds={}", meetingId, userIds);
+
         if (meetingId == null || userIds == null || userIds.isEmpty()) {
             logger.error("Meeting ID is null or users list is empty");
             return false;

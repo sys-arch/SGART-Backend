@@ -97,19 +97,21 @@ public interface InvitationsDao extends JpaRepository<Invitations, Integer> {
 	  @Query(value = "SELECT user_id FROM SGART_InvitationsTable WHERE meeting_id = :meetingId", nativeQuery = true)
 	  List<UUID> findUserIdsByMeetingId(@Param("meetingId") UUID meetingId);
 
-    @Modifying
-    @Query(value = """
-            INSERT INTO SGART_InvitationsTable 
-            (MEETING_ID, USER_ID, INVITATION_STATUS, REJECTION_REASON, USER_ATTENDANCE) 
-            VALUES 
-            (:meetingId, :userId, :status, :comment, 0)
-            """, nativeQuery = true)
-    int createInvitation(
-        @Param("meetingId") UUID meetingId,
-        @Param("userId") UUID userId,
-        @Param("status") String status,
-        @Param("comment") String comment
-    );
+	  @Modifying
+	  @Query(value = """
+	          INSERT INTO SGART_InvitationsTable 
+	          (MEETING_ID, USER_ID, INVITATION_STATUS, REJECTION_REASON, USER_ATTENDANCE) 
+	          VALUES 
+	          (:meetingId, :userId, :status, :comment, 0)
+	          """, nativeQuery = true)
+	  int createInvitation(
+	      @Param("meetingId") UUID meetingId,
+	      @Param("userId") UUID userId,
+	      @Param("status") String status,
+	      @Param("comment") String comment
+	  );
+
+
     
     @Query("SELECT i FROM Invitations i WHERE i.meeting.meetingId = :meetingId AND i.invitation_id <> :excludedInvitationId")
     List<Invitations> findByMeetingIdAndInvitationIdNot(UUID meetingId, UUID excludedInvitationId);
