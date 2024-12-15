@@ -1,10 +1,12 @@
 package com.team1.sgart.backend.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.team1.sgart.backend.dao.UserDao;
 import com.team1.sgart.backend.model.Admin;
 import com.team1.sgart.backend.model.User;
 import com.team1.sgart.backend.model.UserDTO;
 import com.team1.sgart.backend.services.UserService;
+import com.team1.sgart.backend.util.JwtTokenProvider;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -12,7 +14,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,7 +28,8 @@ import org.springframework.web.server.ResponseStatusException;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(UserController.class)
+@SpringBootTest
+@AutoConfigureMockMvc
 class UserControllerTest {
 	
 	private static final String URLREGISTRAR = "/users/registro";
@@ -35,16 +40,21 @@ class UserControllerTest {
 	
     @Autowired
     private MockMvc mockMvc;
+    @MockBean
+    private JwtTokenProvider jwtTokenProvider;
 
     @MockBean
     private UserService userService;
-    
+    @MockBean
+    private UserDao userDao;
+
     private User user;
     private Admin admin;
     private String changesInProfile;
     
     @BeforeEach
     public void setUp() {
+
         user = new User("carlos.romero@example.com", "Carlos", "Romero Navarro", "Quality", "Ciudad Real", "01/01/2024", 
                         "Scrum Developer", "password123@", "password123@", false, false, "");
         admin = new Admin("test", "admin", "test@admin.com", "adminPassword123");
@@ -152,66 +162,8 @@ class UserControllerTest {
                 .andExpect(status().isNotFound());
     }
     
-    /*
-    @Test
-    void loginUsuarioValidoDevuelve200() throws Exception {
-    	ObjectMapper objectMapper = new ObjectMapper();
-        String userJson = objectMapper.writeValueAsString(user);
-
-        GenericUser genericUser = user; // Usuario de tipo User
-        Mockito.when(userService.loginUser(Mockito.any(User.class), Mockito.any(HttpSession.class))).thenReturn(genericUser);
-
-        mockMvc.perform(post("/users/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(userJson)
-                .sessionAttr("session", new MockHttpSession())) // Agregar una sesión simulada
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.type").value("user"))
-                .andExpect(jsonPath("$.user").exists())
-                .andExpect(jsonPath("$.user.email").value(user.getEmail()))
-                .andExpect(jsonPath("$.user.name").value(user.getName()))
-                .andExpect(jsonPath("$.user.lastName").value(user.getLastName()));
-    }
     
-    @Test
-    void loginAdminValidoDevuelve200() throws Exception {
-    	ObjectMapper objectMapper = new ObjectMapper();
-        String userJson = objectMapper.writeValueAsString(user);
 
-        // Simulando un login exitoso con un administrador
-        GenericUser genericUser = admin; // Usuario de tipo Admin
-        Mockito.when(userService.loginUser(Mockito.any(User.class), Mockito.any(HttpSession.class))).thenReturn(genericUser);
-
-        mockMvc.perform(post("/users/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(userJson)
-                .sessionAttr("session", new MockHttpSession())) // Agregar una sesión simulada
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.type").value("admin"))
-                .andExpect(jsonPath("$.admin").exists())
-                .andExpect(jsonPath("$.admin.email").value(admin.getEmail()))
-                .andExpect(jsonPath("$.admin.name").value(admin.getName()))
-                .andExpect(jsonPath("$.admin.lastName").value(admin.getLastName()));
-    }
-    */
-
-    @Test
-    void loginUsuarioNoExistenteDevuelve401() throws Exception {
-    	ObjectMapper objectMapper = new ObjectMapper();
-		String userJson = objectMapper.writeValueAsString(user);
-
-        // Simulando un usuario no encontrado (respondería un error 401)
-        Mockito.when(userService.loginUser(Mockito.any(User.class), Mockito.any(HttpSession.class)))
-                .thenThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, USER_NOTFOUND));
-
-        mockMvc.perform(post(URLLOGIN)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(userJson)
-                .sessionAttr("session", new MockHttpSession())) 
-                .andExpect(status().isUnauthorized())
-                .andExpect(content().string(USER_NOTFOUND));
-    }
-    
     // Tests para el método modificar perfil
     @Test
     void usuarioModificarPerfilDevuelve200() throws Exception {

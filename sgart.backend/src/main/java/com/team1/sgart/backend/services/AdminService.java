@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -17,9 +18,12 @@ import com.team1.sgart.backend.model.AdminDTO;
 import com.team1.sgart.backend.model.User;
 import com.team1.sgart.backend.model.UserDTO;
 
+import jakarta.annotation.PostConstruct;
+
 @Service
 public class AdminService {
-	
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
 	private UserDao userDAO;
 	private AdminDao adminDAO;
 	private InvitationsDao invitationsDAO;
@@ -50,7 +54,22 @@ public class AdminService {
 			return dto;
 		}).collect(Collectors.toList());
 	}
-	
+
+    @PostConstruct
+    public void init() {
+        hashAdminPasswordsOnStartup();
+    }
+
+    public void hashAdminPasswordsOnStartup() {
+        List<Admin> admins = adminDAO.findAll();
+        for (Admin admin : admins) {
+            if (admin.getPassword() != null && !admin.getPassword().startsWith("$2a$")) {
+                admin.setPassword(passwordEncoder.encode(admin.getPassword()));
+                adminDAO.save(admin);
+                System.out.println("Contraseña del administrador con email " + admin.getEmail() + " hasheada.");
+            }
+        }
+    }
 	public List<AdminDTO> mapAdmin(List<Admin> admins){
 		return admins.stream().map(admin -> {
 			AdminDTO dto= new AdminDTO();
@@ -121,19 +140,34 @@ public class AdminService {
 	}
 
 	public void modificarAdmin(Admin admin) {
-		String email = admin.getEmail();
-		if(!emailAdminEstaRegistrado(email)) 
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "El email no está registrado");
-		adminDAO.updateAdmin(email, admin);
+	    String email = admin.getEmail();
+	    if (!emailAdminEstaRegistrado(email)) {
+	        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "El email no está registrado");
+	    }
+
+	    // Hashear la contraseña si no está hasheada
+	    if (admin.getPassword() != null && !admin.getPassword().startsWith("$2a$")) {
+	        admin.setPassword(passwordEncoder.encode(admin.getPassword()));
+	    }
+
+	    adminDAO.updateAdmin(email, admin);
 	}
+
 	
 	public UUID crearAdmin(Admin admin) {
-		String email = admin.getEmail();
-		if(validationService.emailExisteEnSistema(admin.getEmail())) 
-			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El email ya está registrado");
-		adminDAO.save(admin);
-		return adminDAO.findByEmail(admin.getEmail()).get().getID();
+	    if (validationService.emailExisteEnSistema(admin.getEmail())) {
+	        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El email ya está registrado");
+	    }
+
+	    // Hashear la contraseña antes de guardar
+	    if (admin.getPassword() != null && !admin.getPassword().startsWith("$2a$")) {
+	        admin.setPassword(passwordEncoder.encode(admin.getPassword()));
+	    }
+
+	    adminDAO.save(admin);
+	    return adminDAO.findByEmail(admin.getEmail()).get().getID();
 	}
+
 	
 	private boolean emailUserEstaRegistrado(String email) {
 		return userDAO.findByEmail(email).isPresent();

@@ -110,6 +110,23 @@ public class UserService {
 	            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Formato del email incorrecto");
 	        }
 
+	        // Verificar si el usuario es un Admin
+	        Optional<Admin> optionalAdmin = adminDao.findByEmail(email);
+	        if (optionalAdmin.isPresent()) {
+	            Admin admin = optionalAdmin.get();
+	            if (passwordEncoder.matches(password, admin.getPassword())) {
+	                resetAttempts(sessionId);
+	                if (admin.getBlocked()) {
+	                    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cuenta de administrador bloqueada. Contacte al soporte.");
+	                }
+	                return admin; // Devuelve el Admin autenticado
+	            } else {
+	                incrementAttempts(sessionId);
+	                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Contraseña incorrecta.");
+	            }
+	        }
+
+	        // Verificar si el usuario es un User
 	        Optional<User> optionalUser = userDao.findByEmail(email);
 	        if (optionalUser.isPresent()) {
 	            User existingUser = optionalUser.get();
@@ -118,16 +135,20 @@ public class UserService {
 	                if (existingUser.isBlocked()) {
 	                    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cuenta bloqueada. Contacte al soporte.");
 	                }
-	                return existingUser;
+	                return existingUser; // Devuelve el User autenticado
 	            } else {
 	                incrementAttempts(sessionId);
 	                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Contraseña incorrecta.");
 	            }
 	        }
 
+	        // Si no se encuentra ni como User ni como Admin
 	        incrementAttempts(sessionId);
 	        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Email no encontrado.");
 	    }
+
+
+	  
 
 	    private boolean isSessionBlocked(String sessionId) {
 	        if (blockedSessions.containsKey(sessionId)) {

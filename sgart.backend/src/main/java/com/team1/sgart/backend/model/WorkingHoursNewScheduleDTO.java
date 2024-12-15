@@ -39,15 +39,4 @@ public class WorkingHoursNewScheduleDTO {
         return endTime;
     }
 
-    public void setEndTime(LocalTime endTime) {
-        this.endTime = endTime;
-    }
-
-    public String getReason() {
-        return reason;
-    }
-
-    public void setReason(String reason) {
-        this.reason = reason;
-    }
 }
