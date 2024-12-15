@@ -85,6 +85,7 @@ public class UserController {
 	        Map<String, Object> response = new HashMap<>();
 	        response.put(SUCCESS_KEY , true);
 	        response.put("token", token);
+	        logger.info("Token generado: " + token);
 
 	        return ResponseEntity.ok(response);
 	    } catch (Exception e) {

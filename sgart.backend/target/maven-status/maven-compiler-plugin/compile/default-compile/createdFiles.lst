@@ -28,7 +28,6 @@ com\team1\sgart\backend\services\MeetingService.class
 com\team1\sgart\backend\services\UserService.class
 com\team1\sgart\backend\model\MeetingsDTO.class
 com\team1\sgart\backend\http\TwoFactorAuthController.class
-com\team1\sgart\backend\model\WorkingHoursNewSchedule.class
 com\team1\sgart\backend\model\Absences.class
 com\team1\sgart\backend\services\InvitationsService.class
 com\team1\sgart\backend\http\AdminCalendarController.class

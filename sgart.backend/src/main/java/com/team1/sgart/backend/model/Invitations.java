@@ -9,8 +9,10 @@ import java.util.UUID;
 public class Invitations {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.UUID)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "invitationid")
 	private UUID invitation_id;
+
 
 
     @ManyToOne
