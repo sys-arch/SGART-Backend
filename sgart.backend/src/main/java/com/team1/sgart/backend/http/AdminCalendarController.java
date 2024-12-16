@@ -47,8 +47,9 @@ public class AdminCalendarController {
 
         List<InvitationsDTO> invitees = calendarService.getDetailedInvitationsByMeetingId(meetingId);
         if (invitees == null || invitees.isEmpty()) {
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.ok(List.of()); // Devuelve una lista vacía
         }
         return ResponseEntity.ok(invitees);
     }
+
 }
