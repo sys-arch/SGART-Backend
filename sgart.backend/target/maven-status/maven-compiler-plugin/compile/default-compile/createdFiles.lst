@@ -3,6 +3,7 @@ com\team1\sgart\backend\model\Locations.class
 com\team1\sgart\backend\model\GenericUser.class
 com\team1\sgart\backend\dao\LocationsDao.class
 com\team1\sgart\backend\dao\AdminDao.class
+com\team1\sgart\backend\services\NotificacionService.class
 com\team1\sgart\backend\http\MeetingController.class
 com\team1\sgart\backend\config\CorsConfig.class
 com\team1\sgart\backend\services\WorkingHoursService.class
@@ -14,6 +15,7 @@ com\team1\sgart\backend\dao\WorkingHoursDao.class
 com\team1\sgart\backend\model\User.class
 com\team1\sgart\backend\config\AppConfig.class
 com\team1\sgart\backend\http\InvitationsController.class
+com\team1\sgart\backend\model\Notificacion.class
 com\team1\sgart\backend\model\AbsencesDTO.class
 com\team1\sgart\backend\services\LocationsService.class
 com\team1\sgart\backend\http\AdminWorkingHoursController.class
@@ -28,10 +30,12 @@ com\team1\sgart\backend\services\MeetingService.class
 com\team1\sgart\backend\services\UserService.class
 com\team1\sgart\backend\model\MeetingsDTO.class
 com\team1\sgart\backend\http\TwoFactorAuthController.class
+com\team1\sgart\backend\http\NotificacionController.class
 com\team1\sgart\backend\model\Absences.class
 com\team1\sgart\backend\services\InvitationsService.class
 com\team1\sgart\backend\http\AdminCalendarController.class
 com\team1\sgart\backend\config\SecurityConfig.class
+com\team1\sgart\backend\dao\NotificacionDao.class
 com\team1\sgart\backend\http\AbsencesController.class
 com\team1\sgart\backend\model\UserDTO.class
 com\team1\sgart\backend\services\CalendarService.class

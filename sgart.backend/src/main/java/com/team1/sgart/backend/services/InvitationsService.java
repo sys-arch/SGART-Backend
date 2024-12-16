@@ -14,6 +14,9 @@ import org.springframework.stereotype.Service;
 @Service
 @Transactional
 public class InvitationsService {
+	
+	@Autowired
+	private NotificacionService notificacionService;
 
     private static final Logger logger = LoggerFactory.getLogger(InvitationsService.class);
     private final InvitationsDao invitationsDao;
@@ -25,24 +28,36 @@ public class InvitationsService {
         logger.info("[!] InvitationsService created");
     }
 
-    public boolean updateInvitationStatus(UUID meetingId, UUID userId, String newStatus, String comment) {
+    public boolean updateInvitationStatusWithNotification(UUID meetingId, UUID userId, String newStatus, String comment) {
+        // Actualiza el estado usando la lógica original
+        boolean updated = updateInvitationStatusLogic(meetingId, userId, newStatus, comment);
+
+        // Si la actualización fue exitosa, notifica al usuario
+        if (updated) {
+            notificarActualizacionEstado(meetingId, userId, newStatus);
+        }
+
+        return updated;
+    }
+
+    // Método privado que contiene la lógica original
+    private boolean updateInvitationStatusLogic(UUID meetingId, UUID userId, String newStatus, String comment) {
         try {
-            logger.debug("Updating invitation - Meeting: {}, User: {}, Status: {}", 
-                      meetingId, userId, newStatus);
-            
+            logger.debug("Updating invitation - Meeting: {}, User: {}, Status: {}", meetingId, userId, newStatus);
+
             int count = invitationsDao.countByMeetingIdAndUserId(meetingId, userId);
             if (count == 0) {
-                logger.warn("Invitation not found");
+                logger.warn("Invitation not found for Meeting: {} and User: {}", meetingId, userId);
                 return false;
             }
-            
+
             return invitationsDao.updateInvitationStatus(meetingId, userId, newStatus, comment) > 0;
+
         } catch (Exception e) {
             logger.error("Error updating invitation status", e);
             throw new RuntimeException("Error updating invitation status", e);
         }
     }
-
     public boolean updateUserAttendance(UUID meetingId, UUID userId) {
         try {
             logger.debug("Updating user attendance - Meeting: {}, User: {}", 
@@ -114,6 +129,9 @@ public class InvitationsService {
                 if (result > 0) {
                     successCount++;
                 }
+                
+             // Llamada al método independiente para generar notificación
+                notificarInvitacion(meetingId, userId);
             }
             
             logger.info("Successfully created {} invitations out of {} users", 
@@ -126,6 +144,28 @@ public class InvitationsService {
                       meetingId, e.getMessage(), e);
             throw new RuntimeException("Error creating invitations", e);
         }
+    }
+    
+ // Notificar al usuario invitado
+    public void notificarInvitacion(UUID meetingId, UUID userId) {
+        notificacionService.crearNotificacion(
+            userId,
+            "Nueva invitación a reunión",
+            "Has sido invitado a una reunión con ID: " + meetingId
+        );
+    }
+    
+ // Notificar actualización del estado de invitación
+    public void notificarActualizacionEstado(UUID meetingId, UUID userId, String nuevoEstado) {
+        String mensaje = nuevoEstado.equalsIgnoreCase("ACEPTADA")
+            ? "Has aceptado la reunión con ID: " + meetingId
+            : "Has rechazado la reunión con ID: " + meetingId;
+
+        notificacionService.crearNotificacion(
+            userId,
+            "Actualización de invitación",
+            mensaje
+        );
     }
 
 }
