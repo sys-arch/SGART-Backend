@@ -128,25 +128,21 @@ class UserServiceTest {
     
     @Test
     void testLoginUsuarioNoEncontradoDevuelve401() {
-        // Configuración del mock para simular usuario no encontrado
         Mockito.when(userDao.findByEmailAndPassword(EMAIL_USUARIO, PASSWORD_INCORRECTO)).thenReturn(Optional.empty());
         Mockito.when(adminDao.findByEmailAndPassword(EMAIL_USUARIO, PASSWORD_INCORRECTO)).thenReturn(Optional.empty());
 
-        // Ejecución y verificación
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> 
             userService.loginUser(user, new MockHttpSession())
         );
 
         assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatusCode());
-        assertEquals("Usuario o contraseña incorrectos", exception.getReason());
+        assertEquals("Email no encontrado.", exception.getReason());
     }
 
     @Test
     void testLoginEmailFormatoInvalidoDevuelve400() {
-        // Configuración del email con formato inválido
         user.setEmail("carlos.romero");
 
-        // Ejecución y verificación
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> 
             userService.loginUser(user, new MockHttpSession())
         );
@@ -157,7 +153,6 @@ class UserServiceTest {
     
     @Test
     void testModificarPerfilUserExistente() {
-        // Datos de prueba
         Optional<User> optionalUser = Optional.of(user);
 
         User userPerfilModificado = new User();
@@ -168,20 +163,17 @@ class UserServiceTest {
         userPerfilModificado.setCenter(jsonPerfilModificado.getCenter());
         userPerfilModificado.setProfile(jsonPerfilModificado.getProfile());
 
-        // Configurar los mocks
         Mockito.when(userDao.findById(user.getID())).thenReturn(optionalUser); // Simular que el usuario existe
         Mockito.when(userDao.save(Mockito.any(User.class))).thenAnswer(invocation -> invocation.getArgument(0)); // Simular guardado de usuario
 
-        // Ejecutar el método
         userService.modificarPerfilUser(jsonPerfilModificado);
 
-        // Verificar que el perfil ha sido actualizado
         assertEquals("John", user.getName());
         assertEquals("Marston", user.getLastName());
         assertEquals(DEPARTAMENTO, user.getDepartment());
         assertEquals("Royal City", user.getCenter());
         assertEquals("Scrum Master", user.getProfile());
-        Mockito.verify(userDao).save(user); // Verificar que el perfil ha sido actualizado
+        Mockito.verify(userDao).save(user); 
     }
 
     @Test
