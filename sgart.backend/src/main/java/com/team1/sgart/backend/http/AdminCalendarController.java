@@ -39,9 +39,18 @@ public class AdminCalendarController {
     }
 
     @PostMapping("/invitados")
-    public ResponseEntity<List<InvitationsDTO>> getInvitees(@RequestBody Map<String, UUID> payload) {
-        UUID meetingId = payload.get("meetingId");
-        if (meetingId == null) {
+    public ResponseEntity<List<InvitationsDTO>> getInvitees(@RequestBody Map<String, String> payload) {
+        String meetingIdString = payload.get("meetingId");
+        if (meetingIdString == null || meetingIdString.isEmpty()) {
+            logger.error("Error: meetingId es nulo o vacío");
+            return ResponseEntity.badRequest().build();
+        }
+
+        UUID meetingId;
+        try {
+            meetingId = UUID.fromString(meetingIdString);
+        } catch (IllegalArgumentException e) {
+            logger.error("Error: meetingId no es un UUID válido", e);
             return ResponseEntity.badRequest().build();
         }
 
@@ -51,5 +60,6 @@ public class AdminCalendarController {
         }
         return ResponseEntity.ok(invitees);
     }
+
 
 }
