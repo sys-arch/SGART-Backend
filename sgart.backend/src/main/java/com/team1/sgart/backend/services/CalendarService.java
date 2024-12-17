@@ -61,16 +61,21 @@ public class CalendarService {
 
         return results.stream().map(record -> {
             InvitationsDTO dto = new InvitationsDTO();
-            dto.setInvitationId((Integer) record[0]);
-            dto.setMeetingId(UUID.fromString((String) record[1]));
-            dto.setUserId(UUID.fromString((String) record[2]));
-            dto.setUserName(record[3] + " " + record[4]); // Combinar user_name y user_lastName
-            dto.setInvitationStatus((String) record[5]);
-            dto.setUserAttendance((Boolean) record[6]);
-            dto.setRejectionReason((String) record[7]);
+            try {
+                dto.setInvitationId(UUID.fromString(record[0].toString())); // invitation_id
+                dto.setMeetingId(UUID.fromString(record[1].toString()));    // meeting_id
+                dto.setUserId(UUID.fromString(record[2].toString()));       // user_id
+                dto.setUserName(record[3] + " " + record[4]);               // user_name y user_lastName
+                dto.setInvitationStatus((String) record[5]);                // invitation_status
+                dto.setUserAttendance((Boolean) record[6]);                 // user_attendance
+                dto.setRejectionReason((String) record[7]);                 // rejection_reason
+            } catch (Exception e) {
+                logger.error("Error al mapear resultado a InvitationsDTO: ", e);
+            }
             return dto;
         }).collect(Collectors.toList());
     }
+
 
     public List<MeetingsDTO> getMeetingsByUserId(UUID userId) {
         List<UUID> meetingIds = getMeetingIdsByUserId(userId);

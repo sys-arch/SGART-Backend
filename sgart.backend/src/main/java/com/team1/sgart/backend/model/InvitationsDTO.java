@@ -6,7 +6,7 @@ import java.util.UUID;
 public class InvitationsDTO {
 
     @JsonProperty("invitationId")
-    private int invitationId;
+    private UUID invitationId;  // Cambiado a UUID
 
     @JsonProperty("meetingId")
     private UUID meetingId;
@@ -29,7 +29,7 @@ public class InvitationsDTO {
     public InvitationsDTO() {
     }
 
-    public InvitationsDTO(int invitationId, UUID meetingId, UUID userId, String
+    public InvitationsDTO(UUID invitationId, UUID meetingId, UUID userId, String
                                   userName, String invitationStatus,
                           boolean userAttendance, String rejectionReason) {
         this.invitationId = invitationId;
@@ -41,11 +41,11 @@ public class InvitationsDTO {
         this.rejectionReason = rejectionReason;
     }
 
-    public int getInvitationId() {
+    public UUID getInvitationId() {  // Cambiado a UUID
         return invitationId;
     }
 
-    public void setInvitationId(int invitationId) {
+    public void setInvitationId(UUID invitationId) {  // Cambiado a UUID
         this.invitationId = invitationId;
     }
 
@@ -96,5 +96,4 @@ public class InvitationsDTO {
     public void setRejectionReason(String rejectionReason) {
         this.rejectionReason = rejectionReason;
     }
-
 }
