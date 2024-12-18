@@ -63,7 +63,7 @@ public class InvitationsController {
         }
 
         try {
-            boolean updated = invitationsService.updateInvitationStatus(
+            boolean updated = invitationsService.updateInvitationStatusWithNotification(
                     meetingId,
                     userId,
                     requestBody.get("newStatus"),
