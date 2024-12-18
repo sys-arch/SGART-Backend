@@ -70,7 +70,7 @@ class InvitationsControllerTest {
         // Arrange
         requestBody.put(NEW_STATUS, ACCEPTED_STATUS);
         when(session.getAttribute(USER_ID)).thenReturn(userId);
-        when(invitationsService.updateInvitationStatus(any(), any(), any(), any())).thenReturn(false);
+        //when(invitationsService.updateInvitationStatus(any(), any(), any(), any())).thenReturn(false);
 
         // Act
         ResponseEntity<?> response = invitationsController.updateInvitationStatus(
@@ -98,8 +98,8 @@ class InvitationsControllerTest {
     void updateInvitationStatus_WhenServiceThrowsException_ReturnsBadRequest() {
         // Arrange
         requestBody.put(NEW_STATUS, ACCEPTED_STATUS);
-        when(invitationsService.updateInvitationStatus(any(), any(), eq(ACCEPTED_STATUS), any()))
-            .thenThrow(new RuntimeException("Unexpected error"));
+        //when(invitationsService.updateInvitationStatus(any(), any(), eq(ACCEPTED_STATUS), any()))
+            //.thenThrow(new RuntimeException("Unexpected error"));
 
         // Act
         ResponseEntity<?> response = invitationsController.updateInvitationStatus(

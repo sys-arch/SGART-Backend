@@ -24,17 +24,20 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable()) // Deshabilitar CSRF
             .cors(cors -> cors.configure(http))
             .authorizeHttpRequests(auth -> auth
-            	.requestMatchers("/administrador/calendarios/**").authenticated()
-            	.requestMatchers("/auth/validate-totp").permitAll() 
-                .requestMatchers("/auth/generate-qr").permitAll() // Permitir acceso sin autenticación
-                .requestMatchers("/users/current/userId").authenticated() // Permitir acceso a cualquier usuario autenticado
-                .requestMatchers("/api/meetings/**").authenticated() // Restringir acceso a empleados
-                .requestMatchers("/auth/validate-token").permitAll() // Permitir acceso sin autenticación
-                .requestMatchers("/invitations/**").hasAuthority("employee") // Solo empleados pueden invitar
-                .requestMatchers("/admin/**").permitAll() // Solo admin puede acceder
-                .requestMatchers("/employee/**").hasAuthority("employee") // Solo empleados pueden acceder
-                .requestMatchers("/users/**").permitAll() // Solo usuarios pueden acceder
-                .anyRequest().authenticated() // Cualquier otra solicitud requiere autenticación
+            		.requestMatchers("/auth/forgot-password").permitAll() 
+                    .requestMatchers("/administrador/**").authenticated()
+                	.requestMatchers("/administrador/calendarios/invitados").authenticated()
+                	.requestMatchers("/administrador/calendarios/**").authenticated()
+                	.requestMatchers("/auth/validate-totp").permitAll() 
+                    .requestMatchers("/auth/generate-qr").permitAll() // Permitir acceso sin autenticación
+                    .requestMatchers("/users/current/userId").authenticated() // Permitir acceso a cualquier usuario autenticado
+                    .requestMatchers("/api/meetings/**").authenticated() // Restringir acceso a empleados
+                    .requestMatchers("/auth/validate-token").permitAll() // Permitir acceso sin autenticación
+                    .requestMatchers("/invitations/**").hasAuthority("employee") // Solo empleados pueden invitar
+                    .requestMatchers("/admin/**").hasAuthority("admin")
+                    .requestMatchers("/employee/**").hasAuthority("employee") // Solo empleados pueden acceder
+                    .requestMatchers("/users/**").permitAll() // Solo usuarios pueden acceder
+                    .anyRequest().authenticated() // Cualquier otra solicitud requiere autenticación
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // Añadir filtro JWT
 
