@@ -14,7 +14,9 @@ public class CorsConfig implements WebMvcConfigurer {
         registry.addMapping("/**")
                 .allowedOrigins(
                         "https://sgart-v1.web.app", // Producción
-                        "http://localhost:3000"    // Desarrollo
+                        "http://localhost:3000", // Desarrollo
+                        "http://192.168.0.18:9000",
+                        "http://192.168.0.18"
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")

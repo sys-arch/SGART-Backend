@@ -31,10 +31,19 @@ public class NotificacionController {
 
     // Eliminar todas las notificaciones del usuario autenticado
     @DeleteMapping
-    public void eliminarTodas(Authentication authentication) {
-        UUID userId = UUID.fromString(authentication.getName()); // Obtener userId del token
-        notificacionService.eliminarTodas(userId);
+    public void eliminarTodas(Authentication authentication, @RequestParam(required = false) UUID userId) {
+        UUID usuarioId;
+
+        // Si se proporciona un userId, usarlo; si no, usar el del token (usuario autenticado)
+        if (userId != null) {
+            usuarioId = userId;
+        } else {
+            usuarioId = UUID.fromString(authentication.getName());
+        }
+
+        notificacionService.eliminarTodas(usuarioId);
     }
+
     
     @PutMapping("/marcar-leidas")
     public void marcarNotificacionesComoLeidas(@RequestParam UUID userId) {
