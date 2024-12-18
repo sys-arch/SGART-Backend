@@ -25,7 +25,9 @@ public class SecurityConfig {
             .cors(cors -> cors.configure(http))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/forgot-password").permitAll() 
-                .requestMatchers("/administrador/**").hasAuthority("admin")
+                .requestMatchers("/administrador/**").authenticated()
+            	.requestMatchers("/administrador/calendarios/invitados").authenticated()
+
             	.requestMatchers("/administrador/calendarios/**").authenticated()
             	.requestMatchers("/auth/validate-totp").permitAll() 
                 .requestMatchers("/auth/generate-qr").permitAll() // Permitir acceso sin autenticación

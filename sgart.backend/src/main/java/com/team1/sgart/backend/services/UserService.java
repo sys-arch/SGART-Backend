@@ -63,7 +63,8 @@ public class UserService {
 	        Optional<User> userToModify = userDao.findByEmail(user.getEmail());
 	        if (userToModify.isEmpty()) {
 	        	System.out.println("Email no encontrado: " + user.getEmail()); // Agrega esto
-	            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "El email no está registrado");	        }
+	            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "El email no está registrado");	        
+	            }
 
 	        User updatedUser = userToModify.get();
 	        actualizarCampo(updatedUser::setName, user.getName());
