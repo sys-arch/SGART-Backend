@@ -29,13 +29,13 @@ public class ValidationService {
         boolean registradoEnSistema = false;
 
         // Comprobar si el correo está registrado como usuario
-        Optional<User> usuarioExistente = userDao.findByEmail(email);
+        Optional<User> usuarioExistente = userDao.findByEmail(email.toLowerCase());
         if (usuarioExistente.isPresent()) {
             registradoEnSistema = true;
         }
 
         // Comprobar si el correo está registrado como administrador
-        Optional<Admin> adminExistente = adminDao.findByEmail(email);
+        Optional<Admin> adminExistente = adminDao.findByEmail(email.toLowerCase());
         if (adminExistente.isPresent()) {
             registradoEnSistema = true;
         }
