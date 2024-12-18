@@ -121,18 +121,17 @@ class UserControllerTest {
                 .content(userJson))
                 .andExpect(status().isBadRequest());
     }
-
-    // Tests para el método modificar
     @Test
     void usuarioValidoModificarDevuelve200() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         String userJson = objectMapper.writeValueAsString(user);
-        
+
         Mockito.doNothing().when(userService).modificarUser(user);
+
         mockMvc.perform(post(URLMODIFICAR).contentType(MediaType.APPLICATION_JSON)
                 .content(userJson))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Perfil modificado correctamente"));
+                .andExpect(jsonPath("$.message").value("Perfil modificado correctamente")); // Cambiado para verificar JSON
     }
 
     @Test

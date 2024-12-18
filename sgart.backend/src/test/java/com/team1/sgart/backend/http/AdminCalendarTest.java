@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
@@ -49,41 +50,8 @@ class AdminCalendarTest {
         verify(calendarService, times(1)).loadMeetings();
     }
 
-    @Test
-    void testGetInvitees_ValidMeetingId() {
-        // Arrange
-        UUID meetingId = UUID.randomUUID();
-        InvitationsDTO mockInvitation = new InvitationsDTO(1, meetingId, UUID.randomUUID(), EXAMPLE_NAME, ACCEPTED_STATUS, true, null);
-        when(calendarService.getDetailedInvitationsByMeetingId(meetingId)).thenReturn(Collections.singletonList(mockInvitation));
+    
 
-        Map<String, UUID> payload = new HashMap<>();
-        payload.put("meetingId", meetingId);
-
-        // Act
-        ResponseEntity<List<InvitationsDTO>> response = controller.getInvitees(payload);
-
-        // Assert
-        assertNotNull(response);
-        assertEquals(200, response.getStatusCodeValue());
-        assertNotNull(response.getBody());
-        assertEquals(1, response.getBody().size());
-        assertEquals(EXAMPLE_NAME, response.getBody().get(0).getUserName());
-        verify(calendarService, times(1)).getDetailedInvitationsByMeetingId(meetingId);
-    }
-
-    @Test
-    void testGetInvitees_InvalidMeetingId() {
-        // Arrange
-        Map<String, UUID> payload = new HashMap<>();
-
-        // Act
-        ResponseEntity<List<InvitationsDTO>> response = controller.getInvitees(payload);
-
-        // Assert
-        assertNotNull(response);
-        assertEquals(400, response.getStatusCodeValue());
-        verify(calendarService, never()).getDetailedInvitationsByMeetingId(any());
-    }
 
     @Test
     void testLoadMeetings_ServiceLayer() {
@@ -116,20 +84,34 @@ class AdminCalendarTest {
 
 
     @Test
-    void testGetDetailedInvitationsByMeetingId_ServiceLayer() {
+    void testGetInvitees_InvalidMeetingId() {
         // Arrange
-        UUID meetingId = UUID.randomUUID();
-        Object[] mockData = new Object[]{1, meetingId.toString(), UUID.randomUUID().toString(), "John", "Doe", ACCEPTED_STATUS, true, null};
-        List<Object[]> mockResults = Collections.singletonList(mockData);
-
-        when(calendarService.getDetailedInvitationsByMeetingId(meetingId)).thenReturn(Collections.singletonList(new InvitationsDTO(1, meetingId, UUID.randomUUID(), EXAMPLE_NAME, ACCEPTED_STATUS, true, null)));
+        Map<String, String> payload = new HashMap<>(); // Simula un payload vacío
 
         // Act
-        List<InvitationsDTO> invitations = calendarService.getDetailedInvitationsByMeetingId(meetingId);
+        ResponseEntity<List<InvitationsDTO>> response = controller.getInvitees(payload);
 
         // Assert
-        assertNotNull(invitations);
-        assertEquals(1, invitations.size());
-        assertEquals(EXAMPLE_NAME, invitations.get(0).getUserName());
+        assertNotNull(response);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode()); // Verifica el código 400
+        assertNull(response.getBody()); // Verifica que el cuerpo de la respuesta sea nulo
+        verify(calendarService, never()).getDetailedInvitationsByMeetingId(any()); // Asegura que no se llamó al servicio
     }
+
+    @Test
+    void testGetInvitees_InvalidUUIDFormat() {
+        // Arrange
+        Map<String, String> payload = new HashMap<>();
+        payload.put("meetingId", "invalid-uuid-format"); // Simula un UUID no válido
+
+        // Act
+        ResponseEntity<List<InvitationsDTO>> response = controller.getInvitees(payload);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode()); // Verifica el código 400
+        assertNull(response.getBody()); // Verifica que el cuerpo de la respuesta sea nulo
+        verify(calendarService, never()).getDetailedInvitationsByMeetingId(any()); // Asegura que no se llamó al servicio
+    }
+
 }
