@@ -3,6 +3,9 @@ package com.team1.sgart.backend.services;
 import java.util.List;
 import java.util.UUID;
 import com.team1.sgart.backend.dao.InvitationsDao;
+import com.team1.sgart.backend.dao.MeetingsDao;
+import com.team1.sgart.backend.dao.UserDao;
+import com.team1.sgart.backend.model.Meetings;
 
 import jakarta.transaction.Transactional;
 
@@ -17,6 +20,12 @@ public class InvitationsService {
 	
 	@Autowired
 	private NotificacionService notificacionService;
+	
+	@Autowired
+	private MeetingsDao meetingsDao;
+
+	@Autowired
+	private UserDao userDao;
 
     private static final Logger logger = LoggerFactory.getLogger(InvitationsService.class);
     private final InvitationsDao invitationsDao;
@@ -148,24 +157,66 @@ public class InvitationsService {
     
  // Notificar al usuario invitado
     public void notificarInvitacion(UUID meetingId, UUID userId) {
-        notificacionService.crearNotificacion(
-            userId,
-            "Nueva invitación a reunión",
-            "Has sido invitado a una reunión con ID: " + meetingId
-        );
+        try {
+            // Obtener detalles de la reunión
+            Meetings meeting = meetingsDao.findById(meetingId)
+                    .orElseThrow(() -> new RuntimeException("Reunión no encontrada"));
+
+            // Obtener el nombre completo del organizador
+            String organizerName = userDao.findUserFullNameById(meeting.getOrganizerId());
+
+            // Crear el mensaje de la notificación
+            String mensaje = String.format(
+                "Has sido invitado a la reunión \"%s\" organizada por %s el día %s.",
+                meeting.getMeetingTitle(),
+                organizerName,
+                meeting.getMeetingDate()
+            );
+
+            // Crear la notificación
+            notificacionService.crearNotificacion(
+                    userId,
+                    "Nueva invitación a reunión",
+                    mensaje
+            );
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error al generar la notificación: " + e.getMessage(), e);
+        }
     }
     
  // Notificar actualización del estado de invitación
     public void notificarActualizacionEstado(UUID meetingId, UUID userId, String nuevoEstado) {
-        String mensaje = nuevoEstado.equalsIgnoreCase("ACEPTADA")
-            ? "Has aceptado la reunión con ID: " + meetingId
-            : "Has rechazado la reunión con ID: " + meetingId;
+        try {
+            // Obtener detalles de la reunión
+            Meetings meeting = meetingsDao.findById(meetingId)
+                    .orElseThrow(() -> new RuntimeException("Reunión no encontrada"));
 
-        notificacionService.crearNotificacion(
-            userId,
-            "Actualización de invitación",
-            mensaje
-        );
+            // Obtener el nombre completo del invitado
+            String invitadoNombre = userDao.findUserFullNameById(userId);
+
+            // Obtener el ID del organizador
+            UUID organizerId = meeting.getOrganizerId();
+
+            // Crear el mensaje para el organizador
+            String mensajeOrganizador = String.format(
+                "El usuario %s ha %s la invitación a la reunión \"%s\" programada para el día %s.",
+                invitadoNombre,
+                nuevoEstado.equalsIgnoreCase("ACEPTADA") ? "aceptado" : "rechazado",
+                meeting.getMeetingTitle(),
+                meeting.getMeetingDate()
+            );
+
+            // Crear la notificación para el organizador
+            notificacionService.crearNotificacion(
+                    organizerId, // ID del organizador
+                    "Actualización de invitación",
+                    mensajeOrganizador
+            );
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error al generar la notificación de estado para el organizador: " + e.getMessage(), e);
+        }
     }
 
 }

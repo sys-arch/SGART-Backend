@@ -30,4 +30,10 @@ public class NotificacionService {
     public void eliminarTodas(UUID usuarioId) {
         notificaciondao.deleteByUsuarioId(usuarioId);
     }
+    
+    public void marcarComoLeidas(UUID userId) {
+        List<Notificacion> notificaciones = notificaciondao.findByUsuarioId(userId);
+        notificaciones.forEach(notificacion -> notificacion.setLeida(true));
+        notificaciondao.saveAll(notificaciones);
+    }
 }

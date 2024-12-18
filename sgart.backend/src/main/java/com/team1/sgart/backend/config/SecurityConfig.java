@@ -34,6 +34,7 @@ public class SecurityConfig {
                 .requestMatchers("/admin/**").permitAll() // Solo admin puede acceder
                 .requestMatchers("/employee/**").hasAuthority("employee") // Solo empleados pueden acceder
                 .requestMatchers("/users/**").permitAll() // Solo usuarios pueden acceder
+                .requestMatchers("/notificaciones/**").permitAll()
                 .anyRequest().authenticated() // Cualquier otra solicitud requiere autenticación
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // Añadir filtro JWT
