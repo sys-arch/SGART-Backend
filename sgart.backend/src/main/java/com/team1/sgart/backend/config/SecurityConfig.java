@@ -24,6 +24,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable()) // Deshabilitar CSRF
             .cors(cors -> cors.configure(http))
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/auth/forgot-password").permitAll() 
                 .requestMatchers("/administrador/**").hasAuthority("admin")
             	.requestMatchers("/administrador/calendarios/**").authenticated()
             	.requestMatchers("/auth/validate-totp").permitAll() 
