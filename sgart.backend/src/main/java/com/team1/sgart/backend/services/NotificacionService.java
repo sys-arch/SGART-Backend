@@ -4,6 +4,7 @@ import com.team1.sgart.backend.dao.NotificacionDao;
 import com.team1.sgart.backend.model.Notificacion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -27,6 +28,7 @@ public class NotificacionService {
         notificaciondao.deleteById(id);
     }
 
+    @Transactional
     public void eliminarTodas(UUID usuarioId) {
         notificaciondao.deleteByUsuarioId(usuarioId);
     }

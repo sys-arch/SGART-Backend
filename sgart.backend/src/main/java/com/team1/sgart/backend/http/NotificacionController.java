@@ -46,7 +46,9 @@ public class NotificacionController {
 
     
     @PutMapping("/marcar-leidas")
-    public void marcarNotificacionesComoLeidas(@RequestParam UUID userId) {
+    public void marcarNotificacionesComoLeidas(Authentication authentication) {
+        // Extraer el userId desde el token JWT
+        UUID userId = UUID.fromString(authentication.getName());
         notificacionService.marcarComoLeidas(userId);
     }
 }
